@@ -1,0 +1,132 @@
+[
+	// // Longer, fuller responses.
+	// {
+	// 	"response": "Thanks for explaining the ABC of CBT. I've been feeling anxious lately, and I think it was triggered by a job interview I had last week. The interview went well, but now I'm constantly worrying about whether I'll get the job or not.",
+		
+	// 	"has_activating_event": true,
+	// 	"had_thought": false
+	// },
+
+	// {
+	// 	"response": "I'm glad you're helping me navigate CBT. When I think about it, the activating event for my current feelings of guilt and regret was a mistake I made at work. I missed an important deadline, and now I can't stop replaying the situation in my mind.",
+	// 	"has_feeling": true,
+	// 	"has_activating_event": true,
+	// 	"has_thought": false
+	// },
+
+	// {
+	// 	"response": "I'm still getting the hang of CBT, but I think the activating event for my feelings of sadness was an argument I had with my partner. We've been having communication issues lately, and that argument just made everything feel worse.",
+	// 	"has_feeling": true,
+	// 	"has_activating_event": true,
+	// 	"has_thought": false
+	// },
+
+	// {
+	// 	"response": "This ABC concept in CBT sounds interesting. I believe the activating event for my frustration and irritability was getting stuck in traffic this morning. It made me late for an important meeting, and I felt so helpless sitting there in the congestion.",
+	// 	"has_feeling": true,
+	// 	"has_activating_event": true,
+	// 	"has_thought": false
+	// },
+
+	// {
+	// 	"response": "Thank you for explaining the ABC of CBT. The activating event that triggered my anxiety was receiving a rejection email from a university I applied to. I had set my heart on attending that school, and now I'm worried about my future academic prospects.",
+	// 	"has_feeling": true,
+	// 	"has_activating_event": true,
+	// 	"has_thought": false,
+	// },
+
+	// {
+	// 	"response": "I'm really new to CBT, but I think the activating event for my current feelings of insecurity was attending a social gathering where I didn't know many people. I felt out of place and constantly worried about what others were thinking of me.",
+	// 	"has_feeling": true,
+	// 	"has_activating_event": true,
+	// 	"has_thought": false,
+	// },
+
+	// {
+	// 	"response": "I'm still learning about CBT, but I think the activating event for my anger and resentment was a disagreement I had with a family member about a sensitive topic. We have different viewpoints, and it escalated into a heated argument that left me feeling hurt.",
+	// 	"has_feeling": true,
+	// 	"has_activating_event": true,
+	// 	"has_thought": false,
+	// },
+
+	// {
+	// 	"response": "I believe the activating event for my current feelings of disappointment was not getting the promotion I had been working towards. I had put in a lot of effort, and now I feel undervalued and unsure about my career path.",
+	// 	"has_feeling": true,
+	// 	"has_activating_event": true,
+	// 	"has_thought": true,
+	// },
+
+	// {
+	// 	"response": "Thanks for introducing me to CBT and the ABC framework. I think the activating event for my current feelings of loneliness was attending a social event where I didn't know anyone. I felt isolated and struggled to connect with others, which left me feeling down.",
+	// 	"has_feeling": true,
+	// 	"has_activating_event": true,
+	// 	"has_thought": true,
+	// },
+
+	// Shorter responses.
+	{
+		"feeling": ["angry", "resentful"],
+		"activation": "I had a fight with my sibling, and now I feel angry and resentful.",
+		"thought": "My sibling doesn't understand me, that they always provoke me, and that they never listen to my side of the story.",
+		"rephrase": "We have disagreements sometimes, but we can work on understanding each other's perspectives."
+	},
+
+	{
+		"feeling": ["frustrated", "stressed"],
+		"activation": "My car broke down, and I'm feeling frustrated and stressed.",
+		"thought": "Everything always goes wrong, that I can never catch a break, and that I'm constantly dealing with unnecessary obstacles.",
+		"rephrase": "It's a challenging situation, but I can find solutions and work through it step by step."
+	},
+
+	{
+		"feeling": ["disappointed", "discouraged"],
+		"activation": "I received a rejection letter, and now I feel disappointed and discouraged.",
+		"thought": "I'm not good enough, that I'll never achieve my goals, and that I should just give up because there's no point in trying anymore.",
+		"rephrase": "This particular opportunity didn't work out, but there are other possibilities out there, and I can continue pursuing my goals."
+	},
+
+	{
+		"feeling": ["guilty", "anxious"],
+		"activation": "I made a mistake at work, and I'm feeling guilty and anxious.",
+		"thought": "I'm a failure, that I should have known better, and that I've let everyone down."
+	},
+
+	{
+		"feeling": ["lonely", "rejected"],
+		"activation": "My partner canceled our plans, and now I feel lonely and rejected.",
+		"thought": "I'm not worthy of love and connection, that nobody truly cares about me, and that I'll always be alone."
+	},
+
+	{
+		"feeling": ["lonely", "rejected"],
+		"activation": "I received negative feedback, and it made me feel insecure and incompetent.",
+		"thought": "I'm a fraud, that everyone else is more capable than me, and that I'll never measure up to expectations."
+	},
+
+	{
+		"feeling": ["shocked", "anxious"],
+		"activation": "I witnessed an accident, and now I'm feeling shocked and anxious.",
+		"thought": "The world is a dangerous place, that I'm not safe anywhere, and that something terrible could happen at any moment."
+	},
+
+	{
+		"feeling": ["overwhelmed", "stressed"],
+		"activation": "I missed an important deadline, and now I'm feeling overwhelmed and stressed.",
+		"thought": "I can't handle everything, that I'm drowning in responsibilities, and that there's no way out of this never-ending cycle."
+	},
+
+	{
+		"feeling": ["panicked", "worried"],
+		"activation": "I lost my wallet, and now I feel panicked and worried.",
+		"thought": "I'm doomed, that I've lost everything, and that I'll never be able to recover from this situation."
+	},
+
+	{
+		"feeling": ["hurt", "misunderstood"],
+		"activation": "I had an argument with a friend, and now I feel hurt and misunderstood.",
+		"thought": "My friend doesn't care about me, that they intentionally hurt me, and that I'll never be able to trust them again."
+	}
+
+
+
+]
