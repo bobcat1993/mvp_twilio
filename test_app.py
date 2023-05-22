@@ -1,4 +1,5 @@
 import unittest
+import app as my_app
 from app import app
 from parameterized import parameterized
 import logging
@@ -17,7 +18,7 @@ class FeelingsTestCase(unittest.TestCase):
 		# 	'NEG', ['frustrated', 'stressed']),
 		# ('I\'m not sure', 'NEUTRAL', ['unsure']),
 		])
-	def test_your_endpoint(
+	def test_user_feeling(
 		self,
 		body: str,
 		sentiment: str,
@@ -40,12 +41,48 @@ class FeelingsTestCase(unittest.TestCase):
 	  # Assert the response data or any specific values in the response
 	  response_data = response.get_json()
 
-	  assert 'sentiment' in response_data
-	  assert 'feeling' in response_data 
-
-	  # TODO(tonicreswell) Uncomment once hooked up to llm.
 	  self.assertEqual(response_data['sentiment'], sentiment)
 	  assert any(i in response_data['feeling'] for i in feeling)
+
+	@parameterized.expand(
+		[
+			(
+				"NEG\n<feelings> Overwhelmed, helpless </feelings>",
+				Sentiment.NEG,
+				['overwhelmed', 'helpless'],
+			),
+			(
+				"POS\n<feelings> Hopeful, proactive </feelings>",
+				Sentiment.POS,
+				['hopeful', 'proactive'],
+			),
+			(
+				"POS\n<feelings> Good </feelings>",
+				Sentiment.POS,
+				['good'],
+			),
+			(
+				"NEUTRAL\n<feelings> Unsure </feelings>",
+				Sentiment.NEUTRAL,
+				['unsure']
+			),
+			(
+				"NEG\n<feelings> Not great </feelings>",
+				Sentiment.NEG,
+				['not great']
+			),
+
+		])
+	def test_feelings_post_process(self,
+		model_output,
+		sentiment: Sentiment,
+		feelings: list[str]):
+
+		output = my_app.feelings_post_process(model_output)
+
+		self.assertEqual(output['sentiment'], sentiment)
+		self.assertEqual(output['feelings'], feelings)
+
 
 if __name__ == '__main__':
     unittest.main()

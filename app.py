@@ -3,8 +3,9 @@
 These functions can be used later too in the final product.
 """
 from flask import Flask, jsonify, request
-import abc_types
+from abc_types import Sentiment
 import json
+import logging
 
 app = Flask(__name__)
 
@@ -64,8 +65,41 @@ def hello():
 # < NEG | POS | NEURTRAL >
 # <feeling> feeling_1, feeling_2, ... </feeling>.
 _FEELING_PROMPT = """
-For the following sentence please response with POS if the sentiment is positive, NEG if the sentiment is negative and NEUTRAL if the sentiment is neutral.  Then on the next line write <feelings> followed by a list of one word feelings expressed by the user, end this with </feeling>. "{feeling}"
+For the following sentence please response with POS if the sentiment is positive, NEG if the sentiment is negative and NEUTRAL if the sentiment is neutral.  Then on the next line write <feelings> followed by a list of one word feelings expressed by the user, end this with </feelings>. "{feeling}"
 """
+
+def feelings_post_process(model_output: str):
+
+	# Get the sentiment.
+	sentiment = None
+	if 'POS' in model_output:
+		sentiment = Sentiment.POS
+	elif 'NEG' in model_output:
+		sentiment = Sentiment.NEG
+	elif 'NEUTRAL' in model_output:
+		sentiment = Sentiment.NEUTRAL
+	else:
+		logging.warn('Sentiment in %s not detected!', model_output)
+
+	# Get the feelings.
+	feelings = None
+	if '<feelings>' in model_output:
+		model_output = model_output.split('<feelings>')[1]
+		if '</feelings>' in model_output:
+			model_output = model_output.split('</feelings>')[0]
+			feelings = [
+			f.lower().strip()for f in model_output.split(',')]
+		else:
+			logging.warn('No </feelings> key detected in %s.',
+				model_output)
+	else:
+		logging.warn('No <feelings> key detected in %s.',
+			model_output)
+
+	return dict(sentiment=sentiment, feelings=feelings)
+
+
+
 
 @app.post('/feeling')
 def user_feeling():
@@ -75,13 +109,17 @@ def user_feeling():
 	data = request.get_json()
 	message_body = data.get('Body')
 
+	# Create the feelings prompt.
 	prompt = _FEELING_PROMPT.format(
 		feeling=message_body['feeling'])
+
+	# Post-process the output to get the sentiment and feelings.
+	# TODO(toni)
 
 
 	# Prepare the response
 	response = {
-		'sentiment': abc_types.Sentiment.POS.value,
+		'sentiment': Sentiment.POS.value,
 		'feeling': 'good'.lower(),
 	}
 
