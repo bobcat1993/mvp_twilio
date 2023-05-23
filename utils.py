@@ -1,5 +1,7 @@
 """Util. functions."""
 
+import json
+import os
 
 def dummy_call_api(
 	origin: str,
@@ -44,6 +46,15 @@ def dummy_call_api(
 			"total_tokens": 12
 		}
 	}
+
+	# Save the response.
+	# We want to save all responses so that we have a clear record of what's been
+	# tried so far.
+	json_object = json.dumps(response)
+	path = os.path.join(out_dir, 'dummy_responses.json')
+	with open(path, "a") as outfile:
+		outfile.write(json_object)
+
 
 	# TODO(toni) Check finish reason! Needs to be "stop" not "length".
 	return response
