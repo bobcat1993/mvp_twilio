@@ -6,57 +6,11 @@ from flask import Flask, jsonify, request
 from abc_types import Sentiment
 import json
 import logging
+from utils import dummy_call_api as call_api
 
 app = Flask(__name__)
 
 OUT_DATA_PATH = 'data/gpt_outputs'
-
-
-def call_api(
-	origin: str,
-	model="dummy-model",  # gpt-3.5-turbo
-	prompt="Say this is a test",
-  max_tokens=7,
-  temperature=0,
-  ):
-	"""Dummy API call.
-
-	Save the response to OUT_DATA_PATH/{origin}-{xid}
-
-	Args:
-		origin: The origin of the api call.
-		model: The openAI model.
-		prompt: The prompt used.
-		max_tokens: The max. number of tokens to sample.
-		temperature: The sampling temp.
-
-	Returns:
-		A json.
-	"""
-
-	response = {
-		"id": "some-kind-of-id",
-		"object": "text_completion",
-		"created": 1589478378,
-		"model": "dummy-model",
-		"choices": [
-		  {
-		  "text": "\n\nThis is indeed a test",
-			"index": 0,
-			"logprobs": 'null',
-			"finish_reason": "length"
-		  }
-		],
-		"usage": {
-			"prompt_tokens": 5,
-			"completion_tokens": 7,
-			"total_tokens": 12
-		}
-	}
-
-	# TODO(toni) Check finish reason! Needs to be "stop" not "length".
-	return response
-
 
 @app.route('/')
 def hello():
@@ -114,7 +68,9 @@ def user_feeling():
 
 	# Call to the LLM
 	# TODO(toni) Call the LLM
-	model_output = call_api(origin='user_feeling')
+	model_output = call_api(
+		origin='user_feeling',
+		out_dir=OUT_DATA_PATH)
 	model_output = model_output['choices'][0]['text']
 
 	# Post-process the output to get the sentiment and feelings.
