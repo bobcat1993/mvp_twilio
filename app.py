@@ -25,6 +25,7 @@ For the following sentence please response with POS if the sentiment is positive
 """
 
 def feelings_post_process(model_output: str):
+	"""Post processing for the _FEELING_PROMPT prompt."""
 
 	# Get the sentiment.
 	sentiment = None
