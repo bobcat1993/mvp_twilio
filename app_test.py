@@ -47,41 +47,55 @@ class FeelingsTestCase(unittest.TestCase):
 	@parameterized.expand(
 		[
 			(
-				"NEG\n<feelings> Overwhelmed, helpless </feelings>",
+				'NEG\n<feelings> Overwhelmed, helpless </feelings>',
 				Sentiment.NEG.value,
 				['overwhelmed', 'helpless'],
 			),
 			(
-				"POS\n<feelings> Hopeful, proactive </feelings>",
+				'POS\n<feelings> Hopeful, proactive </feelings>',
 				Sentiment.POS.value,
 				['hopeful', 'proactive'],
 			),
 			(
-				"POS\n<feelings> Good </feelings>",
+				'POS\n<feelings> Good </feelings>',
 				Sentiment.POS.value,
 				['good'],
 			),
 			(
-				"NEUTRAL\n<feelings> Unsure </feelings>",
+				'NEUTRAL\n<feelings> Unsure </feelings>',
 				Sentiment.NEUTRAL.value,
 				['unsure']
 			),
 			(
-				"NEG\n<feelings> Not great </feelings>",
+				'NEG\n<feelings> Not great </feelings>',
 				Sentiment.NEG.value,
 				['not great']
+			),
+			(
+				(
+					'NEG\n<feelings> Not great </feelings>'
+					'\n<event>Lost your phone</event>'
+				),
+				Sentiment.NEG.value,
+				['not great'],
+				'lost your phone',
+
 			),
 
 		])
 	def test_feelings_post_process(self,
 		model_output,
 		sentiment: Sentiment,
-		feelings: list[str]):
+		feelings: list[str],
+		event: str = None):
 
 		output = my_app.feelings_post_process(model_output)
 
 		self.assertEqual(output['sentiment'], sentiment)
 		self.assertEqual(output['feelings'], feelings)
+
+		if event:
+			self.assertEqual(output['event'], event)
 
 
 if __name__ == '__main__':

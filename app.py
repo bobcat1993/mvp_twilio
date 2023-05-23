@@ -7,6 +7,7 @@ from abc_types import Sentiment
 import json
 import logging
 from utils import dummy_call_api as call_api
+import copy
 
 app = Flask(__name__)
 
@@ -21,7 +22,7 @@ def hello():
 # < NEG | POS | NEURTRAL >
 # <feeling> feeling_1, feeling_2, ... </feeling>.
 _FEELING_PROMPT = """
-For the following sentence please response with POS if the sentiment is positive, NEG if the sentiment is negative and NEUTRAL if the sentiment is neutral.  Then on the next line write <feelings> followed by a list of one word feelings expressed by the user, end this with </feelings>. "{feeling}"
+For the following sentence please response with POS is the sentiment is positive, NEG if the sentiment is negative and NEUTRAL if the sentiment is neutral.  Then on the next line write <feelings> followed by a list of one word feelings expressed by the use, end this with </feeling>. If the sentence also includes an event include then on the next line write <event> followed by the event that was described, end this with </event>. The event should be described in the second person and be a complete sentence. "{feeling}"
 """
 
 def feelings_post_process(model_output: str):
@@ -40,20 +41,38 @@ def feelings_post_process(model_output: str):
 
 	# Get the feelings.
 	feelings = None
-	if '<feelings>' in model_output:
-		model_output = model_output.split('<feelings>')[1]
-		if '</feelings>' in model_output:
-			model_output = model_output.split('</feelings>')[0]
+	model_output_ = copy.copy(model_output)
+	if '<feelings>' in model_output_:
+		model_output_ = model_output_.split('<feelings>')[1]
+		if '</feelings>' in model_output_:
+			model_output_ = model_output_.split('</feelings>')[0]
 			feelings = [
-			f.lower().strip()for f in model_output.split(',')]
+				f.lower().strip()for f in model_output_.split(',')]
 		else:
 			logging.warning('No </feelings> key detected in %s.',
-				model_output)
+				model_output_)
 	else:
 		logging.warning('No <feelings> key detected in %s.',
+			model_output_)
+
+	# If there is an event, get the event.
+	event = None
+	model_output_ = copy.copy(model_output)
+	if '<event>' in model_output_:
+		model_output_ = model_output_.split('<event>')[1]
+		if '</event>' in model_output_:
+			model_output_ = model_output_.split('</event>')[0]
+			event = model_output_.lower().strip()
+		else:
+			logging.warning('No </event> key detected in %s.',
+				model_output)
+	else:
+		logging.warning('No <event> key detected in %s.',
 			model_output)
 
-	return dict(sentiment=sentiment, feelings=feelings)
+
+	return dict(
+		sentiment=sentiment, feelings=feelings, event=event)
 
 @app.post('/feeling')
 def user_feeling():
@@ -78,11 +97,13 @@ def user_feeling():
 	response = feelings_post_process(model_output)
 
 	# Prepare the response.
+	# TODO(toni) Format feelings into a feelings string.
 	response = {
 		# TODO(toni) REPLACE WITH: response['sentiment'],
 		'sentiment': Sentiment.POS.value, 
 		# TODO(toni) REPLACE WITH: response['feelings']
 		'feelings': 'good',
+		'event': response['event']
 	}
 
 	# Return a JSON response
