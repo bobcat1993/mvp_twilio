@@ -43,7 +43,7 @@ def call_api(
 		  {
 		  "text": "\n\nThis is indeed a test",
 			"index": 0,
-			"logprobs": null,
+			"logprobs": 'null',
 			"finish_reason": "length"
 		  }
 		],
@@ -53,6 +53,8 @@ def call_api(
 			"total_tokens": 12
 		}
 	}
+
+	# TODO(toni) Check finish reason! Needs to be "stop" not "length".
 	return response
 
 
@@ -73,13 +75,13 @@ def feelings_post_process(model_output: str):
 	# Get the sentiment.
 	sentiment = None
 	if 'POS' in model_output:
-		sentiment = Sentiment.POS
+		sentiment = Sentiment.POS.value
 	elif 'NEG' in model_output:
-		sentiment = Sentiment.NEG
+		sentiment = Sentiment.NEG.value
 	elif 'NEUTRAL' in model_output:
-		sentiment = Sentiment.NEUTRAL
+		sentiment = Sentiment.NEUTRAL.value
 	else:
-		logging.warn('Sentiment in %s not detected!', model_output)
+		logging.warning('Sentiment in %s not detected!', model_output)
 
 	# Get the feelings.
 	feelings = None
@@ -90,16 +92,13 @@ def feelings_post_process(model_output: str):
 			feelings = [
 			f.lower().strip()for f in model_output.split(',')]
 		else:
-			logging.warn('No </feelings> key detected in %s.',
+			logging.warning('No </feelings> key detected in %s.',
 				model_output)
 	else:
-		logging.warn('No <feelings> key detected in %s.',
+		logging.warning('No <feelings> key detected in %s.',
 			model_output)
 
 	return dict(sentiment=sentiment, feelings=feelings)
-
-
-
 
 @app.post('/feeling')
 def user_feeling():
@@ -113,14 +112,20 @@ def user_feeling():
 	prompt = _FEELING_PROMPT.format(
 		feeling=message_body['feeling'])
 
+	# Call to the LLM
+	# TODO(toni) Call the LLM
+	model_output = call_api(origin='user_feeling')
+	model_output = model_output['choices'][0]['text']
+
 	# Post-process the output to get the sentiment and feelings.
-	# TODO(toni)
+	response = feelings_post_process(model_output)
 
-
-	# Prepare the response
+	# Prepare the response.
 	response = {
-		'sentiment': Sentiment.POS.value,
-		'feeling': 'good'.lower(),
+		# TODO(toni) REPLACE WITH: response['sentiment'],
+		'sentiment': Sentiment.POS.value, 
+		# TODO(toni) REPLACE WITH: response['feelings']
+		'feelings': 'good',
 	}
 
 	# Return a JSON response

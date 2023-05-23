@@ -42,33 +42,33 @@ class FeelingsTestCase(unittest.TestCase):
 	  response_data = response.get_json()
 
 	  self.assertEqual(response_data['sentiment'], sentiment)
-	  assert any(i in response_data['feeling'] for i in feeling)
+	  assert any(i in response_data['feelings'] for i in feeling)
 
 	@parameterized.expand(
 		[
 			(
 				"NEG\n<feelings> Overwhelmed, helpless </feelings>",
-				Sentiment.NEG,
+				Sentiment.NEG.value,
 				['overwhelmed', 'helpless'],
 			),
 			(
 				"POS\n<feelings> Hopeful, proactive </feelings>",
-				Sentiment.POS,
+				Sentiment.POS.value,
 				['hopeful', 'proactive'],
 			),
 			(
 				"POS\n<feelings> Good </feelings>",
-				Sentiment.POS,
+				Sentiment.POS.value,
 				['good'],
 			),
 			(
 				"NEUTRAL\n<feelings> Unsure </feelings>",
-				Sentiment.NEUTRAL,
+				Sentiment.NEUTRAL.value,
 				['unsure']
 			),
 			(
 				"NEG\n<feelings> Not great </feelings>",
-				Sentiment.NEG,
+				Sentiment.NEG.value,
 				['not great']
 			),
 
