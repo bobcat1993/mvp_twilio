@@ -1,6 +1,9 @@
 """The Flask App to act as an API for our Twilio app. 
 
 These functions can be used later too in the final product.
+
+TODOs:
+- Add data logging based on people's numbers.
 """
 from flask import Flask, jsonify, request
 from abc_types import Sentiment
@@ -73,6 +76,21 @@ def feelings_post_process(model_output: str):
 
 	return dict(
 		sentiment=sentiment, feelings=feelings, event=event)
+
+
+@app.post('/feeling_test')
+def user_feeling_test():
+	"""TEST Response to: How are you feeling today?"""
+	# Prepare the response.
+	# TODO(toni) Format feelings into a feelings string.
+	response = {
+		'sentiment': Sentiment.NEG.value, 
+		'feelings': 'sad',
+		'event': 'had an argument with a friend'
+	}
+
+	# Return a JSON response
+	return jsonify(response)
 
 @app.post('/feeling')
 def user_feeling():
