@@ -4,6 +4,8 @@ These functions can be used later too in the final product.
 
 TODOs:
 - Add data logging based on people's numbers.
+- Deal with multiple distortions.
+- Share the distortion name with the user.
 """
 from flask import Flask, jsonify, request
 from abc_types import Sentiment
@@ -123,6 +125,18 @@ def distortion_detection_post_processing(model_output: str) -> str:
 		logging.warning('The question, %s, does not end with a "?".')
 
 	return dict(distortion=distortion, question=question)
+
+@app.post('/distortions_test')
+def detect_distortions_test():
+	"""TEST Detect distortions in the users belief."""
+	# Prepare the response.
+	response = {
+		'distortion': 'Personalization', 
+		'question': 'Are there any external factors or circumstances that contributed to the outcome, or are you solely responsible for the perceived failure?',
+	}
+
+	# Return a JSON response
+	return jsonify(response)
 
 @app.post('/distortions')
 def detect_distortions():
