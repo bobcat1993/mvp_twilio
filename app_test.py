@@ -120,7 +120,7 @@ class FeelingsTestCase(unittest.TestCase):
 				'\n<question> What evidence do you have that supports the belief that you\'re not worthy of love and connection? Are there any experiences or relationships that contradict this belief? </question>',
 				'Negative self-beliefs',
 				'What evidence do you have that supports the belief that you\'re not worthy of love and connection? Are there any experiences or relationships that contradict this belief?'
-			)
+			),
 			(
 				'<distortion> Personalization </distortion>\n'
 				'<question> Are there any external factors or circumstances that contributed to the outcome, or are you solely responsible for the perceived failure? </question>',
@@ -138,6 +138,32 @@ class FeelingsTestCase(unittest.TestCase):
 
 		self.assertEqual(output['distortion'], distortion)
 		self.assertEqual(output['question'], question)
+
+	# TODO(toni) make param'ed test: 
+	@parameterized.expand([
+		('I\'m doomed, that I\'ve lost everything, and that I\'ll never be able to recover from this situation.'),
+		('I can\'t handle everything, that I\'m drowning in responsibilities, and that there\'s no way out of this never-ending cycle.')
+		])
+	def test_detect_distortions(self, belief):
+	  # Create a sample request payload to simulate the data sent by 
+	  # Twilio
+	  payload = {
+	      'Body': {'belief': belief},
+	      'From': '+1234567890'
+	  }
+
+	  # Send a POST request to the endpoint with the sample payload
+	  logging.info('app:', self.app)
+	  response = self.app.post('/belief', json=payload)
+	  logging.info('response %s', response)
+
+	  # Assert the response status code
+	  # self.assertEqual(response.status_code, 200)
+
+	  # Assert the response data or any specific values in the response
+	  response_data = response.get_json()
+
+	  # TODO(toni) Add asserts when we are using the LLM.
 
 
 if __name__ == '__main__':
