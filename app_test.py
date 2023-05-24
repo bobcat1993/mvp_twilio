@@ -121,6 +121,12 @@ class FeelingsTestCase(unittest.TestCase):
 				'Negative self-beliefs',
 				'What evidence do you have that supports the belief that you\'re not worthy of love and connection? Are there any experiences or relationships that contradict this belief?'
 			)
+			(
+				'<distortion> Personalization </distortion>\n'
+				'<question> Are there any external factors or circumstances that contributed to the outcome, or are you solely responsible for the perceived failure? </question>',
+				'Personalization',
+				'Are there any external factors or circumstances that contributed to the outcome, or are you solely responsible for the perceived failure?'
+			)
 
 		])
 	def test_distortion_detection_post_processing(self,
