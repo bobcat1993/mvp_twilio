@@ -26,8 +26,5 @@ class UtilsTest(unittest.TestCase):
 		output = utils.post_process_tags(text, tag)
 		self.assertEqual(output, expected)
 
-
-
-
 if __name__ == '__main__':
     unittest.main()
