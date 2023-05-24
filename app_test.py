@@ -97,6 +97,42 @@ class FeelingsTestCase(unittest.TestCase):
 		if event:
 			self.assertEqual(output['event'], event)
 
+	@parameterized.expand(
+		[
+			(
+				'<distortion> Catastrophizing </distortion>'
+				'\n<question> What evidence is there to support the belief that you\'re doomed and will never be able to recover from this situation? </question>'
+				'\n\n<distortion> Overgeneralization </distortion>'
+				'\n<question> Have you faced similar situations in the past where you were able to recover? </question>'
+				'\n\n<distortion> Emotional reasoning </distortion>'
+				'\n<question> Are your feelings of doom and hopelessness based on facts or more on how you\'re currently feeling? </question>',
+				'Catastrophizing',
+				'What evidence is there to support the belief that you\'re doomed and will never be able to recover from this situation?',
+			),
+			(
+				'<distortion> Impostor Syndrome </distortion>'
+				'\n<question> Hey, can you think of any specific accomplishments or skills that demonstrate your capability and competence? </question>',
+				'Impostor Syndrome',
+				'Hey, can you think of any specific accomplishments or skills that demonstrate your capability and competence?'
+			),
+			(
+				'<distortion> Negative self-beliefs </distortion>'
+				'\n<question> What evidence do you have that supports the belief that you\'re not worthy of love and connection? Are there any experiences or relationships that contradict this belief? </question>',
+				'Negative self-beliefs',
+				'What evidence do you have that supports the belief that you\'re not worthy of love and connection? Are there any experiences or relationships that contradict this belief?'
+			)
+
+		])
+	def test_distortion_detection_post_processing(self,
+		model_outupt,
+		distortion: str,
+		question: str):
+
+		output = my_app.distortion_detection_post_processing(model_outupt)
+
+		self.assertEqual(output['distortion'], distortion)
+		self.assertEqual(output['question'], question)
+
 
 if __name__ == '__main__':
     unittest.main()

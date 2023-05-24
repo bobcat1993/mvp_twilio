@@ -29,8 +29,8 @@ _FEELING_PROMPT = """
 For the following sentence please response with POS is the sentiment is positive, NEG if the sentiment is negative and NEUTRAL if the sentiment is neutral.  Then on the next line write <feelings> followed by a list of one word feelings expressed by the use, end this with </feelings>. If the sentence also includes an event include then on the next line write <event> followed by the event that was described, end this with </event>. The event should be described in the second person and be a complete sentence. "{feeling}".
 """
 
-def feelings_post_process(model_output: str):
-	"""Post processing for the _FEELING_PROMPT prompt."""
+def feelings_post_process(model_output: str) -> str:
+	"""Post processes outputs from the _FEELING_PROMPT prompt."""
 
 	# Get the sentiment.
 	sentiment = None
@@ -47,10 +47,12 @@ def feelings_post_process(model_output: str):
 	feelings = utils.post_process_tags(model_output, 'feelings')
 	if feelings:
 		# If not None, feelings needs to be a list of feelings.
-		feelings = [f.strip() for f in feelings.split(',')]
+		feelings = [f.strip().lower() for f in feelings.split(',')]
 
 	# If there is an event, get the event.
 	event = utils.post_process_tags(model_output, 'event')
+	if event:
+		event = event.lower()
 
 	return dict(
 		sentiment=sentiment, feelings=feelings, event=event)
@@ -79,6 +81,7 @@ def user_feeling():
 	message_body = data.get('Body')
 
 	# Create the feelings prompt.
+	# The "feeling" key comes from the http_feeling widget on the Twilio side.
 	prompt = _FEELING_PROMPT.format(
 		feeling=message_body['feeling'])
 
@@ -110,14 +113,45 @@ _DISTORTION_DETECTION_PROMPT = """
 For the following sentence you need to identify the distortions in the users thinking and pose a question to help them realise that distortion. For distortion question pair you must start on a new line with the key <distortion> followed by the distortion, end this with </distortion>. Then on the next line write <question> followed by a question that would help someone identify the distortion, end this with </question>. The question should not directly reference the distortion and should be relevant to the original sentence. "{belief}."
 """
 
+def distortion_detection_post_processing(model_output: str) -> str:
+	"""Post processes outputs from the _DISTORTION_DETECTION_PROMPT prompt."""
+
+	distortion = utils.post_process_tags(model_output, 'distortion')
+	question = utils.post_process_tags(model_output, 'question')
+
+	if not question.endswith('?'):
+		logging.warning('The question, %s, does not end with a "?".')
+
+	return dict(distortion=distortion, question=question)
+
 @app.post('/distortions')
 def detect_distortions():
 	"""Detect distortions in the users belief."""
 
+	# Retrieve data from the request sent by Twilio
+	data = request.get_json()
+	message_body = data.get('Body')
 
+	# Create the feelings prompt.
+	# The "belief" key comes from the http_detect_distortions widget on the Twilio side.
+	prompt = _FEELING_PROMPT.format(belief=message_body['belief'])
 
+	# Call to the LLM
+	# TODO(toni) Call the LLM
+	model_output = call_api(
+		origin='detect_distortions',
+		out_dir=OUT_DATA_PATH)
+	model_output = model_output['choices'][0]['text']
 
+	# The model may have recognised several distortions (separated by '\n\n').
+	# For now just take one of these.
+	# TODO(toni) Use all of the distortions.
+	model_output = model_output.split('\n\n')[0]
 
+	# Post process the response to get the distortion and question to ask the user.
+	response = distortion_detection_post_processing(model_output)
+
+	return jsonify(response)
 
 
 if __name__ == "__main__":
