@@ -77,7 +77,7 @@ def post_process_tags(text: str, tag: str):
 	if f'<{tag}>' in text:
 		text = text.split(f'<{tag}>')[1]
 		if f'</{tag}>' in text:
-			return text.split(f'</{tag}>')[0].strip('. ').lower()
+			return text.split(f'</{tag}>')[0].strip('. ')
 		else:
 			logging.warning('No </%s> key detected in %s.',
 				tag, text)

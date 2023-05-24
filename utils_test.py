@@ -20,8 +20,8 @@ class UtilsTest(unittest.TestCase):
 			"tag2", "another"),
 		("<tag1> and </tag1>\n<tag2> another </tag1>",
 			"tag2", None),
-		("<tag> And it was FUN </tag>", "tag", "and it was fun"),
-		("<tag> And it was FUN. </tag>", "tag", "and it was fun"),
+		("<tag> And it was FUN </tag>", "tag", "And it was FUN"),
+		("<tag> And it was FUN. </tag>", "tag", "And it was FUN"),
 		])
 	def test_post_process_tags(self, text, tag, expected):
 
