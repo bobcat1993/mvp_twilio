@@ -85,7 +85,7 @@ def user_feeling_test():
 	# TODO(toni) Format feelings into a feelings string.
 	response = {
 		'sentiment': Sentiment.NEG.value, 
-		'feelings': 'sad',
+		'feelings': ['sad', 'angry'],
 		'event': 'had an argument with a friend'
 	}
 
