@@ -2,6 +2,7 @@
 
 import json
 import os
+import logging
 
 def dummy_call_api(
 	origin: str,
@@ -11,7 +12,7 @@ def dummy_call_api(
   max_tokens=7,
   temperature=0,
   ):
-	"""Dummy API call.
+	"""Calls a dummy API.
 
 	Save the response to OUT_DATA_PATH/{origin}-{xid}
 
@@ -58,3 +59,37 @@ def dummy_call_api(
 
 	# TODO(toni) Check finish reason! Needs to be "stop" not "length".
 	return response
+
+
+def post_process_tags(text: str, tag: str):
+	"""Extracts text from between <tag> and </tag>.
+
+	Args:
+		text: The input text.
+		tag: The tag without the <>.
+
+	Returns:
+		The text between the tags. For example if text=<tag> and </tag>,
+		the function returns "and".
+	"""
+
+	output = None
+	if f'<{tag}>' in text:
+		text = text.split(f'<{tag}>')[1]
+		if f'</{tag}>' in text:
+			return text.split(f'</{tag}>')[0].strip()
+		else:
+			logging.warning('No </%s> key detected in %s.',
+				tag, text)
+	else:
+		logging.warning('No <%s> key detected in %s.',
+			tag, text)
+
+
+
+
+
+
+
+
+
