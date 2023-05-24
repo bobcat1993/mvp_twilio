@@ -10,6 +10,7 @@ from abc_types import Sentiment
 import json
 import logging
 from utils import dummy_call_api as call_api
+import utils
 import copy
 
 app = Flask(__name__)
@@ -25,7 +26,7 @@ def hello():
 # < NEG | POS | NEURTRAL >
 # <feeling> feeling_1, feeling_2, ... </feeling>.
 _FEELING_PROMPT = """
-For the following sentence please response with POS is the sentiment is positive, NEG if the sentiment is negative and NEUTRAL if the sentiment is neutral.  Then on the next line write <feelings> followed by a list of one word feelings expressed by the use, end this with </feeling>. If the sentence also includes an event include then on the next line write <event> followed by the event that was described, end this with </event>. The event should be described in the second person and be a complete sentence. "{feeling}"
+For the following sentence please response with POS is the sentiment is positive, NEG if the sentiment is negative and NEUTRAL if the sentiment is neutral.  Then on the next line write <feelings> followed by a list of one word feelings expressed by the use, end this with </feelings>. If the sentence also includes an event include then on the next line write <event> followed by the event that was described, end this with </event>. The event should be described in the second person and be a complete sentence. "{feeling}".
 """
 
 def feelings_post_process(model_output: str):
@@ -43,36 +44,13 @@ def feelings_post_process(model_output: str):
 		logging.warning('Sentiment in %s not detected!', model_output)
 
 	# Get the feelings.
-	feelings = None
-	model_output_ = copy.copy(model_output)
-	if '<feelings>' in model_output_:
-		model_output_ = model_output_.split('<feelings>')[1]
-		if '</feelings>' in model_output_:
-			model_output_ = model_output_.split('</feelings>')[0]
-			feelings = [
-				f.lower().strip()for f in model_output_.split(',')]
-		else:
-			logging.warning('No </feelings> key detected in %s.',
-				model_output_)
-	else:
-		logging.warning('No <feelings> key detected in %s.',
-			model_output_)
+	feelings = utils.post_process_tags(model_output, 'feelings')
+	if feelings:
+		# If not None, feelings needs to be a list of feelings.
+		feelings = [f.strip() for f in feelings.split(',')]
 
 	# If there is an event, get the event.
-	event = None
-	model_output_ = copy.copy(model_output)
-	if '<event>' in model_output_:
-		model_output_ = model_output_.split('<event>')[1]
-		if '</event>' in model_output_:
-			model_output_ = model_output_.split('</event>')[0]
-			event = model_output_.lower().strip()
-		else:
-			logging.warning('No </event> key detected in %s.',
-				model_output)
-	else:
-		logging.warning('No <event> key detected in %s.',
-			model_output)
-
+	event = utils.post_process_tags(model_output, 'event')
 
 	return dict(
 		sentiment=sentiment, feelings=feelings, event=event)
@@ -126,6 +104,20 @@ def user_feeling():
 
 	# Return a JSON response
 	return jsonify(response)
+
+
+_DISTORTION_DETECTION_PROMPT = """
+For the following sentence you need to identify the distortions in the users thinking and pose a question to help them realise that distortion. For distortion question pair you must start on a new line with the key <distortion> followed by the distortion, end this with </distortion>. Then on the next line write <question> followed by a question that would help someone identify the distortion, end this with </question>. The question should not directly reference the distortion and should be relevant to the original sentence. "{belief}."
+"""
+
+@app.post('/distortions')
+def detect_distortions():
+	"""Detect distortions in the users belief."""
+
+
+
+
+
 
 
 if __name__ == "__main__":
