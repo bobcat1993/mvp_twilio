@@ -165,6 +165,39 @@ class FeelingsTestCase(unittest.TestCase):
 
 	  # TODO(toni) Add asserts when we are using the LLM.
 
+	def test_save_abc_data(self):
+		# Create a sample request payload to simulate the data sent by 
+	  # Twilio
+	  payload = {
+	      'Body': {
+	      	"user_feeling": 'dummy_user_feeling',
+					"bot_feeling": dict(
+						sentiment='POS', feelings=['sad'], event=None),
+					"user_event": 'dummy_user_event',
+					"user_belief": 'dummy_user_belief',
+					"bot_distortions": dict(
+						distortion='dummy_distortion',
+						question='dummy_question'),
+					"user_rephrase": 'dummy_user_rephrase',
+					"user_easy": 'dummy_easy_score',
+					"user_feel_after": 'dummy_feeling_after_score',
+					"user_feedback": 'dummy_user_feedback',
+					"flow_vars": 'dummy_flow_vars',
+					"flow_sid": 'dummy_sid',
+					"flow_variable": 'dummy_flow_variable',
+					# So we know that this is a test sample.
+					"origin": "test"
+					},
+
+	      'From': '+1234567890'
+	  }
+
+	  logging.info('app:', self.app)
+	  response = self.app.post('/save_abc_data', json=payload)
+	  logging.info('response %s', response)
+	  self.assertEqual(response.status_code, 200)
+
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -14,10 +14,12 @@ import logging
 from utils import dummy_call_api as call_api
 import utils
 import copy
+import os
 
 app = Flask(__name__)
 
-OUT_DATA_PATH = 'data/gpt_outputs'
+OUT_GPT_DATA_PATH = 'data/gpt_outputs'
+OUT_FLOW_DATA_PATH = 'data/flow_outputs'
 
 @app.route('/')
 def hello():
@@ -91,7 +93,7 @@ def user_feeling():
 	# TODO(toni) Call the LLM
 	model_output = call_api(
 		origin='user_feeling',
-		out_dir=OUT_DATA_PATH)
+		out_dir=OUT_GPT_DATA_PATH)
 	model_output = model_output['choices'][0]['text']
 
 	# Post-process the output to get the sentiment and feelings.
@@ -148,13 +150,14 @@ def detect_distortions():
 
 	# Create the feelings prompt.
 	# The "belief" key comes from the http_detect_distortions widget on the Twilio side.
-	prompt = _FEELING_PROMPT.format(belief=message_body['belief'])
+	prompt = _DISTORTION_DETECTION_PROMPT.format(
+		belief=message_body['belief'])
 
 	# Call to the LLM
 	# TODO(toni) Call the LLM
 	model_output = call_api(
 		origin='detect_distortions',
-		out_dir=OUT_DATA_PATH)
+		out_dir=OUT_GPT_DATA_PATH)
 	model_output = model_output['choices'][0]['text']
 
 	# The model may have recognised several distortions (separated by '\n\n').
@@ -166,6 +169,24 @@ def detect_distortions():
 	response = distortion_detection_post_processing(model_output)
 
 	return jsonify(response)
+
+
+@app.post('/save_abc_data')
+def save_abc_data():
+	"""Saves data at the end of the ABC chat."""
+
+	# Retrieve data from the request sent by Twilio
+	data = request.get_json()
+	message_body = data.get('Body')
+
+
+	# Save the data
+	json_object = json.dumps(message_body, indent=2)
+	path = os.path.join(OUT_FLOW_DATA_PATH, 'flow_response.json')
+	with open(path, "a") as outfile:
+		outfile.write(json_object)
+
+	return jsonify({})
 
 
 if __name__ == "__main__":
