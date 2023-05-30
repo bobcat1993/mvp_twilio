@@ -4,6 +4,17 @@ import json
 import os
 import logging
 
+import openai
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Set up the openai LLM client.
+def setup_openai():
+	openai.organization = "org-PIBY8HetnWz6gzQASJ8TOy8d"
+	openai.api_key = os.getenv("OPENAI_API_KEY")
+	return openai.Model.list()
+
 def dummy_call_api(
 	origin: str,
 	out_dir: str,
@@ -30,23 +41,22 @@ def dummy_call_api(
 
 	response = {
 		"id": "some-kind-of-id",
-		"object": "text_completion",
-		"created": 1589478378,
-		"model": "dummy-model",
-		"choices": [
-		  {
-		  "text": "\n\nThis is indeed a test",
+	  "object": "chat.completion",
+	  "created": 1677652288,
+	  "choices": [{
 			"index": 0,
-			"logprobs": 'null',
-			"finish_reason": "length"
-		  }
-		],
+			"message": {
+				"role": "assistant",
+				"content": "\n\nThis is a test!",
+			},
+			"finish_reason": "stop"
+	  }],
 		"usage": {
-			"prompt_tokens": 5,
-			"completion_tokens": 7,
-			"total_tokens": 12
+			"prompt_tokens": 9,
+			"completion_tokens": 12,
+			"total_tokens": 21
+			}
 		}
-	}
 
 	# Save the response.
 	# We want to save all responses so that we have a clear record of what's been
@@ -56,6 +66,49 @@ def dummy_call_api(
 	with open(path, "a") as outfile:
 		outfile.write(json_object)
 
+
+	# TODO(toni) Check finish reason! Needs to be "stop" not "length".
+	return response
+
+
+def call_api(
+	origin: str,
+	out_dir: str,
+	prompt: str,
+	model="gpt-3.5-turbo",
+  max_tokens=32,
+  temperature=1,
+  ):
+	"""Call the OpenAI API to get a response.
+
+	Args:
+		origin: Which function is this api being called from?
+		out_dir: Where to save the response. We always want to save
+			responses to keep track of things we have tried.
+		prompt: The input prompt to the model.
+		model: The chat model we want to use.
+		max_tokens: The max tokens we want to sample.
+		temperature: The temperature to sample with, default to 1. Lower
+			values are more stochastic, values close to one are more
+			deterministic.
+	"""
+	setup_openai()
+
+	response = openai.ChatCompletion.create(
+		model="gpt-3.5-turbo",
+		# TODO(toni) Use the system role to personalise the bot.
+		# e.g. {"role": "system", "content": "You are a helpful bot."}
+		messages=[{"role": "user", "content": prompt}],
+		max_tokens=max_tokens,
+		)
+
+	# Save the response.
+	# We want to save all responses so that we have a clear record of what's been
+	# tried so far.
+	json_object = json.dumps(response, indent=2)
+	path = os.path.join(out_dir, 'openai_api_calls.json')
+	with open(path, "a") as outfile:
+		outfile.write(json_object)
 
 	# TODO(toni) Check finish reason! Needs to be "stop" not "length".
 	return response

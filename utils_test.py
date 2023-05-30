@@ -12,7 +12,25 @@ class UtilsTest(unittest.TestCase):
 		response = utils.dummy_call_api(
 			origin='test_dummy_call_api',
 			out_dir='data/gpt_outputs')
+
 		self.assertIsNotNone(response)
+		self.assertIsNotNone(response['choices'][0]['message']['content'])
+
+	def test_setup_openai(self):
+		model_list = utils.setup_openai()
+		logging.info(model_list)
+
+		self.assertIsNotNone(model_list)
+
+	def test_call_api(self):
+
+		response = utils.call_api(
+			origin='test_call_api',
+			out_dir='data/gpt_outputs',
+			prompt='This is a test.',
+			max_tokens=1)
+		self.assertIsNotNone(response)
+		self.assertIsNotNone(response['choices'][0]['message']['content'])
 
 	@parameterized.expand([
 		("<tag> and </tag>", "tag", "and"),
@@ -29,4 +47,4 @@ class UtilsTest(unittest.TestCase):
 		self.assertEqual(output, expected)
 
 if __name__ == '__main__':
-    unittest.main()
+  unittest.main()

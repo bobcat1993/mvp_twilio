@@ -15,6 +15,12 @@ from utils import dummy_call_api as call_api
 import utils
 import copy
 import os
+import openai
+
+# Set up the openai LLM client.
+openai.organization = "org-PIBY8HetnWz6gzQASJ8TOy8d"
+openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.Model.list()
 
 app = Flask(__name__)
 
@@ -95,7 +101,7 @@ def user_feeling():
 	model_output = call_api(
 		origin='user_feeling',
 		out_dir=OUT_GPT_DATA_PATH)
-	model_output = model_output['choices'][0]['text']
+	model_output = model_output['choices'][0]['message']['content']
 
 	# Post-process the output to get the sentiment and feelings.
 	response = feelings_post_process(model_output)
@@ -158,7 +164,7 @@ def detect_distortions():
 	model_output = call_api(
 		origin='detect_distortions',
 		out_dir=OUT_GPT_DATA_PATH)
-	model_output = model_output['choices'][0]['text']
+	model_output = model_output['choices'][0]['message']['content']
 
 	# The model may have recognised several distortions (separated by '\n\n').
 	# For now just take one of these.
