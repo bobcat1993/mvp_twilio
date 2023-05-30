@@ -81,8 +81,9 @@ def user_feeling():
 	"""Response to: How are you feeling today?"""
 
 	# Retrieve data from the request sent by Twilio
-	data = request.get_json()
-	message_body = data.get('Body')
+	message_body = request.json
+
+	logging.info("message_body:", message_body)
 
 	# Create the feelings prompt.
 	# The "feeling" key comes from the http_feeling widget on the Twilio side.
@@ -145,8 +146,7 @@ def detect_distortions():
 	"""Detect distortions in the users belief."""
 
 	# Retrieve data from the request sent by Twilio
-	data = request.get_json()
-	message_body = data.get('Body')
+	message_body = request.json
 
 	# Create the feelings prompt.
 	# The "belief" key comes from the http_detect_distortions widget on the Twilio side.
@@ -174,11 +174,8 @@ def detect_distortions():
 @app.post('/save_abc_data')
 def save_abc_data():
 	"""Saves data at the end of the ABC chat."""
-
 	# Retrieve data from the request sent by Twilio
-	data = request.get_json()
-	message_body = data.get('Body')
-
+	message_body = request.json
 
 	# Save the data
 	json_object = json.dumps(message_body, indent=2)
@@ -186,7 +183,7 @@ def save_abc_data():
 	with open(path, "a") as outfile:
 		outfile.write(json_object)
 
-	return jsonify({})
+	return jsonify(message_body)
 
 
 if __name__ == "__main__":

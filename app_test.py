@@ -25,10 +25,7 @@ class FeelingsTestCase(unittest.TestCase):
 		feeling: list[str]):
 	  # Create a sample request payload to simulate the data sent by 
 	  # Twilio
-	  payload = {
-	      'Body': {'feeling': feeling},
-	      'From': '+1234567890'
-	  }
+	  payload = {'feeling': feeling}
 
 	  # Send a POST request to the endpoint with the sample payload
 	  logging.info('app:', self.app)
@@ -147,10 +144,7 @@ class FeelingsTestCase(unittest.TestCase):
 	def test_detect_distortions(self, belief):
 	  # Create a sample request payload to simulate the data sent by 
 	  # Twilio
-	  payload = {
-	      'Body': {'belief': belief},
-	      'From': '+1234567890'
-	  }
+	  payload = {'belief': belief}
 
 	  # Send a POST request to the endpoint with the sample payload
 	  logging.info('app:', self.app)
