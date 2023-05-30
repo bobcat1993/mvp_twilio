@@ -175,15 +175,17 @@ def detect_distortions():
 def save_abc_data():
 	"""Saves data at the end of the ABC chat."""
 	# Retrieve data from the request sent by Twilio
-	message_body = request.json
+	try:
+		message_body = request.json
+		# Save the data
+		json_object = json.dumps(message_body, indent=2)
+		path = os.path.join(OUT_FLOW_DATA_PATH, 'flow_response.json')
+		with open(path, "a") as outfile:
+			outfile.write(json_object)
 
-	# Save the data
-	json_object = json.dumps(message_body, indent=2)
-	path = os.path.join(OUT_FLOW_DATA_PATH, 'flow_response.json')
-	with open(path, "a") as outfile:
-		outfile.write(json_object)
-
-	return jsonify(message_body)
+		return jsonify({'message': 'Data saved'})
+	except Exception as e:
+		return jsonify({'error': str(e)})
 
 
 if __name__ == "__main__":
