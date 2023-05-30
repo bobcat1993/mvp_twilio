@@ -138,7 +138,7 @@ class FeelingsTestCase(unittest.TestCase):
 
 	# TODO(toni) make param'ed test: 
 	@parameterized.expand([
-		('I\'m doomed, that I\'ve lost everything, and that I\'ll never be able to recover from this situation.'),
+		('I\'m doomed and I\'ve lost everything I\'ll never be able to recover from this situation.'),
 		('I can\'t handle everything, that I\'m drowning in responsibilities, and that there\'s no way out of this never-ending cycle.')
 		])
 	def test_detect_distortions(self, belief):
@@ -148,11 +148,11 @@ class FeelingsTestCase(unittest.TestCase):
 
 	  # Send a POST request to the endpoint with the sample payload
 	  logging.info('app:', self.app)
-	  response = self.app.post('/belief', json=payload)
+	  response = self.app.post('/distortions', json=payload)
 	  logging.info('response %s', response)
 
 	  # Assert the response status code
-	  # self.assertEqual(response.status_code, 200)
+	  self.assertEqual(response.status_code, 200)
 
 	  # Assert the response data or any specific values in the response
 	  response_data = response.get_json()
