@@ -163,6 +163,51 @@ def detect_distortions():
 
 	return jsonify(response)
 
+_POSITIVE_FEEDBACK_PROMPT = """
+For the following sentence, start your response with <response> the write down a sentence, in the 2nd person, that highlights the achievement in the sentence. End with </response >. "{positive_event}"
+"""
+
+def positive_feedback_post_processing(model_output: str) -> str:
+	"""Post processes outputs from the _DISTORTION_DETECTION_PROMPT prompt."""
+
+	response = utils.post_process_tags(model_output, 'response')
+
+	return dict(response=response)
+
+@app.post('/positive_feedback_test')
+def positive_feedback_test():
+	"""TEST: Responds to users reason for being in a positive mood."""
+	response = {
+		'response': 'Great work today!',
+	}
+	# Return a JSON response
+	return jsonify(response)
+
+
+@app.post('/positive_feedback')
+def positive_feedback():
+	"""Responds to users reason for being in a positive mood."""
+
+	# Retrieve data from the request sent by Twilio
+	message_body = request.json
+
+	# Create the feelings prompt.
+	# The "belief" key comes from the http_detect_distortions widget on the Twilio side.
+	prompt = _POSITIVE_FEEDBACK_PROMPT.format(
+		positive_event=message_body['positive_user_event'])
+
+	# Call to the LLM
+	# TODO(toni) Call the LLM
+	model_output = call_api(
+		origin='positive_feedback',
+		out_dir=OUT_GPT_DATA_PATH,
+		prompt=prompt)
+	model_output = model_output['choices'][0]['message']['content']
+
+	# Post process the response to get the distortion and question to ask the user.
+	response = positive_feedback_post_processing(model_output)
+
+	return jsonify(response)
 
 @app.post('/save_abc_data')
 def save_abc_data():
