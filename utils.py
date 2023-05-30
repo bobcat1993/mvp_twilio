@@ -51,8 +51,8 @@ def dummy_call_api(
 	# Save the response.
 	# We want to save all responses so that we have a clear record of what's been
 	# tried so far.
-	json_object = json.dumps(response)
-	path = os.path.join(out_dir, 'dummy_responses.json')
+	json_object = json.dumps(response, indent=2)
+	path = os.path.join(out_dir, 'dummy_api_calls.json')
 	with open(path, "a") as outfile:
 		outfile.write(json_object)
 
@@ -84,10 +84,6 @@ def post_process_tags(text: str, tag: str):
 	else:
 		logging.warning('No <%s> key detected in %s.',
 			tag, text)
-
-
-
-
 
 
 

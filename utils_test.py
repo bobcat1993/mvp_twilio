@@ -11,7 +11,7 @@ class UtilsTest(unittest.TestCase):
 
 		response = utils.dummy_call_api(
 			origin='test_dummy_call_api',
-			out_dir='data/gpt_outputs/tests')
+			out_dir='data/gpt_outputs')
 		self.assertIsNotNone(response)
 
 	@parameterized.expand([
