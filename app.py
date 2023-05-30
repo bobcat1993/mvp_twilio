@@ -11,16 +11,11 @@ from flask import Flask, jsonify, request
 from abc_types import Sentiment
 import json
 import logging
-from utils import dummy_call_api as call_api
+from utils import call_api as call_api
 import utils
 import copy
 import os
-import openai
 
-# Set up the openai LLM client.
-openai.organization = "org-PIBY8HetnWz6gzQASJ8TOy8d"
-openai.api_key = os.getenv("OPENAI_API_KEY")
-openai.Model.list()
 
 app = Flask(__name__)
 
@@ -100,21 +95,12 @@ def user_feeling():
 	# TODO(toni) Call the LLM
 	model_output = call_api(
 		origin='user_feeling',
-		out_dir=OUT_GPT_DATA_PATH)
+		out_dir=OUT_GPT_DATA_PATH,
+		prompt=prompt)
 	model_output = model_output['choices'][0]['message']['content']
 
 	# Post-process the output to get the sentiment and feelings.
 	response = feelings_post_process(model_output)
-
-	# Prepare the response.
-	# TODO(toni) Format feelings into a feelings string.
-	response = {
-		# TODO(toni) REPLACE WITH: response['sentiment'],
-		'sentiment': Sentiment.POS.value, 
-		# TODO(toni) REPLACE WITH: response['feelings']
-		'feelings': 'good',
-		'event': response['event']
-	}
 
 	# Return a JSON response
 	return jsonify(response)
@@ -163,7 +149,8 @@ def detect_distortions():
 	# TODO(toni) Call the LLM
 	model_output = call_api(
 		origin='detect_distortions',
-		out_dir=OUT_GPT_DATA_PATH)
+		out_dir=OUT_GPT_DATA_PATH,
+		prompt=prompt)
 	model_output = model_output['choices'][0]['message']['content']
 
 	# The model may have recognised several distortions (separated by '\n\n').

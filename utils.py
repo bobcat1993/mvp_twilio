@@ -55,7 +55,11 @@ def dummy_call_api(
 			"prompt_tokens": 9,
 			"completion_tokens": 12,
 			"total_tokens": 21
-			}
+			},
+		"origin": origin,
+		"prompt": prompt,
+		"temperature": temperature,
+		"max_tokens": max_tokens,
 		}
 
 	# Save the response.
@@ -76,7 +80,7 @@ def call_api(
 	out_dir: str,
 	prompt: str,
 	model="gpt-3.5-turbo",
-  max_tokens=32,
+  max_tokens=1024,
   temperature=1,
   ):
 	"""Call the OpenAI API to get a response.
@@ -100,7 +104,17 @@ def call_api(
 		# e.g. {"role": "system", "content": "You are a helpful bot."}
 		messages=[{"role": "user", "content": prompt}],
 		max_tokens=max_tokens,
+		temperature=temperature,
 		)
+
+	# Add additional info
+	input_info = {
+		"origin": origin,
+		"prompt": prompt,
+		"temperature": temperature,
+		"max_tokens": max_tokens
+		}
+	response.update(input_info)
 
 	# Save the response.
 	# We want to save all responses so that we have a clear record of what's been
