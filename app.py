@@ -164,7 +164,7 @@ def detect_distortions():
 	return jsonify(response)
 
 _POSITIVE_FEEDBACK_PROMPT = """
-For the following sentence, start your response with <response> the write down a sentence, in the 2nd person, that highlights the achievement in the sentence. End with </response >. "{positive_event}"
+For the following sentence, start your response with <response> then write down a sentence, in the 2nd person, that highlights the achievement in the sentence. End with </response >. "{positive_event}"
 """
 
 def positive_feedback_post_processing(model_output: str) -> str:
@@ -215,6 +215,10 @@ def save_abc_data():
 	# Retrieve data from the request sent by Twilio
 	try:
 		message_body = request.json
+
+		# Hash the user_id
+		message_body['user_id'] = str(hash(message_body['user_id']))
+
 		# Save the data
 		json_object = json.dumps(message_body, indent=2)
 		path = os.path.join(OUT_FLOW_DATA_PATH, 'flow_response.json')
