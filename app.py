@@ -106,7 +106,7 @@ def user_feeling():
 
 
 _DISTORTION_DETECTION_PROMPT = """
-For the following sentence you need to identify the distortions in the users thinking and pose a question to help them realise that distortion. For distortion question pair you must start on a new line with the key <distortion> followed by the distortion, end this with </distortion>. Then on the next line write <question> followed by a question that would help someone identify the distortion, end this with </question>. The question should not directly reference the distortion and should be relevant to the original sentence. "{belief}."
+For the following sentence you need to identify the distortions in the users thinking and pose a question to help them realise that distortion. For distortion question pair you must start on a new line with the key <distortion> followed by the distortion, end this with </distortion>. Then on the next line write <question> followed by a question that would help someone identify the distortion, end this with </question>. The question should not directly reference the distortion and should be relevant to the original sentence. "{belief}"
 """
 
 def distortion_detection_post_processing(model_output: str) -> str:
@@ -161,7 +161,7 @@ def detect_distortions():
 	return jsonify(response)
 
 _POSITIVE_FEEDBACK_PROMPT = """
-For the following sentence, start your response with <response> then write down a sentence, in the 2nd person, that highlights the achievement in the sentence. End with </response >. "{positive_event}"
+For the following sentence, start your response with <response> then write down a sentence, in the 2nd person, praises the user if they have achieve something, otherwise response appropriately in a supportive way. End with </response >. "{positive_event}"
 """
 
 def positive_feedback_post_processing(model_output: str) -> str:
