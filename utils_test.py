@@ -14,7 +14,6 @@ class UtilsTest(unittest.TestCase):
 			out_dir='data/gpt_outputs')
 
 		self.assertIsNotNone(response)
-		self.assertIsNotNone(response['choices'][0]['text'])
 
 	def test_setup_openai(self):
 		model_list = utils.setup_openai()
@@ -30,7 +29,6 @@ class UtilsTest(unittest.TestCase):
 			prompt='This is a test.',
 			max_tokens=1)
 		self.assertIsNotNone(response)
-		self.assertIsNotNone(response['choices'][0]['text'])
 
 	@parameterized.expand([
 		("<tag> and </tag>", "tag", "and"),

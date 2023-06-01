@@ -22,7 +22,7 @@ def dummy_call_api(
 	prompt="Say this is a test",
   max_tokens=7,
   temperature=0,
-  ):
+  ) -> str :
 	"""Calls a dummy API.
 
 	Save the response to OUT_DATA_PATH/{origin}-{xid}
@@ -36,7 +36,7 @@ def dummy_call_api(
 		temperature: The sampling temp.
 
 	Returns:
-		A json.
+		A text response.
 	"""
 
 	response = {
@@ -73,17 +73,17 @@ def dummy_call_api(
 
 
 	# TODO(toni) Check finish reason! Needs to be "stop" not "length".
-	return response
+	return "\n\nThis is indeed a test"
 
 
 def call_api(
 	origin: str,
 	out_dir: str,
 	prompt: str,
-	model="text-davinci-002",
+	model="gpt-3.5-turbo",
   max_tokens=1024,
   temperature=1,
-  ):
+  ) -> str:
 	"""Call the OpenAI API to get a response.
 
 	Args:
@@ -96,15 +96,21 @@ def call_api(
 		temperature: The temperature to sample with, default to 1. Lower
 			values are more stochastic, values close to one are more
 			deterministic.
+
+	Returns:
+		A text response.
 	"""
 	setup_openai()
 
-	response = openai.Completion.create(
+	response = openai.ChatCompletion.create(
 		model=model,
-		prompt=prompt,
+		messages=[
+			{"role": "system", "content": "You are a helpful assistant."},
+			{"role": "user", "content": prompt}],
 		max_tokens=max_tokens,
 		temperature=temperature,
 		)
+
 
 	# Add additional info
 	input_info = {
@@ -124,7 +130,7 @@ def call_api(
 		outfile.write(json_object)
 
 	# TODO(toni) Check finish reason! Needs to be "stop" not "length".
-	return response
+	return response['choices'][0]['message']['content']
 
 
 def post_process_tags(text: str, tag: str):
