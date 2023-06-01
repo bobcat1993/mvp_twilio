@@ -31,7 +31,7 @@ def hello():
 # < NEG | POS | NEURTRAL >
 # <feeling> feeling_1, feeling_2, ... </feeling>.
 _FEELING_PROMPT = """
-For the following sentence please response with POS if the sentiment is positive, NEG if the sentiment is negative and NEUTRAL if the sentiment is neutral. Then on the next line write <feelings> followed by a short list of one word feelings directly expressed in the sentence, end this with </feelings>. If the sentence also includes an event include then on the next line write <event> followed by the event that was described, end this with </event>. The event should be described in the second person and be a complete sentence. "{feeling}".
+For the following sentence please response with POS if the sentiment is positive, NEG if the sentiment is negative and NEUTRAL if the sentiment is neutral. Then on the next line write <feelings> followed by a short list of one word feelings expressed in the sentence, end this with </feelings>. If the sentence also includes an event include then on the next line write <event> followed by the event that was described, end this with </event>. The event should be described in the second person and be a complete sentence. "{feeling}".
 """
 
 def feelings_post_process(model_output: str) -> str:

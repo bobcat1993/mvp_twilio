@@ -13,19 +13,19 @@ class FeelingsTestCase(unittest.TestCase):
 	@parameterized.expand(
 		[
 		('I\'m good, thanks.', Sentiment.POS.value, ['good']),
-		# ('Feeling very tired today.', 'NEG', ['tired']),
-		# ('My car broke down, and I\'m feeling frustrated and stressed.',
-		# 	'NEG', ['frustrated', 'stressed']),
+		('Feeling very tired today.', Sentiment.NEG.value, ['tired']),
+		('My car broke down, and I\'m feeling frustrated and stressed.',
+			Sentiment.NEG.value, ['frustrated', 'stressed']),
 		# ('I\'m not sure', 'NEUTRAL', ['unsure']),
 		])
 	def test_user_feeling(
 		self,
-		body: str,
+		user_feeling: str,
 		sentiment: str,
-		feeling: list[str]):
+		target_feelings: list[str]):
 	  # Create a sample request payload to simulate the data sent by 
 	  # Twilio
-	  payload = {'feeling': feeling}
+	  payload = {'feeling': user_feeling}
 
 	  # Send a POST request to the endpoint with the sample payload
 	  logging.info('app:', self.app)
@@ -39,9 +39,9 @@ class FeelingsTestCase(unittest.TestCase):
 	  response_data = response.get_json()
 
 	  self.assertEqual(response_data['sentiment'], sentiment)
-	  if not any(i in response_data['feelings'] for i in feeling):
+	  if not any(i in response_data['feelings'] for i in target_feelings):
 	  	logging.warn(
-	  		'%s not in %s', feeling, response_data['feelings'])
+	  		'%s not in %s', target_feelings, response_data['feelings'])
 
 	@parameterized.expand(
 		[
