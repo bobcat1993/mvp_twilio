@@ -48,7 +48,7 @@ def dummy_call_api(
 	    {
 	      "text": "\n\nThis is indeed a test",
 	      "index": 0,
-	      "logprobs": null,
+	      "logprobs": None,
 	      "finish_reason": "length"
 	    }
 	  ],
@@ -80,7 +80,7 @@ def call_api(
 	origin: str,
 	out_dir: str,
 	prompt: str,
-	model="text-davinci-003",
+	model="text-davinci-002",
   max_tokens=1024,
   temperature=1,
   ):
