@@ -31,7 +31,7 @@ def hello():
 # < NEG | POS | NEURTRAL >
 # <feeling> feeling_1, feeling_2, ... </feeling>.
 _FEELING_PROMPT = """
-For the following sentence please response with POS is the sentiment is positive, NEG if the sentiment is negative and NEUTRAL if the sentiment is neutral.  Then on the next line write <feelings> followed by a list of one word feelings expressed by the use, end this with </feelings>. If the sentence also includes an event include then on the next line write <event> followed by the event that was described, end this with </event>. The event should be described in the second person and be a complete sentence. "{feeling}".
+For the following sentence please response with POS is the sentiment is positive, NEG if the sentiment is negative and NEUTRAL if the sentiment is neutral.  Then on the next line write <feelings> followed by a list of one word feelings expressed in the sentence, end this with </feelings>. The one words feelings should as similar as possible to those in the sentence. If the sentence also includes an event include then on the next line write <event> followed by the event that was described, end this with </event>. The event should be described in the second person and be a complete sentence. "{feeling}".
 """
 
 def feelings_post_process(model_output: str) -> str:
@@ -97,7 +97,7 @@ def user_feeling():
 		origin='user_feeling',
 		out_dir=OUT_GPT_DATA_PATH,
 		prompt=prompt)
-	model_output = model_output['choices'][0]['message']['content']
+	model_output = model_output['choices'][0]['text']
 
 	# Post-process the output to get the sentiment and feelings.
 	response = feelings_post_process(model_output)
@@ -151,7 +151,7 @@ def detect_distortions():
 		origin='detect_distortions',
 		out_dir=OUT_GPT_DATA_PATH,
 		prompt=prompt)
-	model_output = model_output['choices'][0]['message']['content']
+	model_output = model_output['choices'][0]['text']
 
 	# The model may have recognised several distortions (separated by '\n\n').
 	# For now just take one of these.
@@ -202,7 +202,7 @@ def positive_feedback():
 		origin='positive_feedback',
 		out_dir=OUT_GPT_DATA_PATH,
 		prompt=prompt)
-	model_output = model_output['choices'][0]['message']['content']
+	model_output = model_output['choices'][0]['text']
 
 	# Post process the response to get the distortion and question to ask the user.
 	response = positive_feedback_post_processing(model_output)
@@ -216,7 +216,7 @@ def save_abc_data():
 	try:
 		message_body = request.json
 
-		# Hash the user_id
+		# Hash the user_id so that the data is pseudo-anonyms.
 		message_body['user_id'] = str(hash(message_body['user_id']))
 
 		# Save the data

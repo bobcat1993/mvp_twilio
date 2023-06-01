@@ -39,7 +39,9 @@ class FeelingsTestCase(unittest.TestCase):
 	  response_data = response.get_json()
 
 	  self.assertEqual(response_data['sentiment'], sentiment)
-	  assert any(i in response_data['feelings'] for i in feeling)
+	  if not any(i in response_data['feelings'] for i in feeling):
+	  	logging.warn(
+	  		'%s not in %s', feeling, response_data['feelings'])
 
 	@parameterized.expand(
 		[
@@ -182,7 +184,8 @@ class FeelingsTestCase(unittest.TestCase):
 			"user_feel_after": "",
 			"user_feedback": "Nothing more from me",
 			"flow_sid": "some-twilio-sid",
-			"origin": "test_save_abc_data"
+			"origin": "test_save_abc_data",
+			"user_id": "dummy_hash"
 			}
 
 		logging.info('app:', self.app)

@@ -40,27 +40,28 @@ def dummy_call_api(
 	"""
 
 	response = {
-		"id": "some-kind-of-id",
-	  "object": "chat.completion",
-	  "created": 1677652288,
-	  "choices": [{
-			"index": 0,
-			"message": {
-				"role": "assistant",
-				"content": "\n\nThis is a test!",
-			},
-			"finish_reason": "stop"
-	  }],
-		"usage": {
-			"prompt_tokens": 9,
-			"completion_tokens": 12,
-			"total_tokens": 21
-			},
-		"origin": origin,
+	  "id": "some-kind-of-id",
+	  "object": "text_completion",
+	  "created": 1589478378,
+	  "model": "text-davinci-003",
+	  "choices": [
+	    {
+	      "text": "\n\nThis is indeed a test",
+	      "index": 0,
+	      "logprobs": null,
+	      "finish_reason": "length"
+	    }
+	  ],
+	  "usage": {
+	    "prompt_tokens": 5,
+	    "completion_tokens": 7,
+	    "total_tokens": 12
+	  },
+	  "origin": origin,
 		"prompt": prompt,
 		"temperature": temperature,
-		"max_tokens": max_tokens,
-		}
+		"max_tokens": max_tokens
+	}
 
 	# Save the response.
 	# We want to save all responses so that we have a clear record of what's been
@@ -79,7 +80,7 @@ def call_api(
 	origin: str,
 	out_dir: str,
 	prompt: str,
-	model="gpt-3.5-turbo",
+	model="text-davinci-003",
   max_tokens=1024,
   temperature=1,
   ):
@@ -98,11 +99,9 @@ def call_api(
 	"""
 	setup_openai()
 
-	response = openai.ChatCompletion.create(
-		model="gpt-3.5-turbo",
-		# TODO(toni) Use the system role to personalise the bot.
-		# e.g. {"role": "system", "content": "You are a helpful bot."}
-		messages=[{"role": "user", "content": prompt}],
+	response = openai.Completion.create(
+		model=model,
+		prompt=prompt,
 		max_tokens=max_tokens,
 		temperature=temperature,
 		)
