@@ -31,7 +31,7 @@ def hello():
 # < NEG | POS | NEURTRAL >
 # <feeling> feeling_1, feeling_2, ... </feeling>.
 _FEELING_PROMPT = """
-For the following sentence please response with POS if the sentiment is positive, NEG if the sentiment is negative and NEUTRAL if the sentiment is neutral. Then on the next line write <feelings> followed by a short (comma separated) list of one word feelings expressed in the sentence, end this with </feelings>. If the sentence also includes an event include then on the next line write <event> followed by the event that was described, end this with </event>. The event should be described in the second person and be a complete sentence. "{feeling}".
+For the following sentence please response with POS if the sentiment is positive, NEG if the sentiment is negative and NEUTRAL if the sentiment is neutral. Then on the next line write <feelings> followed by a short (comma separated) list of one word feelings expressed in the sentence, end this with </feelings>. If the feeling is mixed pick POS or NEG and make sure the first feeling in the feeling list corresponds with this sentiment. If the sentence also includes an event include then on the next line write <event> followed by the event that was described, end this with </event>. The event should be described in the second person and be a complete sentence. "{feeling}".
 """
 
 def feelings_post_process(model_output: str) -> str:
@@ -110,12 +110,7 @@ def user_feeling():
 # Asking the the user for any self-talk/beliefs/thoughts in the
 # context of the event. 
 # This prompt includes one example.
-_ASKING_FOR_THOUGHT = """
-Given the sentence below, ask the user to express any relevant beliefs, thoughts or self-talk. Start your response with <question> followed by the short question and end with </question>. The question should sound like it's coming from a good friend. "I received feedback on my project that wasn't as positive as I had hoped, and it's made me doubt my abilities."
-
-<question>How have you been talking to yourself since you received feedback that wasn't as positive as you had hoped? What thoughts have been going through your mind?</question>
-
-Given the sentence below, ask the user to express any relevant beliefs, thoughts or self-talk. Start your response with <question> followed by the short question and end with </question>. The question should sound like it's coming from a good friend. "{event}"
+_ASKING_FOR_THOUGHT = """The following sentence is an activating event identified during the ABC of a CBT session. "{event}" You must now ask the user to identify any thoughts, beliefs or self-talk to help keep them on track with their CBT session. Give your response must start with <question> followed by the question to identify self-talk, beliefs or thoughts. End with </question>. Ask the question in a friendly way.
 """
 
 _DEFAULT_ASK_FOR_THOUGHT = """
