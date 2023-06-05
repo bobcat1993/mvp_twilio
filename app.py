@@ -110,7 +110,7 @@ def user_feeling():
 # Asking the the user for any self-talk/beliefs/thoughts in the
 # context of the event. 
 # This prompt includes one example.
-_ASKING_FOR_THOUGHT = """The following sentence is an activating event identified during the ABC of a CBT session. "{event}" You must now ask the user to identify any thoughts, beliefs or self-talk to help keep them on track with their CBT session. Give your response must start with <question> followed by the question to identify self-talk, beliefs or thoughts. End with </question>. Ask the question in a friendly way.
+_ASKING_FOR_THOUGHT_PROMPT = """The following sentence is an activating event identified during the ABC of a CBT session. "{event}" You must now ask the user to identify any thoughts, beliefs or self-talk to help keep them on track with their CBT session. Give your response must start with <question> followed by the question to identify self-talk, beliefs or thoughts. End with </question>. Ask the question in a friendly way.
 """
 
 _DEFAULT_ASK_FOR_THOUGHT = """
@@ -132,7 +132,7 @@ def ask_for_thought():
 
 	# Create the feelings prompt.
 	# The "event" key comes from the http_ask_for_thought widget on the Twilio side.
-	prompt = _ASKING_FOR_THOUGHT.format(
+	prompt = _ASKING_FOR_THOUGHT_PROMPT.format(
 		event=message_body['event'])
 
 	# Call to the LLM
