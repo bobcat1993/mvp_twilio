@@ -150,7 +150,7 @@ class TestApp(unittest.TestCase):
 
 		# Send a POST request to the endpoint with the sample payload.
 		logging.info('app:', self.app)
-		response = self.app.post('/ask_for_thought', json=payload)
+		response = self.app.post('/thought', json=payload)
 		logging.info('response %s', response)
 
 		# Assert the response status code
