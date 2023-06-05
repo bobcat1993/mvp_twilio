@@ -5,7 +5,7 @@ from parameterized import parameterized
 import logging
 from abc_types import Sentiment
 
-class FeelingsTestCase(unittest.TestCase):
+class TestApp(unittest.TestCase):
 
 	def setUp(self):
 		self.app = app.test_client()
@@ -18,6 +18,8 @@ class FeelingsTestCase(unittest.TestCase):
 			Sentiment.NEG.value, ['frustrated', 'stressed']),
 		# ('I\'m not sure', 'NEUTRAL', ['unsure']),
 		])
+
+	# TODO(toni) Reformat as target_sentiment.
 	def test_user_feeling(
 		self,
 		user_feeling: str,
@@ -33,7 +35,7 @@ class FeelingsTestCase(unittest.TestCase):
 	  logging.info('response %s', response)
 
 	  # Assert the response status code
-	  # self.assertEqual(response.status_code, 200)
+	  self.assertEqual(response.status_code, 200)
 
 	  # Assert the response data or any specific values in the response
 	  response_data = response.get_json()
@@ -83,7 +85,7 @@ class FeelingsTestCase(unittest.TestCase):
 
 		])
 	def test_feelings_post_process(self,
-		model_output,
+		model_output: str,
 		sentiment: Sentiment,
 		feelings: list[str],
 		event: str = None):
@@ -95,6 +97,69 @@ class FeelingsTestCase(unittest.TestCase):
 
 		if event:
 			self.assertEqual(output['event'], event)
+
+
+	@parameterized.expand([
+		(
+			'one_question',
+			'<question>question_1?</question>',
+			'question_1?'
+		),
+		(
+			'two_questions',
+			'<question>question_1? question_2?</question>',
+			'question_1? question_2?'
+		),
+		(
+			'two_questions_on_different_lines',
+			# Questions on two lines.
+			'<question>question_1?</question>'
+			'\n\n<question>question_2?</question>',
+			'question_1?'
+		),
+		(
+			'two_questions_on_different_lines_with_text_inbetween',
+			# Questions on two lines.
+			'<question>question_1?</question>'
+			'some other text'
+			'\n\n<question>question_2?</question>',
+			'question_1?'
+		)
+		])
+	def test_ask_for_thought_post_processing(self,
+		test_name: str, 
+		model_output: str,
+		target_question: str):
+
+		output = my_app.ask_for_thought_post_processing(
+			model_output)
+
+		self.assertEqual(output['question'], target_question)
+
+
+	@parameterized.expand([
+		(
+			'simple_test',
+			'I lost my phone.',
+		)
+		])
+	def test_ask_for_thought(self, test_name: str, user_event: str):
+		"""Tests the ask_for_thought function."""
+
+		payload = {'event': user_event}
+
+		# Send a POST request to the endpoint with the sample payload.
+		logging.info('app:', self.app)
+		response = self.app.post('/ask_for_thought', json=payload)
+		logging.info('response %s', response)
+
+		# Assert the response status code
+		self.assertEqual(response.status_code, 200)
+
+		# Make sure the response is not None.
+		response_data = response.get_json()
+		self.assertIsNotNone(response)
+
 
 	@parameterized.expand(
 		[
@@ -128,6 +193,10 @@ class FeelingsTestCase(unittest.TestCase):
 			)
 
 		])
+
+	# TODO(toni) Reformat to target_question.
+	# TODO(toni) Reformat to target_distortion.
+	# TODO(toni) Add test_name.
 	def test_distortion_detection_post_processing(self,
 		model_outupt,
 		distortion: str,
@@ -143,31 +212,32 @@ class FeelingsTestCase(unittest.TestCase):
 		('I\'m doomed and I\'ve lost everything I\'ll never be able to recover from this situation.'),
 		('I can\'t handle everything, that I\'m drowning in responsibilities, and that there\'s no way out of this never-ending cycle.')
 		])
+	# TODO(toni) Reformat as user_belief.
 	def test_detect_distortions(self, belief):
-	  # Create a sample request payload to simulate the data sent by 
-	  # Twilio
-	  payload = {'belief': belief}
+		# Create a sample request payload to simulate the data sent by 
+		# Twilio
+		payload = {'belief': belief}
 
-	  # Send a POST request to the endpoint with the sample payload
-	  logging.info('app:', self.app)
-	  response = self.app.post('/distortions', json=payload)
-	  logging.info('response %s', response)
+		# Send a POST request to the endpoint with the sample payload
+		logging.info('app:', self.app)
+		response = self.app.post('/distortions', json=payload)
+		logging.info('response %s', response)
 
-	  # Assert the response status code
-	  self.assertEqual(response.status_code, 200)
+		# Assert the response status code
+		self.assertEqual(response.status_code, 200)
 
-	  # Assert the response data or any specific values in the response
-	  response_data = response.get_json()
+		# Assert the response data or any specific values in the response
+		response_data = response.get_json()
 
-	  # TODO(toni) Add asserts when we are using the LLM.
+		# TODO(toni) Add asserts when we are using the LLM.
 
 	def test_possitive_feedback(self):
 		# Create a sample request payload to simulate the data sent by 
-	  # Twilio
-	  payload = {"positive_user_event": "I got all my chores done."}
-	  response = self.app.post('/positive_feedback', json=payload)
-	  logging.info('response %s', response)
-	  self.assertEqual(response.status_code, 200)
+		# Twilio
+		payload = {"positive_user_event": "I got all my chores done."}
+		response = self.app.post('/positive_feedback', json=payload)
+		logging.info('response %s', response)
+		self.assertEqual(response.status_code, 200)
 
 
 	def test_save_abc_data(self):

@@ -105,6 +105,53 @@ def user_feeling():
 	return jsonify(response)
 
 
+# The ask for thought prompt: Expected output is:
+# <question> question </question>.
+# Asking the the user for any self-talk/beliefs/thoughts in the
+# context of the event. 
+# This prompt includes one example.
+_ASKING_FOR_THOUGHT = """
+Given the sentence below, ask the user to express any relevant beliefs, thoughts or self-talk. Start your response with <question> followed by the short question and end with </question>. The question should sound like it's coming from a good friend. "I received feedback on my project that wasn't as positive as I had hoped, and it's made me doubt my abilities."
+
+<question>How have you been talking to yourself since you received feedback that wasn't as positive as you had hoped? What thoughts have been going through your mind?</question>
+
+Given the sentence below, ask the user to express any relevant beliefs, thoughts or self-talk. Start your response with <question> followed by the short question and end with </question>. The question should sound like it's coming from a good friend. "{event}"
+"""
+
+_DEFAULT_ASK_FOR_THOUGHT = """
+When you think about this situation, what's going through your head? Any recurring thoughts or beliefs?"""
+
+def ask_for_thought_post_processing(model_output: str) -> str:
+	"""Post processes outputs from the _ASKING_FOR_THOUGHT prompt."""
+
+	question = utils.post_process_tags(model_output, 'question')
+
+	return dict(question=question)
+
+@app.post('/ask_for_thought')
+def ask_for_thought():
+	"""Asks user for their thoughts, belief or self-talk."""
+
+	# Retrieve data from the request sent by Twilio
+	message_body = request.json
+
+	# Create the feelings prompt.
+	# The "event" key comes from the http_ask_for_thought widget on the Twilio side.
+	prompt = _ASKING_FOR_THOUGHT.format(
+		event=message_body['event'])
+
+	# Call to the LLM
+	model_output = call_api(
+		origin='ask_for_thought',
+		out_dir=OUT_GPT_DATA_PATH,
+		prompt=prompt)
+
+	# Post process the response to get the distortion and question to ask the user.
+	response = ask_for_thought_post_processing(model_output)
+
+	return jsonify(response)
+
+
 _DISTORTION_DETECTION_PROMPT = """
 For the following sentence you need to identify the distortions in the users thinking and pose a question to help them realise that distortion. For distortion question pair you must start on a new line with the key <distortion> followed by the distortion, end this with </distortion>. Then on the next line write <question> followed by a question that would help someone identify the distortion, end this with </question>. The question should not directly reference the distortion and should be relevant to the original sentence. "{belief}"
 """
@@ -161,7 +208,7 @@ def detect_distortions():
 	return jsonify(response)
 
 _POSITIVE_FEEDBACK_PROMPT = """
-For the following sentence, start your response with <response> then write down a sentence, in the 2nd person, praises the user if they have achieve something, otherwise response appropriately in a supportive way. End with </response >. "{positive_event}"
+For the following sentence, start your response with <response> then write down a sentence, in the 2nd person, praises the user if they have achieve something, otherwise response appropriately in a supportive way. End with </response >. Do not ask any questions. "{positive_event}"
 """
 
 def positive_feedback_post_processing(model_output: str) -> str:
