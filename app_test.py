@@ -23,7 +23,7 @@ class TestApp(unittest.TestCase):
 	def test_user_feeling(
 		self,
 		user_feeling: str,
-		sentiment: str,
+		target_sentiment: str,
 		target_feelings: list[str]):
 	  # Create a sample request payload to simulate the data sent by 
 	  # Twilio
@@ -40,7 +40,7 @@ class TestApp(unittest.TestCase):
 	  # Assert the response data or any specific values in the response
 	  response_data = response.get_json()
 
-	  self.assertEqual(response_data['sentiment'], sentiment)
+	  self.assertEqual(response_data['sentiment'], target_sentiment)
 	  if not any(i in response_data['feelings'] for i in target_feelings):
 	  	logging.warn(
 	  		'%s not in %s', target_feelings, response_data['feelings'])
@@ -86,17 +86,17 @@ class TestApp(unittest.TestCase):
 		])
 	def test_feelings_post_process(self,
 		model_output: str,
-		sentiment: Sentiment,
-		feelings: list[str],
-		event: str = None):
+		target_sentiment: Sentiment,
+		target_feelings: list[str],
+		target_event: str = None):
 
 		output = my_app.feelings_post_process(model_output)
 
-		self.assertEqual(output['sentiment'], sentiment)
-		self.assertEqual(output['feelings'], feelings)
+		self.assertEqual(output['sentiment'], target_sentiment)
+		self.assertEqual(output['feelings'], target_feelings)
 
-		if event:
-			self.assertEqual(output['event'], event)
+		if target_event:
+			self.assertEqual(output['event'], target_event)
 
 
 	@parameterized.expand([
@@ -164,6 +164,7 @@ class TestApp(unittest.TestCase):
 	@parameterized.expand(
 		[
 			(
+				'multiple_questions',
 				'<distortion> Catastrophizing </distortion>'
 				'\n<question> What evidence is there to support the belief that you\'re doomed and will never be able to recover from this situation? </question>'
 				'\n\n<distortion> Overgeneralization </distortion>'
@@ -174,18 +175,21 @@ class TestApp(unittest.TestCase):
 				'What evidence is there to support the belief that you\'re doomed and will never be able to recover from this situation?',
 			),
 			(
+				'single_question_multi-word_distortion_upper_cases',
 				'<distortion> Impostor Syndrome </distortion>'
 				'\n<question> Hey, can you think of any specific accomplishments or skills that demonstrate your capability and competence? </question>',
 				'Impostor Syndrome',
 				'Hey, can you think of any specific accomplishments or skills that demonstrate your capability and competence?'
 			),
 			(
+				'single_question_multi-word_distortion_lower_cases',
 				'<distortion> Negative self-beliefs </distortion>'
 				'\n<question> What evidence do you have that supports the belief that you\'re not worthy of love and connection? Are there any experiences or relationships that contradict this belief? </question>',
 				'Negative self-beliefs',
 				'What evidence do you have that supports the belief that you\'re not worthy of love and connection? Are there any experiences or relationships that contradict this belief?'
 			),
 			(
+				'single_question',
 				'<distortion> Personalization </distortion>\n'
 				'<question> Are there any external factors or circumstances that contributed to the outcome, or are you solely responsible for the perceived failure? </question>',
 				'Personalization',
@@ -193,19 +197,16 @@ class TestApp(unittest.TestCase):
 			)
 
 		])
-
-	# TODO(toni) Reformat to target_question.
-	# TODO(toni) Reformat to target_distortion.
-	# TODO(toni) Add test_name.
 	def test_distortion_detection_post_processing(self,
-		model_outupt,
-		distortion: str,
-		question: str):
+		test_name: str,
+		model_outupt: str,
+		target_distortion: str,
+		target_question: str):
 
 		output = my_app.distortion_detection_post_processing(model_outupt)
 
-		self.assertEqual(output['distortion'], distortion)
-		self.assertEqual(output['question'], question)
+		self.assertEqual(output['distortion'], target_distortion)
+		self.assertEqual(output['question'], target_question)
 
 	# TODO(toni) make param'ed test: 
 	@parameterized.expand([
@@ -213,10 +214,10 @@ class TestApp(unittest.TestCase):
 		('I can\'t handle everything, that I\'m drowning in responsibilities, and that there\'s no way out of this never-ending cycle.')
 		])
 	# TODO(toni) Reformat as user_belief.
-	def test_detect_distortions(self, belief):
+	def test_detect_distortions(self, user_belief):
 		# Create a sample request payload to simulate the data sent by 
 		# Twilio
-		payload = {'belief': belief}
+		payload = {'belief': user_belief}
 
 		# Send a POST request to the endpoint with the sample payload
 		logging.info('app:', self.app)
