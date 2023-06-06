@@ -29,9 +29,11 @@ def hello():
 
 # The feeling prompt: Expected output is of the form:
 # < NEG | POS | NEURTRAL >
-# <feeling> feeling_1, feeling_2, ... </feeling>.
-_FEELING_PROMPT = """
-For the following sentence please response with POS if the sentiment is positive, NEG if the sentiment is negative and NEUTRAL if the sentiment is neutral. Then on the next line write <feelings> followed by a short (comma separated) list of one word feelings expressed in the sentence, end this with </feelings>. If the feeling is mixed pick POS or NEG and make sure the first feeling in the feeling list corresponds with this sentiment. If the sentence also includes an event include then on the next line write <event> followed by the event that was described, end this with </event>. The event should be described in the second person and be a complete sentence. "{feeling}".
+# <question> Why do you feel x </question>.
+_SENTIMENT_PROMPT = """For the following sentence please respond with POS if the sentiment is positive, NEG if the sentiment is negative or NEUTRAL if the sentiment is neutral. “{feeling}”.
+"""
+
+_FEELING_PROMPT = """The follow sentence is a feeling identified during the ABC of a CBT session. "{feeling}". Refering to the feeling ask what happened to make them feel this way. Start your response with <question> followed by the question, ending with </question>. The question should be asked in a friendly manner. If the sentence already describes the event, ask for a little more information about it.
 """
 
 def feelings_post_process(model_output: str) -> str:
@@ -48,19 +50,11 @@ def feelings_post_process(model_output: str) -> str:
 	else:
 		logging.warning('Sentiment in %s not detected!', model_output)
 
-	# Get the feelings.
-	feelings = utils.post_process_tags(model_output, 'feelings')
-	if feelings:
-		# If not None, feelings needs to be a list of feelings.
-		feelings = [f.strip().lower() for f in feelings.split(',')]
-
-	# If there is an event, get the event.
-	event = utils.post_process_tags(model_output, 'event')
-	if event:
-		event = event.lower()
+	# Get the question
+	question = utils.post_process_tags(model_output, 'question')
 
 	return dict(
-		sentiment=sentiment, feelings=feelings, event=event)
+		sentiment=sentiment, question=question)
 
 
 @app.post('/feeling_test')
@@ -70,8 +64,7 @@ def user_feeling_test():
 	# TODO(toni) Format feelings into a feelings string.
 	response = {
 		'sentiment': Sentiment.NEG.value, 
-		'feelings': ['sad', 'angry'],
-		'event': 'had an argument with a friend'
+		'question': 'What\'s got you feeling sad?',
 	}
 
 	# Return a JSON response
@@ -86,17 +79,28 @@ def user_feeling():
 
 	logging.info("message_body:", message_body)
 
-	# Create the feelings prompt.
+	# Create the sentiment prompt.
 	# The "feeling" key comes from the http_feeling widget on the Twilio side.
-	prompt = _FEELING_PROMPT.format(
+	sentiment_prompt = _SENTIMENT_PROMPT.format(
 		feeling=message_body['feeling'])
 
 	# Call to the LLM
-	# TODO(toni) Call the LLM
-	model_output = call_api(
+	sentiment_model_output = call_api(
 		origin='user_feeling',
 		out_dir=OUT_GPT_DATA_PATH,
-		prompt=prompt)
+		prompt=sentiment_prompt)
+
+	# Create the feeling question prompt.
+	feeling_prompt = _FEELING_PROMPT.format(
+		feeling=message_body['feeling'])
+
+	# Call to the LLM
+	feeling_model_output = call_api(
+		origin='user_feeling',
+		out_dir=OUT_GPT_DATA_PATH,
+		prompt=feeling_prompt)
+
+	model_output = f'{sentiment_model_output}\n{feeling_model_output}'
 
 	# Post-process the output to get the sentiment and feelings.
 	response = feelings_post_process(model_output)

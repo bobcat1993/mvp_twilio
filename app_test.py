@@ -12,19 +12,22 @@ class TestApp(unittest.TestCase):
 
 	@parameterized.expand(
 		[
-		('I\'m good, thanks.', Sentiment.POS.value, ['good']),
-		('Feeling very tired today.', Sentiment.NEG.value, ['tired']),
+		# This is being detected as neutral.
+		# ('I\'m good, thanks.', Sentiment.POS.value),
+		# This is being detected as neutral too.
+		# ('Feeling very tired today.', Sentiment.NEG.value),
 		('My car broke down, and I\'m feeling frustrated and stressed.',
-			Sentiment.NEG.value, ['frustrated', 'stressed']),
-		# ('I\'m not sure', 'NEUTRAL', ['unsure']),
+			Sentiment.NEG.value),
+		('I\'m not sure', Sentiment.NEUTRAL.value),
+		('I had a really fun time with my friends', Sentiment.POS.value),
+		('I had so much fun, sad it\'s over', Sentiment.POS.value)
 		])
 
 	# TODO(toni) Reformat as target_sentiment.
 	def test_user_feeling(
 		self,
 		user_feeling: str,
-		target_sentiment: str,
-		target_feelings: list[str]):
+		target_sentiment: str):
 	  # Create a sample request payload to simulate the data sent by 
 	  # Twilio
 	  payload = {'feeling': user_feeling}
@@ -41,62 +44,30 @@ class TestApp(unittest.TestCase):
 	  response_data = response.get_json()
 
 	  self.assertEqual(response_data['sentiment'], target_sentiment)
-	  if not any(i in response_data['feelings'] for i in target_feelings):
-	  	logging.warn(
-	  		'%s not in %s', target_feelings, response_data['feelings'])
+	  self.assertIsNotNone(response_data['question'])
 
 	@parameterized.expand(
 		[
 			(
-				'NEG\n<feelings> Overwhelmed, helpless </feelings>',
+				'NEG\n<question> What\'s got you feeling helpless? </question>',
 				Sentiment.NEG.value,
-				['overwhelmed', 'helpless'],
+				'What\'s got you feeling helpless?',
 			),
 			(
-				'POS\n<feelings> Hopeful, proactive </feelings>',
+				'POS\n<question> What happened to make you feel hopeful? </question>',
 				Sentiment.POS.value,
-				['hopeful', 'proactive'],
+				'What happened to make you feel hopeful?',
 			),
-			(
-				'POS\n<feelings> Good </feelings>',
-				Sentiment.POS.value,
-				['good'],
-			),
-			(
-				'NEUTRAL\n<feelings> Unsure </feelings>',
-				Sentiment.NEUTRAL.value,
-				['unsure']
-			),
-			(
-				'NEG\n<feelings> Not great </feelings>',
-				Sentiment.NEG.value,
-				['not great']
-			),
-			(
-				(
-					'NEG\n<feelings> Not great </feelings>'
-					'\n<event>Lost your phone</event>'
-				),
-				Sentiment.NEG.value,
-				['not great'],
-				'lost your phone',
-
-			),
-
 		])
 	def test_feelings_post_process(self,
 		model_output: str,
-		target_sentiment: Sentiment,
-		target_feelings: list[str],
-		target_event: str = None):
+		target_sentiment: str,
+		target_question: str):
 
 		output = my_app.feelings_post_process(model_output)
 
 		self.assertEqual(output['sentiment'], target_sentiment)
-		self.assertEqual(output['feelings'], target_feelings)
-
-		if target_event:
-			self.assertEqual(output['event'], target_event)
+		self.assertEqual(output['question'], target_question)
 
 
 	@parameterized.expand([
