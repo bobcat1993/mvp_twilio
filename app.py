@@ -282,8 +282,15 @@ def save_abc_data():
 		# TODO(toni) Create an empty data list if this is a new file.
 		json_file = f'flow_response_{file_name}.json'
 		path = os.path.join(OUT_FLOW_DATA_PATH, json_file)
-		with open(path) as f:
-			data = json.load(f)
+
+		# Check if the file already exists...
+		if not os.path.exists(path):
+			# If not create an empty list to collect the data.
+			data = []
+		else:
+			# Otherwise load the data we have so far.
+			with open(path) as f:
+				data = json.load(f)
 
 		# Add the new data.
 		data.append(message_body)
