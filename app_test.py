@@ -12,8 +12,7 @@ class TestApp(unittest.TestCase):
 
 	@parameterized.expand(
 		[
-		# This is being detected as neutral.
-		# ('I\'m good, thanks.', Sentiment.POS.value),
+		('I\'m good, thanks.', Sentiment.POS.value),
 		# This is being detected as neutral too.
 		# ('Feeling very tired today.', Sentiment.NEG.value),
 		('My car broke down, and I\'m feeling frustrated and stressed.',
@@ -42,6 +41,7 @@ class TestApp(unittest.TestCase):
 
 	  # Assert the response data or any specific values in the response
 	  response_data = response.get_json()
+	  logging.info('response_data %s', response_data)
 
 	  self.assertEqual(response_data['sentiment'], target_sentiment)
 	  self.assertIsNotNone(response_data['question'])

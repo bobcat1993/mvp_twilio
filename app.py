@@ -15,7 +15,10 @@ from utils import call_api as call_api
 import utils
 import copy
 import os
+from absl import flags
+FLAGS = flags.FLAGS
 
+flags.DEFINE_string('data_name', None, 'Name of the file where data will be stored')
 
 app = Flask(__name__)
 
@@ -30,10 +33,23 @@ def hello():
 # The feeling prompt: Expected output is of the form:
 # < NEG | POS | NEURTRAL >
 # <question> Why do you feel x </question>.
-_SENTIMENT_PROMPT = """For the following sentence please respond with POS if the sentiment is positive, NEG if the sentiment is negative or NEUTRAL if the sentiment is neutral. “{feeling}”.
-"""
+_FEELING_PROMPT = """For the following feelings please identify is the sentiment is positive (POS), negative (NEG) or neutral (NEUTRAL). Then referring to the feeling ask what happened to make them feel this way. The question should be asked in a friendly manner. If the sentence already describes the event, ask for a little more information about it.
 
-_FEELING_PROMPT = """The follow sentence is a feeling identified during the ABC of a CBT session. "{feeling}". Refering to the feeling ask what happened to make them feel this way. Start your response with <question> followed by the question, ending with </question>. The question should be asked in a friendly manner. If the sentence already describes the event, ask for a little more information about it.
+Here are some examples:
+
+Feeling: I'm good, thanks.
+POS
+<question> That's good to hear. What's going well for you today? </question>
+
+Feeling: Feeling a bit sad today.
+NEG
+<question> Sorry to hear this. Has something happened to make you feel sad? </question>
+
+Feeling: I've got a big presentation coming up and I'm super anxious!
+NEG
+<question> Oh, no! Can you tell me more about the presentation? </question>
+
+Feeling: {feeling}
 """
 
 def feelings_post_process(model_output: str) -> str:
@@ -81,26 +97,14 @@ def user_feeling():
 
 	# Create the sentiment prompt.
 	# The "feeling" key comes from the http_feeling widget on the Twilio side.
-	sentiment_prompt = _SENTIMENT_PROMPT.format(
+	sentiment_prompt = _FEELING_PROMPT.format(
 		feeling=message_body['feeling'])
 
 	# Call to the LLM
-	sentiment_model_output = call_api(
+	model_output = call_api(
 		origin='user_feeling',
 		out_dir=OUT_GPT_DATA_PATH,
 		prompt=sentiment_prompt)
-
-	# Create the feeling question prompt.
-	feeling_prompt = _FEELING_PROMPT.format(
-		feeling=message_body['feeling'])
-
-	# Call to the LLM
-	feeling_model_output = call_api(
-		origin='user_feeling',
-		out_dir=OUT_GPT_DATA_PATH,
-		prompt=feeling_prompt)
-
-	model_output = f'{sentiment_model_output}\n{feeling_model_output}'
 
 	# Post-process the output to get the sentiment and feelings.
 	response = feelings_post_process(model_output)
@@ -263,7 +267,7 @@ def save_abc_data():
 
 		# Save the data
 		json_object = json.dumps(message_body, indent=2)
-		path = os.path.join(OUT_FLOW_DATA_PATH, 'flow_response.json')
+		path = os.path.join(OUT_FLOW_DATA_PATH, f'flow_response_{FLAGS.data_name}.json')
 		with open(path, "a") as outfile:
 			outfile.write(json_object)
 
