@@ -15,15 +15,23 @@ from utils import call_api as call_api
 import utils
 import copy
 import os
-from absl import flags
-FLAGS = flags.FLAGS
+import sys
+import datetime
 
-flags.DEFINE_string('data_name', None, 'Name of the file where data will be stored')
+from absl import flags
+
+flags.DEFINE_string('file_name', None, 'Name of the file where data will be stored')
+
 
 app = Flask(__name__)
 
 OUT_GPT_DATA_PATH = 'data/gpt_outputs'
 OUT_FLOW_DATA_PATH = 'data/flow_outputs'
+
+
+@app.before_first_request
+def parse_flags():
+	flags.FLAGS(sys.argv)
 
 @app.route('/')
 def hello():
@@ -259,19 +267,23 @@ def positive_feedback():
 def save_abc_data():
 	"""Saves data at the end of the ABC chat."""
 	# Retrieve data from the request sent by Twilio
+	file_name = flags.FLAGS.file_name
 	try:
 		message_body = request.json
 
 		# Hash the user_id so that the data is pseudo-anonyms.
 		message_body['user_id'] = str(hash(message_body['user_id']))
 
+		now = datetime.datetime.now()
+		message_body['time'] = str(now)
+
 		# Save the data
 		json_object = json.dumps(message_body, indent=2)
-		path = os.path.join(OUT_FLOW_DATA_PATH, f'flow_response_{FLAGS.data_name}.json')
+		path = os.path.join(OUT_FLOW_DATA_PATH, f'flow_response_{file_name}.json')
 		with open(path, "a") as outfile:
 			outfile.write(json_object)
 
-		return jsonify({'message': 'Data saved'})
+		return jsonify({'message': f'Data saved to {file_name}'})
 	except Exception as e:
 		return jsonify({'error': str(e)})
 
