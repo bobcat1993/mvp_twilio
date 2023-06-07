@@ -277,11 +277,21 @@ def save_abc_data():
 		now = datetime.datetime.now()
 		message_body['time'] = str(now)
 
-		# Save the data
-		json_object = json.dumps(message_body, indent=2)
-		path = os.path.join(OUT_FLOW_DATA_PATH, f'flow_response_{file_name}.json')
-		with open(path, "a") as outfile:
-			outfile.write(json_object)
+		# To save the data we need to load the current data.
+		# Read Existing JSON File
+		# TODO(toni) Create an empty data list if this is a new file.
+		json_file = f'flow_response_{file_name}.json'
+		path = os.path.join(OUT_FLOW_DATA_PATH, json_file)
+		with open(path) as f:
+			data = json.load(f)
+
+		# Add the new data.
+		data.append(message_body)
+
+		# Save the updated data.
+		with open(path, 'w') as f:
+			json.dump(data, f, indent=2)
+		f.close()
 
 		return jsonify({'message': f'Data saved to {file_name}'})
 	except Exception as e:
