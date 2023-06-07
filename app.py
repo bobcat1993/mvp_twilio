@@ -17,6 +17,7 @@ import copy
 import os
 import sys
 import datetime
+from hashlib import md5
 
 from absl import flags
 
@@ -263,6 +264,9 @@ def positive_feedback():
 
 	return jsonify(response)
 
+def string_hash(string):
+	return md5(string.encode()).hexdigest()
+
 @app.post('/save_abc_data')
 def save_abc_data():
 	"""Saves data at the end of the ABC chat."""
@@ -272,7 +276,7 @@ def save_abc_data():
 		message_body = request.json
 
 		# Hash the user_id so that the data is pseudo-anonyms.
-		message_body['user_id'] = str(hash(message_body['user_id']))
+		message_body['user_id'] = string_hash(message_body['user_id'])
 
 		now = datetime.datetime.now()
 		message_body['time'] = str(now)
