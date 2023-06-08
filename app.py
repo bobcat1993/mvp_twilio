@@ -63,11 +63,14 @@ def parse_flags():
 	# If running on heroku it will use url of Postgres.
 	database_url = os.getenv("DATABASE_URL")
 	if database_url.startswith('postgres://'):
-    database_url.replace('postgres://', 'postgresql://')
+		database_url.replace('postgres://', 'postgresql://')
 	app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 
 	# initialize the app with the extension
-	db.init_app(app)
+	# Check if db.init_app(app) has already been called
+	if not hasattr(app, 'db_initialized'):
+		db.init_app(app)
+		app.db_initialized = True
 
 	# Create the database.
 	with app.app_context():
