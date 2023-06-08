@@ -18,21 +18,54 @@ import os
 import sys
 import datetime
 from hashlib import md5
+from flask_sqlalchemy import SQLAlchemy
 
 from absl import flags
 
 flags.DEFINE_string('file_name', None, 'Name of the file where data will be stored')
 
 
+# create the extension
+db = SQLAlchemy()
+
 app = Flask(__name__)
 
 OUT_GPT_DATA_PATH = 'data/gpt_outputs'
-OUT_FLOW_DATA_PATH = 'data/flow_outputs'
+# OUT_FLOW_DATA_PATH = 'data/flow_outputs'
+
+
+class FlowDatum(db.Model):
+
+	id = db.Column(db.Integer, primary_key=True)
+	user_feeling = db.Column(db.String, nullable=True)
+	user_event = db.Column(db.String, nullable=True)
+	bot_feeling = db.Column(db.String, nullable=True)
+	user_belief = db.Column(db.String, nullable=True)
+	bot_distortions = db.Column(db.String, nullable=True)
+	user_rephrase = db.Column(db.String, nullable=True)
+	user_feel_after = db.Column(db.String, nullable=True)
+	user_feedback = db.Column(db.String, nullable=True)
+	flow_sid = db.Column(db.String, nullable=True)
+	origin = db.Column(db.String, nullable=True)
+	user_id = db.Column(db.String, nullable=True)
+	error = db.Column(db.String, nullable=True)
+	time = db.Column(db.DateTime, nullable=True)
 
 
 @app.before_first_request
 def parse_flags():
 	flags.FLAGS(sys.argv)
+
+	# configure the SQLite database, relative to the app instance folder
+	app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{flags.FLAGS.file_name}.db"
+	
+	# initialize the app with the extension
+	db.init_app(app)
+
+	# Create the database.
+	with app.app_context():
+		db.create_all()
+
 
 @app.route('/')
 def hello():
@@ -279,30 +312,10 @@ def save_abc_data():
 		message_body['user_id'] = string_hash(message_body['user_id'])
 
 		now = datetime.datetime.now()
-		message_body['time'] = str(now)
 
-		# To save the data we need to load the current data.
-		# Read Existing JSON File
-		# TODO(toni) Create an empty data list if this is a new file.
-		json_file = f'flow_response_{file_name}.json'
-		path = os.path.join(OUT_FLOW_DATA_PATH, json_file)
-
-		# Check if the file already exists...
-		if not os.path.exists(path):
-			# If not create an empty list to collect the data.
-			data = []
-		else:
-			# Otherwise load the data we have so far.
-			with open(path) as f:
-				data = json.load(f)
-
-		# Add the new data.
-		data.append(message_body)
-
-		# Save the updated data.
-		with open(path, 'w') as f:
-			json.dump(data, f, indent=2)
-		f.close()
+		flow_datum = FlowDatum(**message_body)
+		db.session.add(flow_datum)
+		db.session.commit()
 
 		return jsonify({'message': f'Data saved to {file_name}'})
 	except Exception as e:
