@@ -57,12 +57,13 @@ class FlowDatum(db.Model):
 def parse_flags():
 	flags.FLAGS(sys.argv)
 
-	# configure the SQLite database, relative to the app instance folder
-	# if ENV = 'dev':
-	# 	app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{flags.FLAGS.file_name}.db"
-	# else:
-	# Use the ulr of Postgres.
+	# Configure the SQLite database, relative to the app instance folder
+	# TODO(toni) Make this more clean.
+	# If local it will use the DATABASE_URL stored in the local .env.
+	# If running on heroku it will use url of Postgres.
 	database_url = os.getenv("DATABASE_URL")
+	if database_url.startswith('postgres://'):
+    database_url.replace('postgres://', 'postgresql://')
 	app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 
 	# initialize the app with the extension
