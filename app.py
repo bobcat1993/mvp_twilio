@@ -19,6 +19,7 @@ import sys
 import datetime
 from hashlib import md5
 from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv
 
 from absl import flags
 
@@ -57,8 +58,13 @@ def parse_flags():
 	flags.FLAGS(sys.argv)
 
 	# configure the SQLite database, relative to the app instance folder
-	app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{flags.FLAGS.file_name}.db"
-	
+	# if ENV = 'dev':
+	# 	app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{flags.FLAGS.file_name}.db"
+	# else:
+	# Use the ulr of Postgres.
+	database_url = os.getenv("DATABASE_URL")
+	app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+
 	# initialize the app with the extension
 	db.init_app(app)
 
