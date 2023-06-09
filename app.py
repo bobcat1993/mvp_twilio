@@ -20,6 +20,8 @@ import datetime
 from hashlib import md5
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
+from utils import validate_twilio_request
+
 
 from absl import flags
 
@@ -139,6 +141,7 @@ def user_feeling_test():
 	return jsonify(response)
 
 @app.post('/feeling')
+@validate_twilio_request
 def user_feeling():
 	"""Response to: How are you feeling today?"""
 
@@ -184,6 +187,7 @@ def ask_for_thought_post_processing(model_output: str) -> str:
 	return dict(question=question)
 
 @app.post('/thought')
+@validate_twilio_request
 def ask_for_thought():
 	"""Asks user for their thoughts, belief or self-talk."""
 
@@ -235,6 +239,7 @@ def detect_distortions_test():
 	return jsonify(response)
 
 @app.post('/distortions')
+@validate_twilio_request
 def detect_distortions():
 	"""Detect distortions in the users belief."""
 
@@ -284,6 +289,7 @@ def positive_feedback_test():
 
 
 @app.post('/positive_feedback')
+@validate_twilio_request
 def positive_feedback():
 	"""Responds to users reason for being in a positive mood."""
 
@@ -311,6 +317,7 @@ def string_hash(string):
 	return md5(string.encode()).hexdigest()
 
 @app.post('/save_abc_data')
+@validate_twilio_request
 def save_abc_data():
 	"""Saves data at the end of the ABC chat."""
 	# Retrieve data from the request sent by Twilio

@@ -8,6 +8,8 @@ from abc_types import Sentiment
 class TestApp(unittest.TestCase):
 
 	def setUp(self):
+		app.config['TESTING'] = True
+		app.config['DEBUG'] = True 
 		self.app = app.test_client()
 
 	@parameterized.expand(
