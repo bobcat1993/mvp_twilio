@@ -128,10 +128,10 @@ def call_api(
 	# Save the response.
 	# We want to save all responses so that we have a clear record of what's been
 	# tried so far.
-	json_object = json.dumps(response, indent=2)
-	path = os.path.join(out_dir, 'openai_api_calls.json')
-	with open(path, "a") as outfile:
-		outfile.write(json_object)
+	# json_object = json.dumps(response, indent=2)
+	# path = os.path.join(out_dir, 'openai_api_calls.json')
+	# with open(path, "a") as outfile:
+	# 	outfile.write(json_object)
 
 	# TODO(toni) Check finish reason! Needs to be "stop" not "length".
 	return response['choices'][0]['message']['content']
