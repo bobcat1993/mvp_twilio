@@ -322,6 +322,7 @@ def save_abc_data():
 		message_body['user_id'] = string_hash(message_body['user_id'])
 
 		now = datetime.datetime.now()
+		message_body['time'] = now
 
 		flow_datum = FlowDatum(**message_body)
 		db.session.add(flow_datum)
