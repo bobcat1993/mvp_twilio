@@ -230,7 +230,13 @@ When you think about this situation, what's going through your head? Any recurri
 def ask_for_thought_post_processing(model_output: str) -> str:
 	"""Post processes outputs from the _ASKING_FOR_THOUGHT prompt."""
 
+	# TODO(toni) Sometimes the question is good, but the formatting is
+	# not correct.
+
 	question = utils.post_process_tags(model_output, 'question')
+	if not question:
+		# If the was no question, ask the default question.
+		question = _DEFAULT_ASK_FOR_THOUGHT
 
 	return dict(question=question)
 
