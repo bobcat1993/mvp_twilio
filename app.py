@@ -97,11 +97,11 @@ POS
 
 Feeling: Feeling a bit sad today.
 NEG
-<question> Sorry to hear this. Has something happened to make you feel sad? </question>
+<question> Sorry to hear this. What's happened to make you feel sad? </question>
 
 Feeling: I've got a big presentation coming up and I'm super anxious!
 NEG
-<question> Oh, no! Can you tell me more about the presentation? </question>
+<question> Oh, no! Tell me more about the presentation? </question>
 
 Feeling: {feeling}
 """
