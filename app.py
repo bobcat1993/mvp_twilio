@@ -113,6 +113,8 @@ NEG
 Feeling: {feeling}
 """
 
+_DEFAULT_ASK_FOR_FEELING = """Tell me more about what\'s happened to make you feel this way?"""
+
 def feelings_post_process(model_output: str) -> str:
 	"""Post processes outputs from the _FEELING_PROMPT prompt."""
 
@@ -129,6 +131,9 @@ def feelings_post_process(model_output: str) -> str:
 
 	# Get the question
 	question = utils.post_process_tags(model_output, 'question')
+
+	if not question:
+		return _DEFAULT_ASK_FOR_FEELING
 
 	return dict(
 		sentiment=sentiment, question=question)
@@ -230,8 +235,8 @@ When you think about this situation, what's going through your head? Any recurri
 def ask_for_thought_post_processing(model_output: str) -> str:
 	"""Post processes outputs from the _ASKING_FOR_THOUGHT prompt."""
 
-	# TODO(toni) Sometimes the question is good, but the formatting is
-	# not correct.
+	# TODO(toni) 1/10 times the question is good, but the formatting is
+	# not correct -- hence we use a default question for now.
 
 	question = utils.post_process_tags(model_output, 'question')
 	if not question:
