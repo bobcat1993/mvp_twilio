@@ -213,16 +213,16 @@ _ASKING_FOR_THOUGHT_PROMPT = """The following event was supplied by a user. Refe
 Here are some examples:
 
 Event: My delivery is running really late and I'm worried it wont arrive in time.
-<question> What thoughts are running through your mind when you think about the possibility of your delivery being late? </question>
+Question: <question> What thoughts are running through your mind when you think about the possibility of your delivery being late? </question>
 
 Event: I have too much work to do and I'm running really behind.
-<question> It sounds like you're feeling really overwhelmed with your workload. What thoughts or beliefs do you have about your ability to catch up and get your work done on time? </question>
+Question: <question> It sounds like you're feeling really overwhelmed with your workload. What thoughts or beliefs do you have about your ability to catch up and get your work done on time? </question>
 
-Event: I just started a new project and I'm feeling a mix of .
-<question> I'm sorry to hear that you haven't been able to sleep. Can you tell me what thoughts were going through your mind last night that might have kept you awake? </question>
+Event: I haven't slept all night!
+Question: <question> I'm sorry to hear that you haven't been able to sleep. Can you tell me what thoughts were going through your mind last night that might have kept you awake? </question>
 
 Event: {event}
-"""
+Question:"""
 
 _DEFAULT_ASK_FOR_THOUGHT = """
 When you think about this situation, what's going through your head? Any recurring thoughts or beliefs?"""
