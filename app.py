@@ -175,6 +175,34 @@ def user_feeling():
 	return jsonify(response)
 
 
+@app.post('/detect_event')
+@validate_twilio_request
+def detect_event():
+	"""Detects if the user has specified an event.
+	
+	Checks if the current user_event contains a user event. If it does
+		this information is returned. If not the model continues to ask
+		questions and update the history until an event has been detected.
+
+	"""
+	message_body = request.json
+
+	user_feeling = message_body['user_feeling']
+	current_user_event = message_body['user_event']
+	history = message_body['history']
+
+	# TODO(toni) Got to here!
+
+	# response = openai.ChatCompletion.create(
+	# 	model=model,
+	# 	messages=[
+	# 		{"role": "system", "content": "You are a helpful assistant."},
+	# 		{"role": "user", "content": prompt}],
+	# 	max_tokens=max_tokens,
+	# 	temperature=temperature,
+	# 	)
+
+
 # The ask for thought prompt: Expected output is:
 # <question> question </question>.
 # Asking the the user for any self-talk/beliefs/thoughts in the
