@@ -104,7 +104,7 @@ def call_api(
 	Returns:
 		A text response.
 	"""
-	setup_openai()
+	# setup_openai()
 
 	response = openai.ChatCompletion.create(
 		model=model,

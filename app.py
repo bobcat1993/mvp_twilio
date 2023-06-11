@@ -21,6 +21,7 @@ from hashlib import md5
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from utils import validate_twilio_request
+import openai
 
 
 from absl import flags
@@ -60,7 +61,7 @@ class FlowDatum(db.Model):
 
 
 @app.before_first_request
-def parse_flags():
+def init_app():
 	flags.FLAGS(sys.argv)
 
 	# Configure the SQLite database, relative to the app instance folder
@@ -80,6 +81,9 @@ def parse_flags():
 	# Create the database.
 	with app.app_context():
 		db.create_all()
+
+	# Setup the openai API.
+	utils.setup_openai()
 
 
 @app.route('/')

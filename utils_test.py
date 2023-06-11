@@ -7,6 +7,9 @@ from abc_types import Sentiment
 
 class UtilsTest(unittest.TestCase):
 
+	def setUp(self):
+		model_list = utils.setup_openai()
+
 	def test_dummy_call_api(self):
 
 		response = utils.dummy_call_api(
