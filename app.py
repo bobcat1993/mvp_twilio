@@ -164,20 +164,77 @@ def user_feeling():
 
 	# Create the sentiment prompt.
 	# The "feeling" key comes from the http_feeling widget on the Twilio side.
-	sentiment_prompt = _FEELING_PROMPT.format(
+	prompt = _FEELING_PROMPT.format(
 		feeling=message_body['feeling'])
 
 	# Call to the LLM
 	model_output = call_api(
 		origin='user_feeling',
 		out_dir=OUT_GPT_DATA_PATH,
-		prompt=sentiment_prompt)
+		prompt=prompt)
 
 	# Post-process the output to get the sentiment and feelings.
 	response = feelings_post_process(model_output)
 
 	# Return a JSON response
 	return jsonify(response)
+
+
+# The detect sentiment prompt: Expected output is of the form:
+# < NEG | POS | NEURTRAL >
+_SENTIMENT_PROMPT = """For the following feelings please identify is the sentiment is positive (POS), negative (NEG) or neutral (NEUTRAL).
+
+Here are some examples:
+
+Feeling: I'm good, thanks.
+POS
+
+Feeling: Feeling a bit sad today.
+NEG
+
+Feeling: I've got a big presentation coming up and I'm super anxious!
+NEG
+
+Feeling: {feeling}
+"""
+
+# TODO(toni) Use this in feelings_post_process. 
+def detect_sentiment_post_process(model_output: str):
+	# Get the sentiment.
+	sentiment = None
+	if 'POS' in model_output:
+		sentiment = Sentiment.POS.value
+	elif 'NEG' in model_output:
+		sentiment = Sentiment.NEG.value
+	elif 'NEUTRAL' in model_output:
+		sentiment = Sentiment.NEUTRAL.value
+	else:
+		app.logger.warning('Sentiment in %s not detected!', model_output)
+
+	return dict(sentiment=sentiment)
+
+@app.post('/detect_sentiment')
+def detect_sentiment():
+
+	# Retrieve data from the request sent by Twilio
+	message_body = request.json
+
+	sentiment_prompt = _SENTIMENT_PROMPT.format(
+		feeling=message_body['feeling'])
+
+	# Call to the LLM
+	model_output = call_api(
+		origin='detect_sentiment',
+		out_dir=OUT_GPT_DATA_PATH,
+		prompt=prompt)
+
+	# Post-process the output to get the sentiment and feelings.
+	response = feelings_post_process(model_output)
+
+	# Return a JSON response
+	return jsonify(response)
+
+
 
 
 @app.post('/detect_event')
