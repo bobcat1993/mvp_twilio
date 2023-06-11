@@ -219,7 +219,7 @@ def detect_sentiment():
 	# Retrieve data from the request sent by Twilio
 	message_body = request.json
 
-	sentiment_prompt = _SENTIMENT_PROMPT.format(
+	prompt = _SENTIMENT_PROMPT.format(
 		feeling=message_body['feeling'])
 
 	# Call to the LLM
@@ -229,17 +229,17 @@ def detect_sentiment():
 		prompt=prompt)
 
 	# Post-process the output to get the sentiment and feelings.
-	response = feelings_post_process(model_output)
+	response = detect_sentiment_post_process(model_output)
 
 	# Return a JSON response
 	return jsonify(response)
 
+_ASK_FOR_EVENT_SYSETM_PROMPT = """You are a focused, friendly assistant and you have one goal. The user has told how they are feeling and you must find out one event that is making them feel this way. When you do you should respond with "STOP EVENT DETECTED" and give a short sentence to summarise the event."""
 
 
-
-@app.post('/detect_event')
+@app.post('/ask_for_event')
 @validate_twilio_request
-def detect_event():
+def ask_for_event():
 	"""Detects if the user has specified an event.
 	
 	Checks if the current user_event contains a user event. If it does
@@ -250,19 +250,43 @@ def detect_event():
 	message_body = request.json
 
 	user_feeling = message_body['user_feeling']
-	current_user_event = message_body['user_event']
-	history = message_body['history']
+	history = message_body['event_history']
+	current_user_event = message_body['last_user_response']
 
-	# TODO(toni) Got to here!
+	# Hacky way to add the previous user response, since
+	if current_user_event:
+		history.append({"role": "user", "content": current_user_event})
 
-	# response = openai.ChatCompletion.create(
-	# 	model=model,
-	# 	messages=[
-	# 		{"role": "system", "content": "You are a helpful assistant."},
-	# 		{"role": "user", "content": prompt}],
-	# 	max_tokens=max_tokens,
-	# 	temperature=temperature,
-	# 	)
+	app.logger.info('[ask_for_event] history: %s', history)
+
+	messages= [
+		{"role": "system", "content": _ASK_FOR_EVENT_SYSETM_PROMPT},
+		{"role": "user", "content": user_feeling},
+		*history,
+	]
+
+	model_output = openai.ChatCompletion.create(
+		model="gpt-3.5-turbo",
+		messages=messages,
+		max_tokens=1024,
+		temperature=1.0,
+		)
+
+	history.append(model_output['choices'][0]['message'])
+	next_question = model_output['choices'][0]['message']['content']
+
+	# Check if there is an event detected.
+	has_event = True if 'STOP EVENT DETECTED' in next_question else False
+
+	if has_event:
+		user_event = current_user_event
+	
+	return jsonify(dict(
+		has_event=has_event,
+		question=next_question,
+		history=history,
+		user_event=current_user_event,
+		))
 
 
 # The ask for thought prompt: Expected output is:
