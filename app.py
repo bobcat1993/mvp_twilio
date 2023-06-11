@@ -208,7 +208,20 @@ def detect_event():
 # Asking the the user for any self-talk/beliefs/thoughts in the
 # context of the event. 
 # This prompt includes one example.
-_ASKING_FOR_THOUGHT_PROMPT = """The following sentence is an activating event identified during the ABC of a CBT session. "{event}" You must now ask the user to identify any thoughts, beliefs or self-talk to help keep them on track with their CBT session. Give your response must start with <question> followed by the question to identify self-talk, beliefs or thoughts. End with </question>. Ask the question in a friendly way.
+_ASKING_FOR_THOUGHT_PROMPT = """The following event was supplied by a user. Referring to the event, ask the user a question to help them identify any thoughts, beliefs or self-talk to help keep them on track with their CBT session. Ask the question in a friendly way.
+
+Here are some examples:
+
+Event: My delivery is running really late and I'm worried it wont arrive in time.
+<question> What thoughts are running through your mind when you think about the possibility of your delivery being late? </question>
+
+Event: I have too much work to do and I'm running really behind.
+<question> It sounds like you're feeling really overwhelmed with your workload. What thoughts or beliefs do you have about your ability to catch up and get your work done on time? </question>
+
+Event: I just started a new project and I'm feeling a mix of .
+<question> I'm sorry to hear that you haven't been able to sleep. Can you tell me what thoughts were going through your mind last night that might have kept you awake? </question>
+
+Event: {event}
 """
 
 _DEFAULT_ASK_FOR_THOUGHT = """
