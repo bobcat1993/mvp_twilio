@@ -2,8 +2,11 @@ import unittest
 import app as my_app
 from app import app
 from parameterized import parameterized
-import logging
 from abc_types import Sentiment
+import logging
+
+# See all the logs.
+app.logger.setLevel(logging.INFO)
 
 class TestApp(unittest.TestCase):
 
@@ -34,16 +37,15 @@ class TestApp(unittest.TestCase):
 	  payload = {'feeling': user_feeling}
 
 	  # Send a POST request to the endpoint with the sample payload
-	  logging.info('app:', self.app)
 	  response = self.app.post('/feeling', json=payload)
-	  logging.info('response %s', response)
+	  app.logger.info('response %s', response)
 
 	  # Assert the response status code
 	  self.assertEqual(response.status_code, 200)
 
 	  # Assert the response data or any specific values in the response
 	  response_data = response.get_json()
-	  logging.info('response_data %s', response_data)
+	  app.logger.info('response_data %s', response_data)
 
 	  self.assertEqual(response_data['sentiment'], target_sentiment)
 	  self.assertIsNotNone(response_data['question'])
@@ -122,9 +124,8 @@ class TestApp(unittest.TestCase):
 		payload = {'event': user_event}
 
 		# Send a POST request to the endpoint with the sample payload.
-		logging.info('app:', self.app)
 		response = self.app.post('/thought', json=payload)
-		logging.info('response %s', response)
+		app.logger.info('response %s', response)
 
 		# Assert the response status code
 		self.assertEqual(response.status_code, 200)
@@ -193,9 +194,8 @@ class TestApp(unittest.TestCase):
 		payload = {'belief': user_belief}
 
 		# Send a POST request to the endpoint with the sample payload
-		logging.info('app:', self.app)
 		response = self.app.post('/distortions', json=payload)
-		logging.info('response %s', response)
+		app.logger.info('response %s', response)
 
 		# Assert the response status code
 		self.assertEqual(response.status_code, 200)
@@ -210,7 +210,7 @@ class TestApp(unittest.TestCase):
 		# Twilio
 		payload = {"positive_user_event": "I got all my chores done."}
 		response = self.app.post('/positive_feedback', json=payload)
-		logging.info('response %s', response)
+		app.logger.info('response %s', response)
 		self.assertEqual(response.status_code, 200)
 
 
@@ -231,10 +231,8 @@ class TestApp(unittest.TestCase):
 			"origin": "test_save_abc_data",
 			"user_id": "dummy_hash"
 			}
-
-		logging.info('app:', self.app)
 		response = self.app.post('/save_abc_data', json=payload)
-		logging.info('response %s', response)
+		app.logger.info('response %s', response)
 		self.assertEqual(response.status_code, 200)
 
 

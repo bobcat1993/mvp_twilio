@@ -34,6 +34,9 @@ db = SQLAlchemy()
 
 app = Flask(__name__)
 
+# See all the logs.
+app.logger.setLevel(logging.INFO)
+
 OUT_GPT_DATA_PATH = 'data/gpt_outputs'
 # OUT_FLOW_DATA_PATH = 'data/flow_outputs'
 
@@ -68,7 +71,7 @@ def parse_flags():
 	if database_url.startswith('postgres://'):
 		database_url = database_url.replace(
 			'postgres://', 'postgresql://', 1)
-	logging.info(database_url)
+	app.logger.info(database_url)
 	app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 
 	# Initialize the app with the extension
@@ -118,7 +121,7 @@ def feelings_post_process(model_output: str) -> str:
 	elif 'NEUTRAL' in model_output:
 		sentiment = Sentiment.NEUTRAL.value
 	else:
-		logging.warning('Sentiment in %s not detected!', model_output)
+		app.logger.warning('Sentiment in %s not detected!', model_output)
 
 	# Get the question
 	question = utils.post_process_tags(model_output, 'question')
@@ -148,7 +151,7 @@ def user_feeling():
 	# Retrieve data from the request sent by Twilio
 	message_body = request.json
 
-	logging.info("message_body:", message_body)
+	app.logger.info("message_body:", message_body)
 
 	# Create the sentiment prompt.
 	# The "feeling" key comes from the http_feeling widget on the Twilio side.
@@ -222,7 +225,7 @@ def distortion_detection_post_processing(model_output: str) -> str:
 	question = utils.post_process_tags(model_output, 'question')
 
 	if not question.endswith('?'):
-		logging.warning('The question, %s, does not end with a "?".')
+		app.logger.warning('The question, %s, does not end with a "?".')
 
 	return dict(distortion=distortion, question=question)
 
