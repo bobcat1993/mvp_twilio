@@ -289,7 +289,10 @@ def ask_for_event():
 	has_event = True if 'STOP EVENT DETECTED' in next_question else False
 
 	if has_event:
-		user_event = current_user_event
+		# Don't use the raw value from the user any more.
+		# user_event = current_user_event
+
+		user_event = has_event.split('DETECTED').strip()
 	
 	return jsonify(
 		has_event=has_event,
