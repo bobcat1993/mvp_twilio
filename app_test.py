@@ -27,7 +27,6 @@ class TestApp(unittest.TestCase):
 		('I had so much fun, sad it\'s over', Sentiment.POS.value)
 		])
 
-	# TODO(toni) Reformat as target_sentiment.
 	def test_user_feeling(
 		self,
 		user_feeling: str,
@@ -73,6 +72,36 @@ class TestApp(unittest.TestCase):
 		self.assertEqual(output['sentiment'], target_sentiment)
 		self.assertEqual(output['question'], target_question)
 
+	@parameterized.expand(
+		[
+		('I\'m good, thanks.', Sentiment.POS.value),
+		('Feeling very tired today.', Sentiment.NEG.value),
+		('My car broke down, and I\'m feeling frustrated and stressed.',
+			Sentiment.NEG.value),
+		('I\'m not sure', Sentiment.NEUTRAL.value),
+		('I had a really fun time with my friends', Sentiment.POS.value),
+		('I had so much fun, sad it\'s over', Sentiment.POS.value)
+		])
+	def test_detect_sentiment(
+		self,
+		user_feeling: str,
+		target_sentiment: str):
+	  # Create a sample request payload to simulate the data sent by 
+	  # Twilio
+	  payload = {'feeling': user_feeling}
+
+	  # Send a POST request to the endpoint with the sample payload
+	  response = self.app.post('/feeling', json=payload)
+	  app.logger.info('response %s', response)
+
+	  # Assert the response status code
+	  self.assertEqual(response.status_code, 200)
+
+	  # Assert the response data or any specific values in the response
+	  response_data = response.get_json()
+	  app.logger.info('response_data %s', response_data)
+
+	  self.assertEqual(response_data['sentiment'], target_sentiment)
 
 	@parameterized.expand([
 		(
@@ -229,6 +258,12 @@ class TestApp(unittest.TestCase):
 			"user_feedback": "Nothing more from me",
 			"flow_sid": "some-twilio-sid",
 			"origin": "test_save_abc_data",
+			"event_history": [
+        {
+          "role": "assistant",
+          "content": "That’s great to hear! Is there anything on your mind that you would like to talk about?"
+          }
+        ],
 			"user_id": "dummy_hash"
 			}
 		response = self.app.post('/save_abc_data', json=payload)

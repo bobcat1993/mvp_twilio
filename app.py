@@ -58,6 +58,7 @@ class FlowDatum(db.Model):
 	origin = db.Column(db.String, nullable=True)
 	user_id = db.Column(db.String, nullable=True)
 	error = db.Column(db.String, nullable=True)
+	event_history = db.Column(db.String, nullable=True)
 	time = db.Column(db.DateTime, nullable=True)
 
 
@@ -292,7 +293,7 @@ def ask_for_event():
 		# Don't use the raw value from the user any more.
 		# user_event = current_user_event
 
-		user_event = has_event.split('DETECTED').strip()
+		user_event = next_question.split('DETECTED')[-1].strip()
 	
 	return jsonify(
 		has_event=has_event,
@@ -482,6 +483,8 @@ def save_abc_data():
 
 		now = datetime.datetime.now()
 		message_body['time'] = now
+
+		message_body['event_history'] = json.dumps(message_body['event_history'])
 
 		flow_datum = FlowDatum(**message_body)
 		db.session.add(flow_datum)
