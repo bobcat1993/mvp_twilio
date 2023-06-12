@@ -235,9 +235,15 @@ def detect_sentiment():
 	# Return a JSON response
 	return jsonify(response)
 
-_ASK_FOR_EVENT_SYSETM_PROMPT = """You are a focused, friendly assistant and you have one goal. The user has told how they are feeling and you must find out one event that is making them feel this way. When you do you should respond with "STOP EVENT DETECTED" and give a short sentence to summarise the event."""
+_ASK_FOR_EVENT_SYSETM_PROMPT = """You are a focused, friendly assistant and you have one goal. The user has told how they are feeling, find out whats event has made them feel this way. 
 
+For example, if the user say that are good, ask why they are feeling good and if the user says they are sad, find our what happened to make them sad.
 
+When you know the event, respond with "STOP EVENT DETECTED" and give a short sentence to summarise the event."""
+
+# TODO(toni) Use the event summary rather than the user_event.
+# TODO(toni) If after a fixed number of step no event is detected do something.
+# We can compute steps by the len(history).
 @app.post('/ask_for_event')
 @validate_twilio_request
 def ask_for_event():
