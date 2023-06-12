@@ -22,6 +22,7 @@ from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from utils import validate_twilio_request
 import openai
+import ast
 
 
 from absl import flags
@@ -250,7 +251,9 @@ def ask_for_event():
 	message_body = request.json
 
 	user_feeling = message_body['user_feeling']
+	# history = ast.literal_eval(message_body['event_history'])
 	history = message_body['event_history']
+
 	current_user_event = message_body['last_user_response']
 
 	# Hacky way to add the previous user response, since
@@ -261,6 +264,7 @@ def ask_for_event():
 
 	messages= [
 		{"role": "system", "content": _ASK_FOR_EVENT_SYSETM_PROMPT},
+		{"role": "assistant", "content": "How are you feeling right now?"},
 		{"role": "user", "content": user_feeling},
 		*history,
 	]
@@ -272,8 +276,8 @@ def ask_for_event():
 		temperature=1.0,
 		)
 
-	history.append(model_output['choices'][0]['message'])
 	next_question = model_output['choices'][0]['message']['content']
+	history.append({"role": "assistant", "content": next_question})
 
 	# Check if there is an event detected.
 	has_event = True if 'STOP EVENT DETECTED' in next_question else False
@@ -281,12 +285,11 @@ def ask_for_event():
 	if has_event:
 		user_event = current_user_event
 	
-	return jsonify(dict(
+	return jsonify(
 		has_event=has_event,
 		question=next_question,
-		history=history,
-		user_event=current_user_event,
-		))
+		history=json.dumps(history),  # Be sure to dump!!
+		user_event=current_user_event)
 
 
 # The ask for thought prompt: Expected output is:
