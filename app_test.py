@@ -234,6 +234,42 @@ class TestApp(unittest.TestCase):
 
 		# TODO(toni) Add asserts when we are using the LLM.
 
+	# TODO(toni) make param'ed test: 
+	@parameterized.expand([
+    ("I’m excited for the potential benefits but I’m also worried that there will be a lot of bugs.",
+    	[],
+    	None
+    ),
+    ("I’m excited for the potential benefits but I’m also worried that there will be a lot of bugs.",
+    	[{"role": "assistant", "content": "It's understandable to have such concerns. But do you think it's fair to assume that there will definitely be a lot of bugs even before giving it a chance?"}],
+    	"I think that there will be a lot of bugs!"
+    ),
+		])
+	# TODO(toni) Reformat as user_belief.
+	def test_distortion_loop(
+		self,
+		user_belief,
+		distortion_history,
+		last_user_response):
+		# Create a sample request payload to simulate the data sent by 
+		# Twilio
+		payload = {
+		'user_belief': user_belief,
+		"distortion_history": distortion_history,
+    "last_user_response": last_user_response}
+
+		# Send a POST request to the endpoint with the sample payload
+		response = self.app.post('/distortion_loop', json=payload)
+		app.logger.info('response %s', response)
+
+		# Assert the response status code
+		self.assertEqual(response.status_code, 200)
+
+		# Assert the response data or any specific values in the response
+		response_data = response.get_json()
+
+		# TODO(toni) Add asserts when we are using the LLM.
+
 	def test_possitive_feedback(self):
 		# Create a sample request payload to simulate the data sent by 
 		# Twilio

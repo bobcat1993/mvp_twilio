@@ -242,7 +242,6 @@ For example, if the user say that are good, ask why they are feeling good and if
 
 When you know the event, respond with "STOP EVENT DETECTED" and give a short sentence to summarise the event."""
 
-# TODO(toni) Use the event summary rather than the user_event.
 # TODO(toni) If after a fixed number of step no event is detected do something.
 # We can compute steps by the len(history).
 @app.post('/ask_for_event')
@@ -419,6 +418,68 @@ def detect_distortions():
 	response = distortion_detection_post_processing(model_output)
 
 	return jsonify(response)
+
+_DISTORTION_SYSTEM_PROMPT = """
+The user has shared a belief with you. You must now identify a distortion in their thinking and ask them questions to help them realise that distortion. This should be framed in a friendly way and take the side of the user.
+
+The conversation must finish after no more than three turns. Respond with "DONE" when the user has identified the distortion.
+"""
+
+MAX_STEPS = 6  # Relates to the "three" above.
+
+@app.post('/distortion_loop')
+@validate_twilio_request
+def distortion_loop():
+	"""Asks the users question to help identify distortions.
+	
+	Asks the user questions until the conversation in DONE.
+
+	"""
+	message_body = request.json
+
+	user_belief = message_body['user_belief']
+	history = message_body['distortion_history']
+
+	current_user_response = message_body['last_user_response']
+
+	# Add the previous user response to the end of the history.
+	if current_user_response:
+		history.append({"role": "user", "content": current_user_response})
+
+	app.logger.info('[ask_for_event] history: %s', history)
+
+	messages= [
+		{"role": "system", "content": _DISTORTION_SYSTEM_PROMPT},
+		{"role": "user", "content": user_belief},
+		*history,
+	]
+
+	model_output = openai.ChatCompletion.create(
+		model="gpt-3.5-turbo",
+		messages=messages,
+		max_tokens=1024,
+		temperature=1.0,
+		)
+
+	next_question = model_output['choices'][0]['message']['content']
+	history.append({"role": "assistant", "content": next_question})
+
+	# Check if there is an event detected.
+	is_done = True if 'DONE' in next_question else False
+
+	if len(messages) == MAX_STEPS:
+		app.logger.warn('is_done != True, but has reached 6 messages.')
+		is_done = True
+
+	if is_done:
+		next_question = next_question.replace('DONE', '')
+	
+	return jsonify(
+		is_done=is_done,
+		question=next_question,
+		history=json.dumps(history),  # Be sure to dump!!
+	)
+
 
 _POSITIVE_FEEDBACK_PROMPT = """
 For the following sentence, start your response with <response> then write down a sentence, in the 2nd person, praises the user if they have achieve something, otherwise response appropriately in a supportive way. End with </response >. Do not ask any questions. "{positive_event}"
