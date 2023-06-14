@@ -234,7 +234,7 @@ def detect_sentiment():
 	response = detect_sentiment_post_process(model_output)
 
 	# Return a JSON response
-	return jsonify(response)
+	return jsonify(response), 200
 
 _ASK_FOR_EVENT_SYSETM_PROMPT = """You are a focused, friendly assistant and you have one goal. The user has told how they are feeling, find out whats event has made them feel this way. 
 
@@ -275,7 +275,8 @@ def ask_for_event():
 		*history,
 	]
 
-	model_output = openai.ChatCompletion.create(
+	# Using the chat_completion that's wrapped in a retry.
+	model_output = utils.chat_completion(
 		model="gpt-3.5-turbo",
 		messages=messages,
 		max_tokens=1024,
@@ -454,7 +455,7 @@ def distortion_loop():
 		*history,
 	]
 
-	model_output = openai.ChatCompletion.create(
+	model_output = utils.chat_completion(
 		model="gpt-3.5-turbo",
 		messages=messages,
 		max_tokens=1024,
@@ -516,7 +517,6 @@ def positive_feedback():
 		positive_event=message_body['positive_user_event'])
 
 	# Call to the LLM
-	# TODO(toni) Call the LLM
 	model_output = call_api(
 		origin='positive_feedback',
 		out_dir=OUT_GPT_DATA_PATH,

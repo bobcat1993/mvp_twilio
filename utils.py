@@ -13,6 +13,8 @@ from flask import abort, current_app, request
 
 load_dotenv()
 
+OPEN_AI_ERROR = 'OPEN_AI_ERROR'
+
 # Set up the openai LLM client.
 def setup_openai():
 	openai.organization = "org-PIBY8HetnWz6gzQASJ8TOy8d"
@@ -67,17 +69,61 @@ def dummy_call_api(
 		"max_tokens": max_tokens
 	}
 
-	# Save the response.
-	# We want to save all responses so that we have a clear record of what's been
-	# tried so far.
-	# json_object = json.dumps(response, indent=2)
-	# path = os.path.join(out_dir, 'dummy_api_calls.json')
-	# with open(path, "a") as outfile:
-	# 	outfile.write(json_object)
-
-
 	# TODO(toni) Check finish reason! Needs to be "stop" not "length".
 	return "\n\nThis is indeed a test"
+
+def retry_with_exponential_backoff(
+		func,
+		initial_delay: float = 1,
+		exponential_base: float = 2,
+		jitter: bool = True,
+		max_retries: int = 10,
+		errors: tuple = (openai.error.RateLimitError,),
+):
+		"""Retry a function with exponential backoff.
+
+		This function is copied from here:
+		https://github.com/openai/openai-cookbook/blob/main/examples/\
+		How_to_handle_rate_limits.ipynb
+		"""
+
+		def wrapper(*args, **kwargs):
+			# Initialize variables
+			num_retries = 0
+			delay = initial_delay
+
+			# Loop until a successful response or max_retries is hit or an exception is raised
+			while True:
+				try:
+						return func(*args, **kwargs)
+
+				# Retry on specified errors
+				except errors as e:
+					# Increment retries
+					num_retries += 1
+
+					# Check if max retries has been reached
+					if num_retries > max_retries:
+						raise Exception(
+							f"Maximum number of retries ({max_retries}) exceeded."
+						)
+
+					# Increment the delay
+					delay *= exponential_base * (1 + jitter * random.random())
+
+					# Sleep for the delay
+					time.sleep(delay)
+
+				# Raise exceptions for any errors not specified
+				except Exception as e:
+					raise e
+
+		return wrapper
+
+
+@retry_with_exponential_backoff
+def chat_completion(**kwargs):
+	return openai.ChatCompletion.create(**kwargs)
 
 
 def call_api(
@@ -89,6 +135,8 @@ def call_api(
 	temperature=1,
 	) -> str:
 	"""Call the OpenAI API to get a response.
+
+	Note a HTTP request from Twilio Studio can only last 10 seconds.
 
 	Args:
 		origin: Which function is this api being called from?
@@ -104,9 +152,8 @@ def call_api(
 	Returns:
 		A text response.
 	"""
-	# setup_openai()
 
-	response = openai.ChatCompletion.create(
+	response = chat_completion(
 		model=model,
 		messages=[
 			{"role": "system", "content": "You are a helpful assistant."},
@@ -114,7 +161,6 @@ def call_api(
 		max_tokens=max_tokens,
 		temperature=temperature,
 		)
-
 
 	# Add additional info
 	input_info = {
@@ -124,14 +170,6 @@ def call_api(
 		"max_tokens": max_tokens
 		}
 	response.update(input_info)
-
-	# Save the response.
-	# We want to save all responses so that we have a clear record of what's been
-	# tried so far.
-	# json_object = json.dumps(response, indent=2)
-	# path = os.path.join(out_dir, 'openai_api_calls.json')
-	# with open(path, "a") as outfile:
-	# 	outfile.write(json_object)
 
 	# TODO(toni) Check finish reason! Needs to be "stop" not "length".
 	return response['choices'][0]['message']['content']
@@ -182,6 +220,3 @@ def validate_twilio_request(f):
 		else:
 			return abort(403)
 	return decorated_function
-
-
-
