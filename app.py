@@ -277,7 +277,7 @@ def ask_for_event():
 
 	# Using the chat_completion that's wrapped in a retry.
 	model_output = utils.chat_completion(
-		model="gpt-3.5-turbo",
+		model="gpt-3.5-turbo-0613",
 		messages=messages,
 		max_tokens=1024,
 		temperature=1.0,
@@ -421,9 +421,9 @@ def detect_distortions():
 	return jsonify(response)
 
 _DISTORTION_SYSTEM_PROMPT = """
-The user has shared a belief with you. You must now identify a distortion in their thinking and ask them questions to help them realise that distortion. This should be framed in a friendly way and take the side of the user.
+The user has shared a belief with you. You must now identify a distortion in their thinking and ask them short questions to help them realise that distortion. This should be framed in a friendly way and take the side of the user.
 
-The conversation must finish after no more than three turns. Respond with "DONE" when the user has identified the distortion.
+The conversation must finish after no more than three turns. Respond with "DONE" when the user has identified the distortion and say something appropriate to end the conversation.
 """
 
 MAX_STEPS = 6  # Relates to the "three" above.
@@ -456,7 +456,7 @@ def distortion_loop():
 	]
 
 	model_output = utils.chat_completion(
-		model="gpt-3.5-turbo",
+		model="gpt-3.5-turbo-0613",
 		messages=messages,
 		max_tokens=1024,
 		temperature=1.0,
