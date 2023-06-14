@@ -423,8 +423,7 @@ def detect_distortions():
 _DISTORTION_SYSTEM_PROMPT = """
 The user has shared a belief with you. You must now identify a distortion in their thinking and ask them short questions to help them realise that distortion. This should be framed in a friendly way and take the side of the user.
 
-The conversation must finish after no more than three turns. Respond with "DONE" when the user has identified the distortion and say something appropriate to end the conversation.
-"""
+The conversation must finish after no more than three turns. Respond with "DONE" when the user has identified the distortion and say something appropriate to end the conversation on this turn. Do not include any questions on this turn."""
 
 MAX_STEPS = 6  # Relates to the "three" above.
 
