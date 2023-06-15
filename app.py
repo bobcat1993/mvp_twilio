@@ -240,7 +240,7 @@ _ASK_FOR_EVENT_SYSETM_PROMPT = """You are a focused, friendly assistant and you 
 
 For example, if the user say that are good, ask why they are feeling good and if the user says they are sad, find our what happened to make them sad.
 
-When you know the event, respond with "STOP EVENT DETECTED" and give a short sentence to summarise the event."""
+When you know the event, respond with "STOP EVENT DETECTED" followed by a short sentence summarising the event."""
 
 # TODO(toni) If after a fixed number of step no event is detected do something.
 # We can compute steps by the len(history).
@@ -292,8 +292,10 @@ def ask_for_event():
 	if has_event:
 		# Don't use the raw value from the user any more.
 		# user_event = current_user_event
-
 		user_event = next_question.split('DETECTED')[-1].strip()
+
+		if not user_event:
+			user_event = current_user_event
 	
 	return jsonify(
 		has_event=has_event,
