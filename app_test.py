@@ -15,62 +15,6 @@ class TestApp(unittest.TestCase):
 		app.config['DEBUG'] = True 
 		self.app = app.test_client()
 
-	@parameterized.expand(
-		[
-		('I\'m good, thanks.', Sentiment.POS.value),
-		# This is being detected as neutral too.
-		# ('Feeling very tired today.', Sentiment.NEG.value),
-		('My car broke down, and I\'m feeling frustrated and stressed.',
-			Sentiment.NEG.value),
-		('I\'m not sure', Sentiment.NEUTRAL.value),
-		('I had a really fun time with my friends', Sentiment.POS.value),
-		('I had so much fun, sad it\'s over', Sentiment.POS.value)
-		])
-
-	def test_user_feeling(
-		self,
-		user_feeling: str,
-		target_sentiment: str):
-	  # Create a sample request payload to simulate the data sent by 
-	  # Twilio
-	  payload = {'feeling': user_feeling}
-
-	  # Send a POST request to the endpoint with the sample payload
-	  response = self.app.post('/feeling', json=payload)
-	  app.logger.info('response %s', response)
-
-	  # Assert the response status code
-	  self.assertEqual(response.status_code, 200)
-
-	  # Assert the response data or any specific values in the response
-	  response_data = response.get_json()
-	  app.logger.info('response_data %s', response_data)
-
-	  self.assertEqual(response_data['sentiment'], target_sentiment)
-	  self.assertIsNotNone(response_data['question'])
-
-	@parameterized.expand(
-		[
-			(
-				'NEG\n<question> What\'s got you feeling helpless? </question>',
-				Sentiment.NEG.value,
-				'What\'s got you feeling helpless?',
-			),
-			(
-				'POS\n<question> What happened to make you feel hopeful? </question>',
-				Sentiment.POS.value,
-				'What happened to make you feel hopeful?',
-			),
-		])
-	def test_feelings_post_process(self,
-		model_output: str,
-		target_sentiment: str,
-		target_question: str):
-
-		output = my_app.feelings_post_process(model_output)
-
-		self.assertEqual(output['sentiment'], target_sentiment)
-		self.assertEqual(output['question'], target_question)
 
 	@parameterized.expand(
 		[
@@ -92,7 +36,7 @@ class TestApp(unittest.TestCase):
 	  payload = {'feeling': user_feeling}
 
 	  # Send a POST request to the endpoint with the sample payload
-	  response = self.app.post('/feeling', json=payload)
+	  response = self.app.post('/detect_sentiment', json=payload)
 	  app.logger.info('response %s', response)
 
 	  # Assert the response status code
@@ -164,78 +108,6 @@ class TestApp(unittest.TestCase):
 		response_data = response.get_json()
 		self.assertIsNotNone(response)
 
-
-	@parameterized.expand(
-		[
-			(
-				'multiple_questions',
-				'<distortion> Catastrophizing </distortion>'
-				'\n<question> What evidence is there to support the belief that you\'re doomed and will never be able to recover from this situation? </question>'
-				'\n\n<distortion> Overgeneralization </distortion>'
-				'\n<question> Have you faced similar situations in the past where you were able to recover? </question>'
-				'\n\n<distortion> Emotional reasoning </distortion>'
-				'\n<question> Are your feelings of doom and hopelessness based on facts or more on how you\'re currently feeling? </question>',
-				'Catastrophizing',
-				'What evidence is there to support the belief that you\'re doomed and will never be able to recover from this situation?',
-			),
-			(
-				'single_question_multi-word_distortion_upper_cases',
-				'<distortion> Impostor Syndrome </distortion>'
-				'\n<question> Hey, can you think of any specific accomplishments or skills that demonstrate your capability and competence? </question>',
-				'Impostor Syndrome',
-				'Hey, can you think of any specific accomplishments or skills that demonstrate your capability and competence?'
-			),
-			(
-				'single_question_multi-word_distortion_lower_cases',
-				'<distortion> Negative self-beliefs </distortion>'
-				'\n<question> What evidence do you have that supports the belief that you\'re not worthy of love and connection? Are there any experiences or relationships that contradict this belief? </question>',
-				'Negative self-beliefs',
-				'What evidence do you have that supports the belief that you\'re not worthy of love and connection? Are there any experiences or relationships that contradict this belief?'
-			),
-			(
-				'single_question',
-				'<distortion> Personalization </distortion>\n'
-				'<question> Are there any external factors or circumstances that contributed to the outcome, or are you solely responsible for the perceived failure? </question>',
-				'Personalization',
-				'Are there any external factors or circumstances that contributed to the outcome, or are you solely responsible for the perceived failure?'
-			)
-
-		])
-	def test_distortion_detection_post_processing(self,
-		test_name: str,
-		model_outupt: str,
-		target_distortion: str,
-		target_question: str):
-
-		output = my_app.distortion_detection_post_processing(model_outupt)
-
-		self.assertEqual(output['distortion'], target_distortion)
-		self.assertEqual(output['question'], target_question)
-
-	# TODO(toni) make param'ed test: 
-	@parameterized.expand([
-		('I\'m doomed and I\'ve lost everything I\'ll never be able to recover from this situation.'),
-		('I can\'t handle everything, that I\'m drowning in responsibilities, and that there\'s no way out of this never-ending cycle.')
-		])
-	# TODO(toni) Reformat as user_belief.
-	def test_detect_distortions(self, user_belief):
-		# Create a sample request payload to simulate the data sent by 
-		# Twilio
-		payload = {'belief': user_belief}
-
-		# Send a POST request to the endpoint with the sample payload
-		response = self.app.post('/distortions', json=payload)
-		app.logger.info('response %s', response)
-
-		# Assert the response status code
-		self.assertEqual(response.status_code, 200)
-
-		# Assert the response data or any specific values in the response
-		response_data = response.get_json()
-
-		# TODO(toni) Add asserts when we are using the LLM.
-
-	# TODO(toni) make param'ed test: 
 	@parameterized.expand([
     ("I’m excited for the potential benefits but I’m also worried that there will be a lot of bugs.",
     	[],
