@@ -25,7 +25,8 @@ class TestApp(unittest.TestCase):
 			Sentiment.NEG.value),
 		('I\'m not sure', Sentiment.NEUTRAL.value),
 		('I had a really fun time with my friends', Sentiment.POS.value),
-		('I had so much fun, sad it\'s over', Sentiment.POS.value)
+		('I had so much fun, sad it\'s over', Sentiment.POS.value),
+		('I\'m not sure.', Sentiment.NEUTRAL.value)
 		])
 	def test_detect_sentiment(
 		self,

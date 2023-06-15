@@ -97,21 +97,11 @@ _DEFAULT_ASK_FOR_FEELING = """Tell me more about what\'s happened to make you fe
 
 # The detect sentiment prompt: Expected output is of the form:
 # < NEG | POS | NEURTRAL >
-_SENTIMENT_PROMPT = """For the following feelings please identify is the sentiment is positive (POS), negative (NEG) or neutral (NEUTRAL).
+_SENTIMENT_SYSTEM_PROMPT = """The user will specify how they are feeling. You must identify the sentiment as positive (POS), negative (NEG) or neutral (NEUTRAL).
 
-Here are some examples:
+Respond with one of POS, NEG or NEUTRAL.
 
-Feeling: I'm good, thanks.
-POS
-
-Feeling: Feeling a bit sad today.
-NEG
-
-Feeling: I've got a big presentation coming up and I'm super anxious!
-NEG
-
-Feeling: {feeling}
-"""
+If someone says they are good, this should be considered positive."""
 
 def detect_sentiment_post_process(model_output: str):
 	# Get the sentiment.
@@ -122,6 +112,16 @@ def detect_sentiment_post_process(model_output: str):
 		sentiment = Sentiment.NEG.value
 	elif 'NEUTRAL' in model_output:
 		sentiment = Sentiment.NEUTRAL.value
+	# As a last resort test the lower cases.
+	elif 'neutral' in model_output:
+		app.logger.warning('Assuming NEUTRAL in %s', model_output)
+		sentiment = Sentiment.NEUTRAL.value
+	elif 'neg' in model_output:
+		app.logger.warning('Assuming NEG in %s', model_output)
+		sentiment = Sentiment.NEG.value
+	elif 'pos' in model_output:
+		app.logger.warning('Assuming POS in %s', model_output)
+		sentiment = Sentiment.POS.value
 	else:
 		app.logger.warning('Sentiment in %s not detected!', model_output)
 
@@ -132,15 +132,22 @@ def detect_sentiment():
 
 	# Retrieve data from the request sent by Twilio
 	message_body = request.json
+	user_feeling = message_body['feeling']
 
-	prompt = _SENTIMENT_PROMPT.format(
-		feeling=message_body['feeling'])
+	# TODO(toni) Consider including "How are you feeling..." text too.
+	messages= [
+		{"role": "system", "content": _SENTIMENT_SYSTEM_PROMPT},
+		{"role": "user", "content": user_feeling}
+	]
 
-	# Call to the LLM
-	model_output = call_api(
-		origin='detect_sentiment',
-		out_dir=OUT_GPT_DATA_PATH,
-		prompt=prompt)
+	model_output = utils.chat_completion(
+		model="gpt-3.5-turbo-0613",
+		messages=messages,
+		max_tokens=1024,
+		temperature=1.0,
+		)
+
+	model_output = model_output['choices'][0]['message']['content']
 
 	# Post-process the output to get the sentiment and feelings.
 	response = detect_sentiment_post_process(model_output)
@@ -148,7 +155,7 @@ def detect_sentiment():
 	# Return a JSON response
 	return jsonify(response)
 
-_ASK_FOR_EVENT_SYSETM_PROMPT = """You are a focused, friendly assistant and you have one goal. The user has told how they are feeling, find out whats event has made them feel this way. 
+_ASK_FOR_EVENT_SYSETM_PROMPT = """You are a focused, friendly assistant and you have one goal. The user has told how they are feeling, find out what event has made them feel this way. 
 
 For example, if the user say that are good, ask why they are feeling good and if the user says they are sad, find our what happened to make them sad.
 
