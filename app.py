@@ -169,7 +169,6 @@ def ask_for_event():
 	message_body = request.json
 
 	user_feeling = message_body['user_feeling']
-	# history = ast.literal_eval(message_body['event_history'])
 	history = message_body['event_history']
 
 	current_user_event = message_body['last_user_response']
@@ -274,63 +273,6 @@ def ask_for_thought():
 
 	# Post process the response to get the distortion and question to ask the user.
 	response = ask_for_thought_post_processing(model_output)
-
-	return jsonify(response)
-
-
-_DISTORTION_DETECTION_PROMPT = """
-For the following sentence you need to identify the distortions in the users thinking and pose a question to help them realise that distortion. For distortion question pair you must start on a new line with the key <distortion> followed by the distortion, end this with </distortion>. Then on the next line write <question> followed by a question that would help someone identify the distortion, end this with </question>. The question should not directly reference the distortion and should be relevant to the original sentence. "{belief}"
-"""
-
-def distortion_detection_post_processing(model_output: str) -> str:
-	"""Post processes outputs from the _DISTORTION_DETECTION_PROMPT prompt."""
-
-	distortion = utils.post_process_tags(model_output, 'distortion')
-	question = utils.post_process_tags(model_output, 'question')
-
-	if not question.endswith('?'):
-		app.logger.warning('The question, %s, does not end with a "?".')
-
-	return dict(distortion=distortion, question=question)
-
-@app.post('/distortions_test')
-def detect_distortions_test():
-	"""TEST Detect distortions in the users belief."""
-	# Prepare the response.
-	response = {
-		'distortion': 'Personalization', 
-		'question': 'Are there any external factors or circumstances that contributed to the outcome, or are you solely responsible for the perceived failure?',
-	}
-
-	# Return a JSON response
-	return jsonify(response)
-
-@app.post('/distortions')
-@validate_twilio_request
-def detect_distortions():
-	"""Detect distortions in the users belief."""
-
-	# Retrieve data from the request sent by Twilio
-	message_body = request.json
-
-	# Create the feelings prompt.
-	# The "belief" key comes from the http_detect_distortions widget on the Twilio side.
-	prompt = _DISTORTION_DETECTION_PROMPT.format(
-		belief=message_body['belief'])
-
-	# Call to the LLM
-	model_output = call_api(
-		origin='detect_distortions',
-		out_dir=OUT_GPT_DATA_PATH,
-		prompt=prompt)
-
-	# The model may have recognised several distortions (separated by '\n\n').
-	# For now just take one of these.
-	# TODO(toni) Use all of the distortions.
-	model_output = model_output.split('\n\n')[0]
-
-	# Post process the response to get the distortion and question to ask the user.
-	response = distortion_detection_post_processing(model_output)
 
 	return jsonify(response)
 
