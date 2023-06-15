@@ -93,94 +93,7 @@ def hello():
 	return 'Hello, World!'
 
 
-# The feeling prompt: Expected output is of the form:
-# < NEG | POS | NEURTRAL >
-# <question> Why do you feel x </question>.
-_FEELING_PROMPT = """For the following feelings please identify is the sentiment is positive (POS), negative (NEG) or neutral (NEUTRAL). Then referring to the feeling ask what happened to make them feel this way. The question should be asked in a friendly manner. If the sentence already describes the event, ask for a little more information about it.
-
-Here are some examples:
-
-Feeling: I'm good, thanks.
-POS
-<question> That's good to hear. What's going well for you today? </question>
-
-Feeling: Feeling a bit sad today.
-NEG
-<question> Sorry to hear this. What's happened to make you feel sad? </question>
-
-Feeling: I've got a big presentation coming up and I'm super anxious!
-NEG
-<question> Oh, no! Tell me more about the presentation? </question>
-
-Feeling: {feeling}
-"""
-
 _DEFAULT_ASK_FOR_FEELING = """Tell me more about what\'s happened to make you feel this way?"""
-
-def feelings_post_process(model_output: str) -> str:
-	"""Post processes outputs from the _FEELING_PROMPT prompt."""
-
-	# Get the sentiment.
-	sentiment = None
-	if 'POS' in model_output:
-		sentiment = Sentiment.POS.value
-	elif 'NEG' in model_output:
-		sentiment = Sentiment.NEG.value
-	elif 'NEUTRAL' in model_output:
-		sentiment = Sentiment.NEUTRAL.value
-	else:
-		app.logger.warning('Sentiment in %s not detected!', model_output)
-
-	# Get the question
-	question = utils.post_process_tags(model_output, 'question')
-
-	if not question:
-		return _DEFAULT_ASK_FOR_FEELING
-
-	return dict(
-		sentiment=sentiment, question=question)
-
-
-@app.post('/feeling_test')
-def user_feeling_test():
-	"""TEST Response to: How are you feeling today?"""
-	# Prepare the response.
-	# TODO(toni) Format feelings into a feelings string.
-	response = {
-		'sentiment': Sentiment.NEG.value, 
-		'question': 'What\'s got you feeling sad?',
-	}
-
-	# Return a JSON response
-	return jsonify(response)
-
-@app.post('/feeling')
-@validate_twilio_request
-def user_feeling():
-	"""Response to: How are you feeling today?"""
-
-	# Retrieve data from the request sent by Twilio
-	message_body = request.json
-
-	app.logger.info("message_body:", message_body)
-
-	# Create the sentiment prompt.
-	# The "feeling" key comes from the http_feeling widget on the Twilio side.
-	prompt = _FEELING_PROMPT.format(
-		feeling=message_body['feeling'])
-
-	# Call to the LLM
-	model_output = call_api(
-		origin='user_feeling',
-		out_dir=OUT_GPT_DATA_PATH,
-		prompt=prompt)
-
-	# Post-process the output to get the sentiment and feelings.
-	response = feelings_post_process(model_output)
-
-	# Return a JSON response
-	return jsonify(response)
-
 
 # The detect sentiment prompt: Expected output is of the form:
 # < NEG | POS | NEURTRAL >
@@ -200,7 +113,6 @@ NEG
 Feeling: {feeling}
 """
 
-# TODO(toni) Use this in feelings_post_process. 
 def detect_sentiment_post_process(model_output: str):
 	# Get the sentiment.
 	sentiment = None
@@ -234,7 +146,7 @@ def detect_sentiment():
 	response = detect_sentiment_post_process(model_output)
 
 	# Return a JSON response
-	return jsonify(response), 200
+	return jsonify(response)
 
 _ASK_FOR_EVENT_SYSETM_PROMPT = """You are a focused, friendly assistant and you have one goal. The user has told how they are feeling, find out whats event has made them feel this way. 
 
