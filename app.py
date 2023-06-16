@@ -37,7 +37,8 @@ db = SQLAlchemy()
 app = Flask(__name__)
 
 # See all the logs.
-app.logger.setLevel(logging.INFO)
+# app.logger.setLevel(logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 
 OUT_GPT_DATA_PATH = 'data/gpt_outputs'
 # OUT_FLOW_DATA_PATH = 'data/flow_outputs'
@@ -227,37 +228,10 @@ def ask_for_event():
 # Asking the the user for any self-talk/beliefs/thoughts in the
 # context of the event. 
 # This prompt includes one example.
-_ASKING_FOR_THOUGHT_PROMPT = """The following event was supplied by a user. Referring to the event, ask the user a question to help them identify any thoughts, beliefs or self-talk to help keep them on track with their CBT session. Ask the question in a friendly way.
-
-Here are some examples:
-
-Event: My delivery is running really late and I'm worried it wont arrive in time.
-Question: <question> What thoughts are running through your mind when you think about the possibility of your delivery being late? </question>
-
-Event: I have too much work to do and I'm running really behind.
-Question: <question> It sounds like you're feeling really overwhelmed with your workload. What thoughts or beliefs do you have about your ability to catch up and get your work done on time? </question>
-
-Event: I haven't slept all night!
-Question: <question> I'm sorry to hear that you haven't been able to sleep. Can you tell me what thoughts were going through your mind last night that might have kept you awake? </question>
-
-Event: {event}
-Question:"""
+_ASK_FOR_THOUGHT_SYSTEM_PROMPT = """The assistant has provided a summary the users event. Ask the user a short question to help them identify any thoughts, beliefs or self-talk. Do not ask a yes/no question."""
 
 _DEFAULT_ASK_FOR_THOUGHT = """
 When you think about this situation, what's going through your head? Any recurring thoughts or beliefs?"""
-
-def ask_for_thought_post_processing(model_output: str) -> str:
-	"""Post processes outputs from the _ASKING_FOR_THOUGHT prompt."""
-
-	# TODO(toni) 1/10 times the question is good, but the formatting is
-	# not correct -- hence we use a default question for now.
-
-	question = utils.post_process_tags(model_output, 'question')
-	if not question:
-		# If the was no question, ask the default question.
-		question = _DEFAULT_ASK_FOR_THOUGHT
-
-	return dict(question=question)
 
 @app.post('/thought')
 @validate_twilio_request
@@ -266,20 +240,24 @@ def ask_for_thought():
 
 	# Retrieve data from the request sent by Twilio
 	message_body = request.json
+	user_event = message_body['event']
 
-	# Create the feelings prompt.
-	# The "event" key comes from the http_ask_for_thought widget on the Twilio side.
-	prompt = _ASKING_FOR_THOUGHT_PROMPT.format(
-		event=message_body['event'])
+	# Generate a question to ask the user for their thoughts about an event.
+	messages= [
+		{"role": "system", "content": _ASK_FOR_THOUGHT_SYSTEM_PROMPT},
+		{"role": "user", "content": user_event},
+	]
 
-	# Call to the LLM
-	model_output = call_api(
-		origin='ask_for_thought',
-		out_dir=OUT_GPT_DATA_PATH,
-		prompt=prompt)
+	model_output = utils.chat_completion(
+		model="gpt-3.5-turbo-0613",
+		messages=messages,
+		max_tokens=1024,
+		temperature=1.0,
+		)
 
-	# Post process the response to get the distortion and question to ask the user.
-	response = ask_for_thought_post_processing(model_output)
+	question = model_output['choices'][0]['message']['content']
+
+	response = dict(question=question)
 
 	return jsonify(response)
 
@@ -309,7 +287,7 @@ def distortion_loop():
 	if current_user_response:
 		history.append({"role": "user", "content": current_user_response})
 
-	app.logger.info('[ask_for_event] history: %s', history)
+	app.logger.info('[distortion_loop] history: %s', history)
 
 	messages= [
 		{"role": "system", "content": _DISTORTION_SYSTEM_PROMPT},
