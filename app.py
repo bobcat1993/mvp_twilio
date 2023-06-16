@@ -325,7 +325,7 @@ def distortion_loop():
 
 
 _POSITIVE_FEEDBACK_PROMPT = """
-For the following sentence, start your response with <response> then write down a sentence, in the 2nd person, praises the user if they have achieve something, otherwise response appropriately in a supportive way. End with </response >. Do not ask any questions. "{positive_event}"
+For the following sentence, start your response with <response> then write down a sentence, in the 2nd person, praises the user if they have achieve something, otherwise response appropriately in a supportive way. End with </response>. Do not ask any questions. "{positive_event}"
 """
 
 def positive_feedback_post_processing(model_output: str) -> str:

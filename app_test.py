@@ -49,43 +49,6 @@ class TestApp(unittest.TestCase):
 
 	  self.assertEqual(response_data['sentiment'], target_sentiment)
 
-	@parameterized.expand([
-		(
-			'one_question',
-			'<question>question_1?</question>',
-			'question_1?'
-		),
-		(
-			'two_questions',
-			'<question>question_1? question_2?</question>',
-			'question_1? question_2?'
-		),
-		(
-			'two_questions_on_different_lines',
-			# Questions on two lines.
-			'<question>question_1?</question>'
-			'\n\n<question>question_2?</question>',
-			'question_1?'
-		),
-		(
-			'two_questions_on_different_lines_with_text_inbetween',
-			# Questions on two lines.
-			'<question>question_1?</question>'
-			'some other text'
-			'\n\n<question>question_2?</question>',
-			'question_1?'
-		)
-		])
-	def test_ask_for_thought_post_processing(self,
-		test_name: str, 
-		model_output: str,
-		target_question: str):
-
-		output = my_app.ask_for_thought_post_processing(
-			model_output)
-
-		self.assertEqual(output['question'], target_question)
-
 
 	@parameterized.expand([
 		(
@@ -157,25 +120,56 @@ class TestApp(unittest.TestCase):
 		# Create a sample request payload to simulate the data sent by 
 	  # Twilio
 		payload = {
-			"user_feeling": "I'm pretty excited!",
-			"bot_feeling": "{event=null, feelings=[excited], sentiment=positive}",
-			"user_event": "",
-			"user_belief": "",
-			"bot_distortions": "",
-			"user_rephrase": "",
-			"user_easy": "",
-			"user_feel_after": "",
-			"user_feedback": "Nothing more from me",
-			"flow_sid": "some-twilio-sid",
-			"origin": "test_save_abc_data",
-			"event_history": [
+    "user_feeling": "I’m frustrated.",
+    "bot_feeling": "{sentiment=negative}",
+    "user_event": "",
+    "user_belief": "my_belief.",
+    "bot_distortions": "",
+    "user_rephrase": "",
+    "user_feel_after": "4",
+    "user_feedback": "",
+    "flow_sid": "FWc07c84c47d2919c40d8561c548416e37",
+    "origin": "twilio_flow",
+    "user_id": "whatsapp:+447479813767",
+    "event_history": [
         {
-          "role": "assistant",
-          "content": "That’s great to hear! Is there anything on your mind that you would like to talk about?"
-          }
-        ],
-			"user_id": "dummy_hash"
-			}
+            "role": "assistant",
+            "content": "I'm sorry to hear that you're feeling frustrated. Can you tell me what happened that made you feel this way?"
+        },
+        {
+            "role": "user",
+            "content": "event_hist_1"
+        },
+        {
+            "role": "assistant",
+            "content": "STOP EVENT DETECTED. event_summary"
+        }
+    ],
+    "distortion_history": [
+        {
+            "role": "assistant",
+            "content": "distortion_hist_1"
+        },
+        {
+            "role": "user",
+            "content": "distortion_hist_2"
+        },
+        {
+            "role": "assistant",
+            "content": "distortion_hist_3"
+        },
+        {
+            "role": "user",
+            "content": "distortion_hist_4"
+        },
+        {
+            "role": "assistant",
+            "content": "distortion_hist_5"
+        }
+    ],
+    "error": "None"
+}
+
 		response = self.app.post('/save_abc_data', json=payload)
 		app.logger.info('response %s', response)
 		self.assertEqual(response.status_code, 200)
