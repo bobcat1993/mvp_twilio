@@ -60,6 +60,7 @@ class FlowDatum(db.Model):
 	user_id = db.Column(db.String, nullable=True)
 	error = db.Column(db.String, nullable=True)
 	event_history = db.Column(db.String, nullable=True)
+	distortion_history = db.Column(db.String, nullable=True)
 	time = db.Column(db.DateTime, nullable=True)
 
 
@@ -243,6 +244,7 @@ def ask_for_thought():
 	user_event = message_body['event']
 
 	# Generate a question to ask the user for their thoughts about an event.
+	# TODO(toni) Consider including the user event.
 	messages= [
 		{"role": "system", "content": _ASK_FOR_THOUGHT_SYSTEM_PROMPT},
 		{"role": "user", "content": user_event},
@@ -385,7 +387,13 @@ def save_abc_data():
 		now = datetime.datetime.now()
 		message_body['time'] = now
 
+		# Dump the event and distortion history (into dicts).
 		message_body['event_history'] = json.dumps(message_body['event_history'])
+		message_body['distortion_history'] = json.dumps(message_body['distortion_history'])
+
+		# Dump other bot responses.
+		message_body['bot_feeling'] = json.dumps(message_body['bot_feeling'])
+		message_body['bot_distortions'] = json.dumps(message_body['bot_distortions'])
 
 		flow_datum = FlowDatum(**message_body)
 		db.session.add(flow_datum)
