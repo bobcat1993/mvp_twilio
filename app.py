@@ -213,13 +213,18 @@ def ask_for_event():
 		# Don't use the raw value from the user any more.
 		# user_event = current_user_event
 		user_event = next_question.split('DETECTED')[-1].strip()
+		user_event = user_event.strip('.,:- ')
 
 		if not user_event:
 			user_event = None
-
-	if len(messages) > 6:
-		has_event = True
+	else:
 		user_event = None
+
+	# Stop after 3 turns each.
+	if len(messages) > 8:
+		app.logger.warning("No event detected after %s turns.",
+			len(messages))
+		has_event = True
 	
 	return jsonify(
 		has_event=has_event,
