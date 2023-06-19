@@ -157,11 +157,11 @@ def detect_sentiment():
 	# Return a JSON response
 	return jsonify(response)
 
-_ASK_FOR_EVENT_SYSETM_PROMPT = """You are a focused, friendly assistant and you have one goal. The user has told how they are feeling, find out what event has made them feel this way. 
+_ASK_FOR_EVENT_SYSETM_PROMPT = """The user has told how they are feeling, ask them short friendly questions to find out what event has made them feel this way.  Do not ask yes/no questions.
 
 For example, if the user say that are good, ask why they are feeling good and if the user says they are sad, find our what happened to make them sad.
 
-When you know the event, respond with "STOP EVENT DETECTED" followed by a short sentence summarising the event."""
+When you know the event, respond with "STOP EVENT DETECTED" followed by a short sentence summarising the event. This conversation must last no more than 3 turns each."""
 
 # TODO(toni) If after a fixed number of step no event is detected do something.
 # We can compute steps by the len(history).
@@ -182,7 +182,7 @@ def ask_for_event():
 
 	current_user_event = message_body['last_user_response']
 
-	# Hacky way to add the previous user response, since
+	# Hacky way to add the previous user response.
 	if current_user_event:
 		history.append({"role": "user", "content": current_user_event})
 
@@ -215,13 +215,17 @@ def ask_for_event():
 		user_event = next_question.split('DETECTED')[-1].strip()
 
 		if not user_event:
-			user_event = current_user_event
+			user_event = None
+
+	if len(messages) > 6:
+		has_event = True
+		user_event = None
 	
 	return jsonify(
 		has_event=has_event,
 		question=next_question,
 		history=json.dumps(history),  # Be sure to dump!!
-		user_event=current_user_event)
+		user_event=user_event)
 
 
 # The ask for thought prompt: Expected output is:
@@ -229,7 +233,7 @@ def ask_for_event():
 # Asking the the user for any self-talk/beliefs/thoughts in the
 # context of the event. 
 # This prompt includes one example.
-_ASK_FOR_THOUGHT_SYSTEM_PROMPT = """The assistant has provided a summary the users event. Ask the user a short question to help them identify any thoughts, beliefs or self-talk. Do not ask a yes/no question."""
+_ASK_FOR_THOUGHT_SYSTEM_PROMPT = """The assistant has provided a summary of the users event. Ask the user a short question to help them identify any thoughts, beliefs or self-talk. Do not ask a yes/no question."""
 
 _DEFAULT_ASK_FOR_THOUGHT = """
 When you think about this situation, what's going through your head? Any recurring thoughts or beliefs?"""
@@ -243,8 +247,12 @@ def ask_for_thought():
 	message_body = request.json
 	user_event = message_body['event']
 
+	# If there was no user event detected, ask the default question.
+	if not user_event:
+		return dict(question=_DEFAULT_ASK_FOR_THOUGHT)
+
 	# Generate a question to ask the user for their thoughts about an event.
-	# TODO(toni) Consider including the user event.
+	# TODO(toni) Consider including the user event history.
 	messages= [
 		{"role": "system", "content": _ASK_FOR_THOUGHT_SYSTEM_PROMPT},
 		{"role": "user", "content": user_event},
