@@ -102,6 +102,48 @@ def hello():
 	return 'Hello, World!'
 
 
+@app.post('/user_feeling')
+def user_feeling():
+	"""Asks the user how they are feeling based on the time of day."""
+
+	early = datetime.time(00, 00, 00)
+	morning = datetime.time(6, 00, 00)
+	afternoon = datetime.time(12, 00, 00)
+	evening = datetime.time(17, 00, 00)
+	late = datetime.time(23, 00, 00)
+
+	# Get the current time.
+	time = datetime.datetime.now().time()
+
+	def x_greater_than_y(time_x, time_y):
+		return time_x - time_y > datetime.timedelta(0)
+
+	def x_less_than_y(time_x, time_y):
+		return time_x - time_y < datetime.timedelta(0)
+
+	
+	if (time > late):
+		response = "Hi, you are up late. How are you feeling?"
+
+	elif (time > early) & (time < morning):
+		response = "Hi, you are up very early. How are you feeling?"
+
+	elif (time > morning) & (time < afternoon):
+		response = "Hi, how are you feeling this morning?"
+
+	elif (time > afternoon) & (time < evening):
+		response = "Hello, how are you feeling this afternoon?"
+
+	elif (time > evening) & (time < late):
+		response = "Hi, how have you been feeling this evening?"
+	else:
+		response = "Hi, how are you feeling?"
+
+	return jsonify(response=response)
+
+
+
+
 _DEFAULT_ASK_FOR_FEELING = """Tell me more about what\'s happened to make you feel this way?"""
 
 # The detect sentiment prompt: Expected output is of the form:

@@ -4,6 +4,7 @@ from app import app
 from parameterized import parameterized
 from abc_types import Sentiment
 import logging
+from freezegun import freeze_time
 
 # See all the logs.
 app.logger.setLevel(logging.INFO)
@@ -15,6 +16,43 @@ class TestApp(unittest.TestCase):
 		app.config['DEBUG'] = True 
 		self.app = app.test_client()
 
+	@parameterized.expand(
+		[
+		(
+			'23:30:12',
+			'Hi, you are up late. How are you feeling?'
+		),
+		(
+			'03:22:12',
+			'Hi, you are up very early. How are you feeling?'
+		),
+		(
+			'10:00:14',
+			'Hi, how are you feeling this morning?'
+		),
+		(
+			'14:23:23',
+			'Hello, how are you feeling this afternoon?'
+		),
+		(
+			'18:22:30',
+			'Hi, how have you been feeling this evening?'
+		),
+		])
+	def test_user_feeling(
+		self,
+		time: str,
+		target_response: str):
+
+		with freeze_time(time):
+			response = self.app.post('/user_feeling')
+
+		# Assert the response status code
+		self.assertEqual(response.status_code, 200)
+
+		# Assert the response status code
+		response_data = response.get_json()
+		self.assertEqual(response_data['response'], target_response)
 
 	@parameterized.expand(
 		[
@@ -32,23 +70,22 @@ class TestApp(unittest.TestCase):
 		self,
 		user_feeling: str,
 		target_sentiment: str):
-	  # Create a sample request payload to simulate the data sent by 
-	  # Twilio
-	  payload = {'feeling': user_feeling}
+		# Create a sample request payload to simulate the data sent by 
+		# Twilio
+		payload = {'feeling': user_feeling}
 
-	  # Send a POST request to the endpoint with the sample payload
-	  response = self.app.post('/detect_sentiment', json=payload)
-	  app.logger.info('response %s', response)
+		# Send a POST request to the endpoint with the sample payload
+		response = self.app.post('/detect_sentiment', json=payload)
+		app.logger.info('response %s', response)
 
-	  # Assert the response status code
-	  self.assertEqual(response.status_code, 200)
+		# Assert the response status code
+		self.assertEqual(response.status_code, 200)
 
-	  # Assert the response data or any specific values in the response
-	  response_data = response.get_json()
-	  app.logger.info('response_data %s', response_data)
+		# Assert the response data or any specific values in the response
+		response_data = response.get_json()
+		app.logger.info('response_data %s', response_data)
 
-	  self.assertEqual(response_data['sentiment'], target_sentiment)
-
+		self.assertEqual(response_data['sentiment'], target_sentiment)
 
 	@parameterized.expand([
 		(
@@ -73,16 +110,15 @@ class TestApp(unittest.TestCase):
 		self.assertIsNotNone(response)
 
 	@parameterized.expand([
-    ("I’m excited for the potential benefits but I’m also worried that there will be a lot of bugs.",
-    	[],
-    	None
-    ),
-    ("I’m excited for the potential benefits but I’m also worried that there will be a lot of bugs.",
-    	[{"role": "assistant", "content": "It's understandable to have such concerns. But do you think it's fair to assume that there will definitely be a lot of bugs even before giving it a chance?"}],
-    	"I think that there will be a lot of bugs!"
-    ),
+		("I’m excited for the potential benefits but I’m also worried that there will be a lot of bugs.",
+			[],
+			None
+		),
+		("I’m excited for the potential benefits but I’m also worried that there will be a lot of bugs.",
+			[{"role": "assistant", "content": "It's understandable to have such concerns. But do you think it's fair to assume that there will definitely be a lot of bugs even before giving it a chance?"}],
+			"I think that there will be a lot of bugs!"
+		),
 		])
-	# TODO(toni) Reformat as user_belief.
 	def test_distortion_loop(
 		self,
 		user_belief,
@@ -93,7 +129,7 @@ class TestApp(unittest.TestCase):
 		payload = {
 		'user_belief': user_belief,
 		"distortion_history": distortion_history,
-    "last_user_response": last_user_response}
+		"last_user_response": last_user_response}
 
 		# Send a POST request to the endpoint with the sample payload
 		response = self.app.post('/distortion_loop', json=payload)
@@ -118,56 +154,56 @@ class TestApp(unittest.TestCase):
 
 	def test_save_abc_data(self):
 		# Create a sample request payload to simulate the data sent by 
-	  # Twilio
+		# Twilio
 		payload = {
-    "user_feeling": "I’m frustrated.",
-    "bot_feeling": "{sentiment=negative}",
-    "user_event": "",
-    "user_belief": "my_belief.",
-    "bot_distortions": "",
-    "user_rephrase": "",
-    "user_feel_after": "4",
-    "user_feedback": "",
-    "flow_sid": "FWc07c84c47d2919c40d8561c548416e37",
-    "origin": "twilio_flow",
-    "user_id": "whatsapp:+447479813767",
-    "event_history": [
-        {
-            "role": "assistant",
-            "content": "I'm sorry to hear that you're feeling frustrated. Can you tell me what happened that made you feel this way?"
-        },
-        {
-            "role": "user",
-            "content": "event_hist_1"
-        },
-        {
-            "role": "assistant",
-            "content": "STOP EVENT DETECTED. event_summary"
-        }
-    ],
-    "distortion_history": [
-        {
-            "role": "assistant",
-            "content": "distortion_hist_1"
-        },
-        {
-            "role": "user",
-            "content": "distortion_hist_2"
-        },
-        {
-            "role": "assistant",
-            "content": "distortion_hist_3"
-        },
-        {
-            "role": "user",
-            "content": "distortion_hist_4"
-        },
-        {
-            "role": "assistant",
-            "content": "distortion_hist_5"
-        }
-    ],
-    "error": "None"
+		"user_feeling": "I’m frustrated.",
+		"bot_feeling": "{sentiment=negative}",
+		"user_event": "",
+		"user_belief": "my_belief.",
+		"bot_distortions": "",
+		"user_rephrase": "",
+		"user_feel_after": "4",
+		"user_feedback": "",
+		"flow_sid": "FWc07c84c47d2919c40d8561c548416e37",
+		"origin": "twilio_flow",
+		"user_id": "whatsapp:+447479813767",
+		"event_history": [
+				{
+						"role": "assistant",
+						"content": "I'm sorry to hear that you're feeling frustrated. Can you tell me what happened that made you feel this way?"
+				},
+				{
+						"role": "user",
+						"content": "event_hist_1"
+				},
+				{
+						"role": "assistant",
+						"content": "STOP EVENT DETECTED. event_summary"
+				}
+		],
+		"distortion_history": [
+				{
+						"role": "assistant",
+						"content": "distortion_hist_1"
+				},
+				{
+						"role": "user",
+						"content": "distortion_hist_2"
+				},
+				{
+						"role": "assistant",
+						"content": "distortion_hist_3"
+				},
+				{
+						"role": "user",
+						"content": "distortion_hist_4"
+				},
+				{
+						"role": "assistant",
+						"content": "distortion_hist_5"
+				}
+		],
+		"error": "None"
 }
 
 		response = self.app.post('/save_abc_data', json=payload)
@@ -177,7 +213,7 @@ class TestApp(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+		unittest.main()
 
 
 
