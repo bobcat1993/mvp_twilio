@@ -399,6 +399,11 @@ def save_user_info():
 
 	message_body = request.json
 
+	# Hash the user_id so that the data is pseudo-anonyms.
+	message_body['user_number'] = string_hash(
+		message_body['user_number'])
+
+	# Get the current time.
 	now = datetime.datetime.now()
 	message_body['time'] = now
 
@@ -420,6 +425,7 @@ def save_abc_data():
 		# Hash the user_id so that the data is pseudo-anonyms.
 		message_body['user_id'] = string_hash(message_body['user_id'])
 
+		# Get the current time.
 		now = datetime.datetime.now()
 		message_body['time'] = now
 
