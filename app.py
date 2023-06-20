@@ -114,13 +114,6 @@ def user_feeling():
 
 	# Get the current time.
 	time = datetime.datetime.now().time()
-
-	def x_greater_than_y(time_x, time_y):
-		return time_x - time_y > datetime.timedelta(0)
-
-	def x_less_than_y(time_x, time_y):
-		return time_x - time_y < datetime.timedelta(0)
-
 	
 	if (time > late):
 		response = "Hi, you are up late. How are you feeling?"
