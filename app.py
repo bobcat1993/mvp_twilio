@@ -344,16 +344,12 @@ def distortion_loop():
 	)
 
 
-_POSITIVE_FEEDBACK_PROMPT = """
-For the following sentence, start your response with <response> then write down a sentence, in the 2nd person, praises the user if they have achieve something, otherwise response appropriately in a supportive way. End with </response>. Do not ask any questions. "{positive_event}"
-"""
+_POSITIVE_FEEDBACK_SYSTEM_PROMPT = """
+The assistant has provided a summary of a users event.
 
-def positive_feedback_post_processing(model_output: str) -> str:
-	"""Post processes outputs from the _DISTORTION_DETECTION_PROMPT prompt."""
+You must praises the user if they have achieve something, otherwise response appropriately in a supportive way. 
 
-	response = utils.post_process_tags(model_output, 'response')
-
-	return dict(response=response)
+Do not ask any question and do not refer to the user; the response must be in the second person."""
 
 @app.post('/positive_feedback_test')
 def positive_feedback_test():
@@ -373,21 +369,23 @@ def positive_feedback():
 	# Retrieve data from the request sent by Twilio
 	message_body = request.json
 
-	# Create the feelings prompt.
-	# The "belief" key comes from the http_detect_distortions widget on the Twilio side.
-	prompt = _POSITIVE_FEEDBACK_PROMPT.format(
-		positive_event=message_body['positive_user_event'])
+	positive_event = message_body['positive_user_event']
 
-	# Call to the LLM
-	model_output = call_api(
-		origin='positive_feedback',
-		out_dir=OUT_GPT_DATA_PATH,
-		prompt=prompt)
+	messages= [
+		{"role": "system", "content": _POSITIVE_FEEDBACK_SYSTEM_PROMPT},
+		{"role": "assistant", "content": positive_event},
+	]
 
-	# Post process the response to get the distortion and question to ask the user.
-	response = positive_feedback_post_processing(model_output)
+	model_output = utils.chat_completion(
+		model="gpt-3.5-turbo-0613",
+		messages=messages,
+		max_tokens=1024,
+		temperature=1.0,
+		)
 
-	return jsonify(response)
+	response = model_output['choices'][0]['message']['content']
+
+	return jsonify(dict(response=response))
 
 def string_hash(string):
 	return md5(string.encode()).hexdigest()
