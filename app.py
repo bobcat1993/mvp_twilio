@@ -64,6 +64,13 @@ class FlowDatum(db.Model):
 	time = db.Column(db.DateTime, nullable=True)
 
 
+class UserDatum(db.Model):
+
+	id = db.Column(db.Integer, primary_key=True)
+	user_number = db.Column(db.String, nullable=True)
+	time = db.Column(db.DateTime, nullable=True)
+
+
 @app.before_first_request
 def init_app():
 	flags.FLAGS(sys.argv)
@@ -385,12 +392,28 @@ def positive_feedback():
 def string_hash(string):
 	return md5(string.encode()).hexdigest()
 
+@app.post('/save_user_info')
+@validate_twilio_request
+def save_user_info():
+	"""Saves the users number and time at the start of the chat."""
+
+	message_body = request.json
+
+	now = datetime.datetime.now()
+	message_body['time'] = now
+
+	user_datum = UserDatum(**message_body)
+	db.session.add(user_datum)
+	db.session.commit()
+
+	return jsonify({'message': f'User data saved.'})
+
+
 @app.post('/save_abc_data')
 @validate_twilio_request
 def save_abc_data():
 	"""Saves data at the end of the ABC chat."""
 	# Retrieve data from the request sent by Twilio
-	file_name = flags.FLAGS.file_name
 	try:
 		message_body = request.json
 
@@ -412,7 +435,7 @@ def save_abc_data():
 		db.session.add(flow_datum)
 		db.session.commit()
 
-		return jsonify({'message': f'Data saved to {file_name}'})
+		return jsonify({'message': f'Flow data saved.'})
 	except Exception as e:
 		return jsonify({'error': str(e)})
 
