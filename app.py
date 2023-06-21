@@ -134,9 +134,6 @@ def user_feeling():
 
 	return jsonify(response=response)
 
-
-
-
 _DEFAULT_ASK_FOR_FEELING = """Tell me more about what\'s happened to make you feel this way?"""
 
 # The detect sentiment prompt: Expected output is of the form:
@@ -169,7 +166,7 @@ def detect_sentiment_post_process(model_output: str):
 	else:
 		app.logger.warning('Sentiment in %s not detected!', model_output)
 
-	return dict(sentiment=sentiment)
+	return sentiment
 
 @app.post('/detect_sentiment')
 def detect_sentiment():
@@ -194,10 +191,10 @@ def detect_sentiment():
 	model_output = model_output['choices'][0]['message']['content']
 
 	# Post-process the output to get the sentiment and feelings.
-	response = detect_sentiment_post_process(model_output)
+	sentiment = detect_sentiment_post_process(model_output)
 
 	# Return a JSON response
-	return jsonify(response)
+	return jsonify(sentiment=sentiment)
 
 _ASK_FOR_EVENT_SYSETM_PROMPT = """The user has told how they are feeling, ask them short friendly questions to find out what event has made them feel this way.  Do not ask yes/no questions.
 
@@ -205,7 +202,7 @@ For example, if the user say that are good, ask why they are feeling good and if
 
 When you know the event, respond with "STOP EVENT DETECTED" followed by a short sentence summarising the event. This conversation must last no more than 3 turns each."""
 
-# TODO(toni) If after a fixed number of step no event is detected do something.
+# TODO(toni) If after a fixed number of step no event is detected do something better than just ending the conversation.
 # We can compute steps by the len(history).
 @app.post('/ask_for_event')
 @validate_twilio_request
@@ -314,9 +311,7 @@ def ask_for_thought():
 
 	question = model_output['choices'][0]['message']['content']
 
-	response = dict(question=question)
-
-	return jsonify(response)
+	return jsonify(question=question)
 
 _DISTORTION_SYSTEM_PROMPT = """
 The user has shared a belief with you. You must now identify a distortion in their thinking and ask them short questions to help them realise that distortion. This should be framed in a friendly way and take the side of the user.
@@ -420,7 +415,7 @@ def positive_feedback():
 
 	response = model_output['choices'][0]['message']['content']
 
-	return jsonify(dict(response=response))
+	return jsonify(response=response)
 
 def string_hash(string):
 	return md5(string.encode()).hexdigest()
