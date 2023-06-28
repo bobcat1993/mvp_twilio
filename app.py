@@ -71,6 +71,16 @@ class UserDatum(db.Model):
 	time = db.Column(db.DateTime, nullable=True)
 
 
+class ProfileDatum(db.Model):
+	"""A user profile."""
+
+	id = db.Column(db.Integer, primary_key=True)
+	user_number = db.Column(db.String, nullable=True)
+	user_email = db.Column(db.String, nullable=True)
+	expiry_date = db.Column(db.Integer, nullable=True)
+	user_wix_id = db.Column(db.String, nullable=True)
+
+
 @app.before_first_request
 def init_app():
 	flags.FLAGS(sys.argv)
@@ -472,6 +482,57 @@ def save_abc_data():
 		return jsonify({'message': f'Flow data saved.'})
 	except Exception as e:
 		return jsonify({'error': str(e)})
+
+
+@app.post('/new_user')
+def new_user():
+	"""Adds new users to the user DB."""
+
+	message_body = request.json['data']
+	user_number = message_body['field:comp-lipwozdh']
+	user_email = message_body['field:comp-like94pe']
+	user_wix_id = message_body['contact.Id']
+
+	# Post-process the user number.
+	if user_number:
+		# Only add data if the user has provided a number
+
+		# From (+44) 7479812734 -->   whatsapp:+447479812734
+		user_number = user_number.replace('(', '')
+		user_number = user_number.replace(')', '')
+		user_number = user_number.replace(' ', '')
+		user_number = f'whatsapp:{user_number}'
+
+		# The data: giving everyone 30 tokens.
+		data = dict(
+			user_number=user_number,
+			user_email=user_email,
+			user_wix_id=user_wix_id,
+			expiry_date=None,
+			)
+
+		# Check if there is already an entry for this person:
+		record = db.session.query(ProfileDatum).filter(ProfileDatum.user_email == user_email).first()
+
+		logging.info("[RECORD] %s", record)
+
+		if record:
+			record.update({ProfileDatum.user_number: user_number},
+				synchronize_session = False)
+			db.session.commit()
+
+		else:
+			profile_datum = ProfileDatum(**data)
+			db.session.add(profile_datum)
+			db.session.commit()
+
+	return jsonify({
+		'message': message_body,
+		'record': record})
+
+
+
+
 
 
 if __name__ == "__main__":
