@@ -486,7 +486,7 @@ def save_abc_data():
 
 @app.post('/new_user')
 def new_user():
-	"""Adds new users to the user DB."""
+	"""Adds new users to the user DB: receives a webhook from Wix."""
 
 	message_body = request.json['data']
 	user_number = message_body['field:comp-lipwozdh']
@@ -529,9 +529,6 @@ def new_user():
 	return jsonify({
 		'message': message_body,
 		'record': record})
-
-
-
 
 
 
