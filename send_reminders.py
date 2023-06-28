@@ -35,6 +35,9 @@ for number in white_list:
 
 	client = Client(account_sid, auth_token)
 
+	# TODO(toni) Check who has not already checked in today and only 
+	# message them.
+
 	message = client.messages.create(
 		from_=f"whatsapp:{whatsapp_from}",
 		body=('Hi! It\'s Bobby here, ready for a check in? Just say "Hi"'
