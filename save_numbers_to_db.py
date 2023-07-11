@@ -116,8 +116,10 @@ def main():
 				conn.commit()
 
 		else:
-			logging.warn(
+			logging.warning(
 				f'%s has not provided a valid phone number.', user_email)
+
+	logging.info(f"There were %s rows", i)
 
 if __name__ == "__main__":
 	main()
