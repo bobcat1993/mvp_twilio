@@ -69,6 +69,7 @@ class UserDatum(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	user_number = db.Column(db.String, nullable=True)
 	time = db.Column(db.DateTime, nullable=True)
+	flow_name = db.Column(db.String, nullable=True)
 
 
 class ProfileDatum(db.Model):
@@ -449,7 +450,7 @@ def save_user_info():
 	db.session.add(user_datum)
 	db.session.commit()
 
-	return jsonify({'message': f'User data saved.'})
+	return jsonify({'message': 'User data saved.'})
 
 
 @app.post('/save_abc_data')
@@ -529,7 +530,6 @@ def new_user():
 	return jsonify({
 		'message': message_body,
 		'record': record})
-
 
 
 if __name__ == "__main__":
