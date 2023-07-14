@@ -434,7 +434,7 @@ MAX_CHEER_STEPS = 30
 _CHEER_SYSTEM_PROMPT = """
 In this coaching session, the assistant is helping the user practice being their own cheerleader.
 
-The assistant must tell the user to imagine that friend is sitting in front of them right now and that what happened to the user today happened to that friend, and they are experiencing the same feelings as the user is right now.  Tell the user that they are their friends' cheerleader and ask them what would say to make their friend feel better.
+Referring to the friend chosen by the user, the assistant must tell the user to imagine that the friend they chose is sitting in front of them right now and that what happened to the user today happened to that friend, and they are experiencing the same feelings as the user is right now. Tell the user that they are their friend's cheerleader and ask them what would say to make their friend feel better.
 
 Once the user says something positive, encourage them to add to that. Then get them to say these same words to them self and ask how they feel.
 
@@ -442,6 +442,9 @@ When the session is finished the assistant should say "SESSION FINISHED".
 
 Keep all responses short and friendly.
 """
+
+# The assistant asks the user for an event.
+_CHEER_ASSISANT_ASK_FOR_EVENT = """To get started, I'd love to hear about a  particular event, challenge, or situation where you could use some support and encouragement."""
 
 # The assistant asks the user to choose someone to cheer on. 
 _CHEER_ASSISTANT_CHOOSE_SOMEONE = """Now, let’s practise showing the same compassion we have for others to ourselves. To start, I want you to think of a friend. They can be anyone, the only condition is that they are someone you care for. Let me know who you choose?"""
@@ -454,6 +457,8 @@ def cheer_loop():
 	# Get the inputs.
 	message_body = request.json
 	history = message_body['cheer_history']
+	user_event = message_body['user_event']
+	user_identifies_person = message_body['user_identifies_person']
 	current_user_response = message_body['last_user_response']
 
 	# Add the previous user response to the end of the history.
@@ -462,7 +467,10 @@ def cheer_loop():
 
 	messages = [
 	{"role": "system", "content": _CHEER_SYSTEM_PROMPT},
+	{"role": "assistant", "content": _CHEER_ASSISANT_ASK_FOR_EVENT},
+	{"role": "user", "content": user_event},
 	{"role": "assistant", "content": _CHEER_ASSISTANT_CHOOSE_SOMEONE},
+	{"role": "user", "content": user_identifies_person},
 	*history
 	]
 
@@ -473,6 +481,8 @@ def cheer_loop():
 		temperature=1.0,
 		)
 
+	import pprint
+	pprint.pprint(messages)
 	next_question = model_output['choices'][0]['message']['content']
 	history.append({"role": "assistant", "content": next_question})
 
@@ -491,6 +501,7 @@ def cheer_loop():
 		is_done=is_done,
 		question=next_question,
 		history=json.dumps(history),  # Be sure to dump!!
+		messages=messages,
 	)
 
 
