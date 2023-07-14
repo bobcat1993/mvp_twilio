@@ -428,6 +428,72 @@ def positive_feedback():
 
 	return jsonify(response=response)
 
+# Large-ish number for the max number of steps before the cheer loop is ended.
+MAX_CHEER_STEPS = 30
+
+_CHEER_SYSTEM_PROMPT = """
+In this coaching session, the assistant is helping the user practice being their own cheerleader.
+
+The assistant must tell the user to imagine that friend is sitting in front of them right now and that what happened to the user today happened to that friend, and they are experiencing the same feelings as the user is right now.  Tell the user that they are their friends' cheerleader and ask them what would say to make their friend feel better.
+
+Once the user says something positive, encourage them to add to that. Then get them to say these same words to them self and ask how they feel.
+
+When the session is finished the assistant should say "SESSION FINISHED".
+
+Keep all responses short and friendly.
+"""
+
+# The assistant asks the user to choose someone to cheer on. 
+_CHEER_ASSISTANT_CHOOSE_SOMEONE = """Now, let’s practise showing the same compassion we have for others to ourselves. To start, I want you to think of a friend. They can be anyone, the only condition is that they are someone you care for. Let me know who you choose?"""
+
+@app.post('/cheerleader/cheer_loop')
+@validate_twilio_request
+def cheer_loop():
+	"""Get the user for cheer a friend and redirect to themselves."""
+
+	# Get the inputs.
+	message_body = request.json
+	history = message_body['cheer_history']
+	current_user_response = message_body['last_user_response']
+
+	# Add the previous user response to the end of the history.
+	if current_user_response:
+		history.append({"role": "user", "content": current_user_response})
+
+	messages = [
+	{"role": "system", "content": _CHEER_SYSTEM_PROMPT},
+	{"role": "assistant", "content": _CHEER_ASSISTANT_CHOOSE_SOMEONE},
+	*history
+	]
+
+	model_output = utils.chat_completion(
+		model="gpt-3.5-turbo-0613",
+		messages=messages,
+		max_tokens=1024,
+		temperature=1.0,
+		)
+
+	next_question = model_output['choices'][0]['message']['content']
+	history.append({"role": "assistant", "content": next_question})
+
+	# Check if there is an event detected.
+	is_done = True if 'SESSION FINISHED' in next_question else False
+
+	if len(messages) == MAX_CHEER_STEPS:
+		app.logger.warn('is_done != True, but has reached 6 messages.')
+		is_done = True
+
+	if is_done:
+		next_question = next_question.replace('SESSION FINISHED', '')
+		next_question = next_question.strip(' .\n')
+	
+	return jsonify(
+		is_done=is_done,
+		question=next_question,
+		history=json.dumps(history),  # Be sure to dump!!
+	)
+
+
 def string_hash(string):
 	return md5(string.encode()).hexdigest()
 
