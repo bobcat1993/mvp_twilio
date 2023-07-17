@@ -452,7 +452,7 @@ _CHEER_ASSISTANT_CHOOSE_SOMEONE = """Now, let’s practise showing the same comp
 @app.post('/cheerleader/cheer_loop')
 @validate_twilio_request
 def cheer_loop():
-	"""Get the user for cheer a friend and redirect to themselves."""
+	"""Gets the user for cheer a friend and redirect to themselves."""
 
 	# Get the inputs.
 	message_body = request.json
@@ -496,6 +496,8 @@ def cheer_loop():
 	if is_done:
 		next_question = next_question.replace('SESSION FINISHED', '')
 		next_question = next_question.strip(' .\n')
+
+	# TODO(toni) If there is no question in "next_question" also return is_done=True.
 	
 	return jsonify(
 		is_done=is_done,
@@ -503,6 +505,40 @@ def cheer_loop():
 		history=json.dumps(history),  # Be sure to dump!!
 		messages=messages,
 	)
+
+_ASK_FOR_PERSON_SYSTEM_PROMPT = """In this coaching session, the assistant is helping the user practice being their own cheerleader.
+
+Referring to the event specified by the user,
+explain to the user that you are going to help them practise showing the same compassion and support that have for others to themselves.  To start, ask them to think of a friend. Tell them that they can choose anyone, the only condition is that they are someone the user cares for. Ask they user who they chose.
+
+This should be contained in a single, friendly and brief response that ends with a question.
+"""
+
+@app.post('/cheerleader/ask_for_person')
+@validate_twilio_request
+def ask_for_person():
+	"""Asks the user to choose a person after user shares event."""
+
+	# Get the inputs.
+	message_body = request.json
+	user_event = message_body['user_event']
+
+	messages = [
+	{'role': 'system', 'content': _ASK_FOR_PERSON_SYSTEM_PROMPT},
+	{'role': 'assistant', 'content': _CHEER_ASSISANT_ASK_FOR_EVENT},
+	{'role': 'user', 'content': user_event},
+	]
+
+	model_output = utils.chat_completion(
+		model='gpt-3.5-turbo-0613',
+		messages=messages,
+		max_tokens=1024,
+		temperature=1.0,
+		)
+
+	response = model_output['choices'][0]['message']['content']
+
+	return jsonify(response=response)
 
 
 def string_hash(string):
