@@ -497,7 +497,9 @@ def cheer_loop():
 		next_question = next_question.replace('SESSION FINISHED', '')
 		next_question = next_question.strip(' .\n')
 
-	# TODO(toni) If there is no question in "next_question" also return is_done=True.
+	# If there is no question in "next_question" also set is_done to True.
+	if '?' not in next_question:
+		is_done = True
 	
 	return jsonify(
 		is_done=is_done,
