@@ -45,6 +45,7 @@ OUT_GPT_DATA_PATH = 'data/gpt_outputs'
 
 
 class FlowDatum(db.Model):
+	"""Stores the data from the Reflect flow."""
 
 	id = db.Column(db.Integer, primary_key=True)
 	user_feeling = db.Column(db.String, nullable=True)
@@ -61,6 +62,23 @@ class FlowDatum(db.Model):
 	error = db.Column(db.String, nullable=True)
 	event_history = db.Column(db.String, nullable=True)
 	distortion_history = db.Column(db.String, nullable=True)
+	time = db.Column(db.DateTime, nullable=True)
+
+
+class CheerFlowDatum(db.Model):
+	"""Stores the data from the Cheerleader flow."""
+
+	id = db.Column(db.Integer, primary_key=True)
+	user_event = db.Column(db.String, nullable=True)
+	http_ask_for_person = db.Column(db.String, nullable=True)
+	user_identifies_person = db.Column(db.String, nullable=True)
+	history = db.Column(db.String, nullable=True)
+	last_bot_cheer = db.Column(db.String, nullable=True)
+	user_feel_after = db.Column(db.String, nullable=True)
+	flow_sid = db.Column(db.String, nullable=True)
+	origin = db.Column(db.String, nullable=True)
+	user_id = db.Column(db.String, nullable=True)
+	error = db.Column(db.String, nullable=True)
 	time = db.Column(db.DateTime, nullable=True)
 
 
@@ -592,6 +610,33 @@ def save_abc_data():
 		message_body['bot_distortions'] = json.dumps(message_body['bot_distortions'])
 
 		flow_datum = FlowDatum(**message_body)
+		db.session.add(flow_datum)
+		db.session.commit()
+
+		return jsonify({'message': f'Flow data saved.'})
+	except Exception as e:
+		return jsonify({'error': str(e)})
+
+
+@app.post('/cheerleader/save_cheer_data')
+@validate_twilio_request
+def save_cheer_data():
+	"""Saves data at the end of the Cheerleader chat."""
+	# Retrieve data from the request sent by Twilio
+	try:
+		message_body = request.json
+
+		# Hash the user_id so that the data is pseudo-anonyms.
+		message_body['user_id'] = string_hash(message_body['user_id'])
+
+		# Get the current time.
+		now = datetime.datetime.now()
+		message_body['time'] = now
+
+		# Dump the history (into dicts).
+		message_body['history'] = json.dumps(message_body['history'])
+
+		flow_datum = CheerFlowDatum(**message_body)
 		db.session.add(flow_datum)
 		db.session.commit()
 
