@@ -40,8 +40,10 @@ for number in white_list:
 
 	message = client.messages.create(
 		from_=f"whatsapp:{whatsapp_from}",
-		body=('Hi! It\'s Bobby here, ready for a check in? Just say "Hi"'
-					' when you are ready to start.'),
+		body=(
+			'Is there anything from today that\'s been playing on your'
+			' mind? Chat it over with Bobby.'
+			' Just say "Hi" to start a conversation with Bobby.'),
 		to=number,
 	)
 
