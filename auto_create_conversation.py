@@ -53,7 +53,7 @@ address_configuration = client.conversations \
          auto_creation_type='studio',
          auto_creation_studio_flow_sid='FW071ef6f74454b46e82ba9f5ca21dab4c',
          type='whatsapp',
-         address='whatsapp:+447897009528'
+         address='whatsapp:+447830379042'
      )
 
 print(address_configuration.sid)
