@@ -151,6 +151,58 @@ class TestApp(unittest.TestCase):
 		app.logger.info('response %s', response)
 		self.assertEqual(response.status_code, 200)
 
+	def test_cheer_loop(self):
+		"""Test the cheerleader loop."""
+
+		payload = {
+			'user_event': 'I didn\'t get the promotion.',
+			'user_identifies_person': 'Bobby',
+			'cheer_history': [],
+			'last_user_response': None
+		}
+		response = self.app.post('/cheerleader/cheer_loop', json=payload)
+
+		# Assert the response status code -- succeeded.
+		self.assertEqual(response.status_code, 200)
+
+
+	def test_ask_for_person(self):
+
+		payload = {'user_event': 'I gave a bad presentation.'}
+		response = self.app.post('/cheerleader/ask_for_person', json=payload)
+
+		# Assert the response status code -- succeeded.
+		self.assertEqual(response.status_code, 200)
+
+	def test_goal_loop(self):
+		"""Test the goal setting loop."""
+
+		payload = {
+			'user_goal': 'I want to go for a walk.',
+			'goal_history': [],
+			'last_user_response': None
+		}
+		response = self.app.post('/goal/goal_loop', json=payload)
+
+		# Assert the response status code -- succeeded.
+		self.assertEqual(response.status_code, 200)
+
+
+	def test_save_goal_data(self):
+
+		payload = {
+"user_goal" : "Go for a swim",
+"history": [{"role": "assistant", "content": "Great! Let's make it a SMART goal. \n\nFirst, let's make it more specific. Are there any specific parameters or objectives you have in mind for this swim?"}, {"role": "user", "content": "Just want to swim for 20 minutes"}, {"role": "assistant", "content": "Perfect! That makes it a lot more specific. \n\nNow let's make it measurable. How will you track your progress throughout the 20 minutes of swimming?"}, {"role": "user", "content": "I\u2019ll use my smart watch?"}, {"role": "assistant", "content": "Excellent! Using your smartwatch to track your swim time makes it easily measurable. \n\nNext, let's make sure it is an achievable goal. Do you feel confident in your ability to complete a 20-minute swim session?"}, {"role": "user", "content": "Am I had to take some rest, but yeah I can definitely in the water for 20 minutes"}, {"role": "assistant", "content": "That's great to hear! Allowing for rests during the swim is a great way to make it achievable. \n\nNow, let's make sure the goal is relevant. Why is going for a 20-minute swim important to you today?"}, {"role": "user", "content": "I need to get back into exercise"}, {"role": "assistant", "content": "That's a fantastic reason! Getting back into exercise is an important goal. \n\nFinally, let's make it time-bound. Will you be able to complete your 20-minute swim session today?"}, {"role": "user", "content": "Yeah, after my last meeting"}, {"role": "assistant", "content": "Wonderful! So, to summarize, your SMART goal for today is: To swim for 20 minutes using your smartwatch to track your progress, allowing for rests, as a way to get back into exercise, after your last meeting.\n\nSESSION ENDED."}],
+"user_feel_after" : "4",
+"origin": "twilio_flow",
+"flow_sid" : "FWXXXXXX",
+"user_id": "whatsapp:+XXXXXXX",
+"error": "None"
+}
+
+		response = self.app.post('/goal/save_goal_data', json=payload)
+		self.assertEqual(response.status_code, 200)
+
 
 	def test_save_abc_data(self):
 		# Create a sample request payload to simulate the data sent by 
@@ -204,7 +256,7 @@ class TestApp(unittest.TestCase):
 				}
 		],
 		"error": "None"
-}
+		}
 
 		response = self.app.post('/save_abc_data', json=payload)
 		app.logger.info('response %s', response)

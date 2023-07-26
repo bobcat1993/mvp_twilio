@@ -82,6 +82,20 @@ class CheerFlowDatum(db.Model):
 	time = db.Column(db.DateTime, nullable=True)
 
 
+class GoalFlowDatum(db.Model):
+	"""Stores the data from the SMART goal setting flow."""
+
+	id = db.Column(db.Integer, primary_key=True)
+	user_goal = db.Column(db.String, nullable=True)
+	history = db.Column(db.String, nullable=True)
+	user_feel_after = db.Column(db.String, nullable=True)
+	flow_sid = db.Column(db.String, nullable=True)
+	origin = db.Column(db.String, nullable=True)
+	user_id = db.Column(db.String, nullable=True)
+	error = db.Column(db.String, nullable=True)
+	time = db.Column(db.DateTime, nullable=True)
+
+
 class UserDatum(db.Model):
 
 	id = db.Column(db.Integer, primary_key=True)
@@ -499,8 +513,6 @@ def cheer_loop():
 		temperature=1.0,
 		)
 
-	import pprint
-	pprint.pprint(messages)
 	next_question = model_output['choices'][0]['message']['content']
 	history.append({"role": "assistant", "content": next_question})
 
@@ -508,7 +520,7 @@ def cheer_loop():
 	is_done = True if 'SESSION FINISHED' in next_question else False
 
 	if len(messages) == MAX_CHEER_STEPS:
-		app.logger.warn('is_done != True, but has reached 6 messages.')
+		app.logger.warn(f'is_done != True, but has reached {MAX_CHEER_STEPS} messages.')
 		is_done = True
 
 	if is_done:
@@ -559,6 +571,74 @@ def ask_for_person():
 	response = model_output['choices'][0]['message']['content']
 
 	return jsonify(response=response)
+
+_MAX_GOAL_STEPS = 30
+
+_GOAL_ASSISANT_ASK_FOR_GOAL = """Let's being, what is your goal for today?"""
+
+_GOAL_SYSTEM_PROMPT = """In this coaching session, the friendly assistant is helping the user set a SMART goal to be completed today.
+
+The assistant should ask the users specific questions, one at a time, to help them refine their initial goal as a SMART goal which is Specific, Measurable, Achievable, Relevant and Time bound.
+
+At the end the assistant should provide a short one sentence summary of the final SMART goal and say SESSION ENDED. Do not let the user set another goal."""
+
+
+@app.post('/goal/goal_loop')
+@validate_twilio_request
+def goal_loop():
+	"""Helps the user set SMART goals."""
+
+	# Get the inputs.
+	message_body = request.json
+	history = message_body['goal_history']
+	user_goal = message_body['user_goal']
+	current_user_response = message_body['last_user_response']
+
+	# Add the previous user response to the end of the history.
+	if current_user_response:
+		history.append({"role": "user", "content": current_user_response})
+
+	messages = [
+	{"role": "system", "content": _GOAL_SYSTEM_PROMPT},
+	{"role": "assistant", "content": _GOAL_ASSISANT_ASK_FOR_GOAL},
+	{"role": "user", "content": user_goal},
+	*history
+	]
+
+	model_output = utils.chat_completion(
+		model="gpt-3.5-turbo-0613",
+		messages=messages,
+		max_tokens=1024,
+		temperature=1.0,
+		)
+
+	import pprint
+	pprint.pprint(messages)
+	next_question = model_output['choices'][0]['message']['content']
+	history.append({"role": "assistant", "content": next_question})
+
+	# Check if there is an event detected.
+	is_done = True if 'SESSION ENDED' in next_question else False
+
+	if len(messages) == _MAX_GOAL_STEPS:
+		app.logger.warn(f'is_done != True, but has reached {MAX_GOAL_STEPS} messages.')
+		is_done = True
+
+	if is_done:
+		next_question = next_question.replace('SESSION ENDED', '')
+		next_question = next_question.strip(' .\n')
+
+	# If there is no question in "next_question" also set is_done to True.
+	# N.B. I've not yet seen a case where this does not end correctly.
+	if '?' not in next_question:
+		is_done = True
+	
+	return jsonify(
+		is_done=is_done,
+		question=next_question,
+		history=json.dumps(history),  # Be sure to dump!!
+		messages=messages,
+	)
 
 
 def string_hash(string):
@@ -637,6 +717,38 @@ def save_cheer_data():
 		message_body['history'] = json.dumps(message_body['history'])
 
 		flow_datum = CheerFlowDatum(**message_body)
+		db.session.add(flow_datum)
+		db.session.commit()
+
+		return jsonify({'message': f'Flow data saved.'})
+	except Exception as e:
+		return jsonify({'error': str(e)})
+
+
+@app.post('/goal/save_goal_data')
+@validate_twilio_request
+def save_goal_data():
+	"""Saves data at the end of the Cheerleader chat."""
+	# Retrieve data from the request sent by Twilio
+	try:
+		message_body = request.json
+
+		# Hash the user_id so that the data is pseudo-anonyms.
+		message_body['user_id'] = string_hash(message_body['user_id'])
+
+		# Get the current time.
+		now = datetime.datetime.now()
+		message_body['time'] = now
+
+		# Dump the history (into dicts).
+		history = message_body['history']
+		message_body['history'] = json.dumps(history)
+
+
+		logging.info("history: %s", history)
+
+
+		flow_datum = GoalFlowDatum(**message_body)
 		db.session.add(flow_datum)
 		db.session.commit()
 
