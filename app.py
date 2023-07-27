@@ -239,11 +239,11 @@ def detect_sentiment():
 	# Return a JSON response
 	return jsonify(sentiment=sentiment)
 
-_ASK_FOR_EVENT_SYSETM_PROMPT = """The user has told how they are feeling, ask them short friendly questions to find out what event has made them feel this way.  Do not ask yes/no questions.
+_ASK_FOR_EVENT_SYSETM_PROMPT = """In this coaching session, the friendly assistant wants to understand what has caused a user to feel a certain way.
 
-For example, if the user say that are good, ask why they are feeling good and if the user says they are sad, find our what happened to make them sad.
+The assistant must ask short, friendly questions to find out what event has occurred to make the user feel the way they do.
 
-When you know the event, respond with "STOP EVENT DETECTED" followed by a short sentence summarising the event. This conversation must last no more than 3 turns each."""
+At the end the assistant must respond "STOP EVENT DETECTED"  and give a one sentence summary of the event. The assistant must not ask any additional questions and should keep the total interaction as short as possible."""
 
 # TODO(toni) If after a fixed number of step no event is detected do something better than just ending the conversation.
 # We can compute steps by the len(history).
@@ -302,10 +302,8 @@ def ask_for_event():
 	else:
 		user_event = None
 
-	# Stop after 3 turns each.
-	if len(messages) > 8:
-		app.logger.warning("No event detected after %s turns.",
-			len(messages))
+	# Stop if there is no question in next_question.
+	if '?' not in next_question:
 		has_event = True
 	
 	return jsonify(
