@@ -159,21 +159,21 @@ def user_feeling():
 	time = datetime.datetime.now().time()
 	
 	if (time > late):
-		response = "Hi, you are up late. How are you feeling?"
+		response = "I notice you are up late. How are you feeling?"
 
 	elif (time > early) & (time < morning):
-		response = "Hi, you are up very early. How are you feeling?"
+		response = "It seems early. How are you feeling?"
 
 	elif (time > morning) & (time < afternoon):
-		response = "Hi, how are you feeling this morning?"
+		response = "Let's start. How you are feeling this morning?"
 
 	elif (time > afternoon) & (time < evening):
-		response = "Hello, how are you feeling this afternoon?"
+		response = "Let's begin. How are you feeling this afternoon?"
 
 	elif (time > evening) & (time < late):
-		response = "Hi, how have you been feeling this evening?"
+		response = "Let's start. How have you been feeling this evening?"
 	else:
-		response = "Hi, how are you feeling?"
+		response = "Let's begin. How are you feeling?"
 
 	return jsonify(response=response)
 
