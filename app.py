@@ -304,10 +304,12 @@ def ask_for_event():
 
 	# Stop if there is no question in next_question.
 	if '?' not in next_question:
+		# TODO(toni) This will result in an empty event. Need to compute a user event.
 		has_event = True
 	
 	return jsonify(
 		has_event=has_event,
+		messages=messages,
 		question=next_question,
 		history=json.dumps(history),  # Be sure to dump!!
 		user_event=user_event)
@@ -323,6 +325,7 @@ _ASK_FOR_THOUGHT_SYSTEM_PROMPT = """The assistant has provided a summary of the 
 _DEFAULT_ASK_FOR_THOUGHT = """
 When you think about this situation, what's going through your head? Any recurring thoughts or beliefs?"""
 
+# TODO(toni) Deprecate this one.
 @app.post('/thought')
 @validate_twilio_request
 def ask_for_thought():
@@ -353,6 +356,39 @@ def ask_for_thought():
 	question = model_output['choices'][0]['message']['content']
 
 	return jsonify(question=question)
+
+
+@app.post('/reflect/ask_for_thought')
+@validate_twilio_request
+def ask_for_thought_v2():
+	"""Asks user for their thoughts, belief or self-talk."""
+
+	# Retrieve data from the request sent by Twilio
+	message_body = request.json
+	user_feeling = message_body['user_feeling']
+	user_event_history = message_body['user_event_history']
+
+	# Generate a question to ask the user for their thoughts about an event.
+	# TODO(toni) Consider including the user event history.
+	messages= [
+		{"role": "system", "content": _ASK_FOR_THOUGHT_SYSTEM_PROMPT},
+		{"role": "assistant", "content": "How are you feeling right now?"},
+		{"role": "user", "content": user_feeling},
+		# The last response is not shown to the user.
+		*user_event_history[:-1]
+	]
+
+	model_output = utils.chat_completion(
+		model="gpt-3.5-turbo-0613",
+		messages=messages,
+		max_tokens=1024,
+		temperature=1.0,
+		)
+
+	question = model_output['choices'][0]['message']['content']
+
+	return jsonify(question=question)
+
 
 _DISTORTION_SYSTEM_PROMPT = """
 The user has shared a belief with you. You must now identify a distortion in their thinking and ask them short questions to help them realise that distortion. This should be framed in a friendly way and take the side of the user.
