@@ -320,7 +320,9 @@ def ask_for_event():
 # Asking the the user for any self-talk/beliefs/thoughts in the
 # context of the event. 
 # This prompt includes one example.
-_ASK_FOR_THOUGHT_SYSTEM_PROMPT = """The assistant has provided a summary of the users event. Ask the user a short question to help them identify any thoughts, beliefs or self-talk. Do not ask a yes/no question."""
+_ASK_FOR_THOUGHT_SYSTEM_PROMPT = """The user has told the assistant about an event.
+
+Now the assistant must ask the user a short question to help them identify any thoughts, beliefs or self-talk. The assistant must not ask a question whose answer is yes or no."""
 
 _DEFAULT_ASK_FOR_THOUGHT = """
 When you think about this situation, what's going through your head? Any recurring thoughts or beliefs?"""
