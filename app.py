@@ -357,9 +357,7 @@ def ask_for_thought():
 _DISTORTION_SYSTEM_PROMPT = """
 The user has shared a belief with you. You must now identify a distortion in their thinking and ask them short questions to help them realise that distortion. This should be framed in a friendly way and take the side of the user.
 
-The conversation must finish after no more than three turns. Respond with "DONE" when the user has identified the distortion and say something appropriate to end the conversation on this turn. Do not include any questions on this turn."""
-
-MAX_STEPS = 6  # Relates to the "three" above.
+Respond with "DONE" when the user has identified the distortion and say something appropriate to end the conversation on this turn. Do not include any questions on this turn."""
 
 @app.post('/distortion_loop')
 @validate_twilio_request
@@ -371,6 +369,8 @@ def distortion_loop():
 	"""
 	message_body = request.json
 
+	user_feeling = message_body['user_feeling']
+	user_event = message_body['user_event']
 	user_belief = message_body['user_belief']
 	history = message_body['distortion_history']
 
@@ -382,8 +382,13 @@ def distortion_loop():
 
 	app.logger.info('[distortion_loop] history: %s', history)
 
+	# TODO(toni) Use the previous histories.
+
 	messages= [
 		{"role": "system", "content": _DISTORTION_SYSTEM_PROMPT},
+		{"role": "assistant", "content": "How are you feeling?"},
+		{"role": "user", "content": user_feeling},
+		{"role": "assistant", "content": _DEFAULT_ASK_FOR_THOUGHT},
 		{"role": "user", "content": user_belief},
 		*history,
 	]
@@ -401,8 +406,7 @@ def distortion_loop():
 	# Check if there is an event detected.
 	is_done = True if 'DONE' in next_question else False
 
-	if len(messages) == MAX_STEPS:
-		app.logger.warn('is_done != True, but has reached 6 messages.')
+	if '?' not in next_question:
 		is_done = True
 
 	if is_done:

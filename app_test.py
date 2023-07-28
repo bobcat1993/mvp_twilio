@@ -20,23 +20,23 @@ class TestApp(unittest.TestCase):
 		[
 		(
 			'23:30:12',
-			'Hi, you are up late. How are you feeling?'
+			'I notice you are up late. How are you feeling?'
 		),
 		(
 			'03:22:12',
-			'Hi, you are up very early. How are you feeling?'
+			'It seems early. How are you feeling?'
 		),
 		(
 			'10:00:14',
-			'Hi, how are you feeling this morning?'
+			'Let\'s start. How you are feeling this morning?'
 		),
 		(
 			'14:23:23',
-			'Hello, how are you feeling this afternoon?'
+			'Let\'s begin. How are you feeling this afternoon?'
 		),
 		(
 			'18:22:30',
-			'Hi, how have you been feeling this evening?'
+			'Let\'s start. How have you been feeling this evening?'
 		),
 		])
 	def test_user_feeling(
@@ -109,27 +109,22 @@ class TestApp(unittest.TestCase):
 		response_data = response.get_json()
 		self.assertIsNotNone(response)
 
-	@parameterized.expand([
-		("I’m excited for the potential benefits but I’m also worried that there will be a lot of bugs.",
-			[],
-			None
-		),
-		("I’m excited for the potential benefits but I’m also worried that there will be a lot of bugs.",
-			[{"role": "assistant", "content": "It's understandable to have such concerns. But do you think it's fair to assume that there will definitely be a lot of bugs even before giving it a chance?"}],
-			"I think that there will be a lot of bugs!"
-		),
-		])
-	def test_distortion_loop(
-		self,
-		user_belief,
-		distortion_history,
-		last_user_response):
+	def test_distortion_loop(self):
 		# Create a sample request payload to simulate the data sent by 
 		# Twilio
+
 		payload = {
-		'user_belief': user_belief,
-		"distortion_history": distortion_history,
-		"last_user_response": last_user_response}
+    "user_feeling": "A bit worried ",
+    "user_belief": "I'm worried that VC's might be right.",
+    "user_event": "User is feeling worried due to VCs expressing scepticism about their company's go-to-market strategy",
+    "distortion_history": [
+        {
+            "role": "assistant",
+            "content": "Ah, I see. So you're concerned about the opinions or judgments of venture capitalists. Can you tell me more about why their opinions hold so much weight for you?"
+        }
+    ],
+    "last_user_response": "Well they do this stuff all the time, they must know something right?"
+    }
 
 		# Send a POST request to the endpoint with the sample payload
 		response = self.app.post('/distortion_loop', json=payload)
