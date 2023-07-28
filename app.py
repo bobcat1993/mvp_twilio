@@ -315,12 +315,8 @@ def ask_for_event():
 		user_event=user_event)
 
 
-# The ask for thought prompt: Expected output is:
-# <question> question </question>.
-# Asking the the user for any self-talk/beliefs/thoughts in the
-# context of the event. 
-# This prompt includes one example.
-_ASK_FOR_THOUGHT_SYSTEM_PROMPT = """The user has told the assistant about an event.
+# The ask for thought prompt:
+_ASK_FOR_THOUGHT_SYSTEM_PROMPT = """The assistant has provided the a summary of an event that the user experienced.
 
 Now the assistant must ask the user a short question to help them identify any thoughts, beliefs or self-talk. The assistant must not ask a question whose answer is yes or no."""
 
@@ -369,15 +365,13 @@ def ask_for_thought_v2():
 	message_body = request.json
 	user_feeling = message_body['user_feeling']
 	user_event_history = message_body['user_event_history']
+	user_event_summary = message_body['user_event_summary']
 
 	# Generate a question to ask the user for their thoughts about an event.
 	# TODO(toni) Consider including the user event history.
 	messages= [
 		{"role": "system", "content": _ASK_FOR_THOUGHT_SYSTEM_PROMPT},
-		{"role": "assistant", "content": "How are you feeling right now?"},
-		{"role": "user", "content": user_feeling},
-		# The last response is not shown to the user.
-		*user_event_history[:-1]
+		{"role": "assistant", "content": user_event_summary}
 	]
 
 	model_output = utils.chat_completion(
@@ -395,7 +389,7 @@ def ask_for_thought_v2():
 _DISTORTION_SYSTEM_PROMPT = """
 The user has shared a belief with you. You must now identify a distortion in their thinking and ask them short questions to help them realise that distortion. This should be framed in a friendly way and take the side of the user.
 
-Respond with "DONE" when the user has identified the distortion and say something appropriate to end the conversation on this turn. Do not include any questions on this turn."""
+Respond with "DONE" when the user has identified the distortion and say something appropriate to end the conversation on this turn. Do not include any questions on this turn and do not ask about another problem."""
 
 @app.post('/distortion_loop')
 @validate_twilio_request
@@ -424,9 +418,9 @@ def distortion_loop():
 
 	messages= [
 		{"role": "system", "content": _DISTORTION_SYSTEM_PROMPT},
-		{"role": "assistant", "content": "How are you feeling?"},
-		{"role": "user", "content": user_feeling},
-		{"role": "assistant", "content": _DEFAULT_ASK_FOR_THOUGHT},
+		# {"role": "assistant", "content": "How are you feeling?"},
+		# {"role": "user", "content": user_feeling},
+		# {"role": "assistant", "content": _DEFAULT_ASK_FOR_THOUGHT},
 		{"role": "user", "content": user_belief},
 		*history,
 	]
