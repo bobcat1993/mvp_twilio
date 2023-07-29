@@ -387,9 +387,9 @@ def ask_for_thought_v2():
 
 
 _DISTORTION_SYSTEM_PROMPT = """
-The user has shared a belief with you. You must now identify a distortion in their thinking and ask them short questions to help them realise that distortion. This should be framed in a friendly way and take the side of the user.
+The user has shared a belief with you. The assistant must identify a distortion in the users thinking and ask the user short questions to help them realise that distortion. This should be framed in a friendly way and take the side of the user.
 
-Respond with "DONE" when the user has identified the distortion and say something appropriate to end the conversation on this turn. Do not include any questions on this turn and do not ask about another problem."""
+Respond with "DONE" when the user has identified the distortion and say something appropriate to end the conversation on this turn. At the end of the conversation, do not ask about another problem."""
 
 @app.post('/distortion_loop')
 @validate_twilio_request
@@ -418,9 +418,6 @@ def distortion_loop():
 
 	messages= [
 		{"role": "system", "content": _DISTORTION_SYSTEM_PROMPT},
-		# {"role": "assistant", "content": "How are you feeling?"},
-		# {"role": "user", "content": user_feeling},
-		# {"role": "assistant", "content": _DEFAULT_ASK_FOR_THOUGHT},
 		{"role": "user", "content": user_belief},
 		*history,
 	]
