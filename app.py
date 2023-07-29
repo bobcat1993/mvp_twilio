@@ -356,36 +356,6 @@ def ask_for_thought():
 	return jsonify(question=question)
 
 
-@app.post('/reflect/ask_for_thought')
-@validate_twilio_request
-def ask_for_thought_v2():
-	"""Asks user for their thoughts, belief or self-talk."""
-
-	# Retrieve data from the request sent by Twilio
-	message_body = request.json
-	user_feeling = message_body['user_feeling']
-	user_event_history = message_body['user_event_history']
-	user_event_summary = message_body['user_event_summary']
-
-	# Generate a question to ask the user for their thoughts about an event.
-	# TODO(toni) Consider including the user event history.
-	messages= [
-		{"role": "system", "content": _ASK_FOR_THOUGHT_SYSTEM_PROMPT},
-		{"role": "assistant", "content": user_event_summary}
-	]
-
-	model_output = utils.chat_completion(
-		model="gpt-3.5-turbo-0613",
-		messages=messages,
-		max_tokens=1024,
-		temperature=1.0,
-		)
-
-	question = model_output['choices'][0]['message']['content']
-
-	return jsonify(question=question)
-
-
 _DISTORTION_SYSTEM_PROMPT = """
 The user has shared a belief with you. The assistant must identify a distortion in the users thinking and ask the user short questions to help them realise that distortion. This should be framed in a friendly way and take the side of the user.
 
