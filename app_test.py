@@ -109,6 +109,21 @@ class TestApp(unittest.TestCase):
 		response_data = response.get_json()
 		self.assertIsNotNone(response)
 
+
+	# TODO(toni) Add test cases that check for belief, thought or self-talk.
+	def test_ask_for_belief_loop(self):
+		"""Tests the ask for thought loop function."""
+		payload = {
+    "user_event": "I have a pile of work and I just got additional emails coming in! ",
+    "history": [],
+    "last_user_response": None
+    }
+
+    # Send a POST request to the endpoint with the sample payload
+		response = self.app.post('/reflect/ask_for_belief_loop', json=payload)
+		app.logger.info('response %s', response)
+
+
 	def test_distortion_loop(self):
 		# Create a sample request payload to simulate the data sent by 
 		# Twilio
