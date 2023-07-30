@@ -386,6 +386,7 @@ def ask_for_belief_loop():
 		{"role": "system", "content": _ASK_FOR_THOUGHT_SYSTEM_PROMPT_V2},
 		{"role": "assistant", "content": _REFLECT_ASSISANT_ASK_FOR_EVENT},
 		{"role": "user", "content": user_event},
+		*history
 	]
 
 	model_output = utils.chat_completion(
@@ -396,6 +397,7 @@ def ask_for_belief_loop():
 		)
 
 	question = model_output['choices'][0]['message']['content']
+	history.append({"role": "assistant", "content": question})
 
 	def _check_if_asked_for_belief(question):
 		"""Check if Bobby has asked about belief."""
@@ -409,6 +411,8 @@ def ask_for_belief_loop():
 
 	is_done = _check_if_asked_for_belief(question)
 
+	# Note that the last output from this loop is a question from the 
+	# model, not a user response.
 	return jsonify(
 		question=question,
 		messages=messages,
