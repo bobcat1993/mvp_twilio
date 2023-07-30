@@ -356,6 +356,66 @@ def ask_for_thought():
 	return jsonify(question=question)
 
 
+_REFLECT_ASSISANT_ASK_FOR_EVENT = """To being, I'd love for you to share with me a particular event, challenge or situation that's been playing on your mind recently."""
+
+# The ask for thought prompt:
+_ASK_FOR_THOUGHT_SYSTEM_PROMPT_V2 = """In this coaching session, the assistant is helping the user identify and challenge unhelpful thoughts.
+
+Referring to the event specified by the user,
+explain to the user that you are going to help them reflect on this event. To start, ask them share any thoughts, self-talk or beliefs that arise from the event.
+
+This should be contained in a single, friendly and brief response that ends with a question."""
+
+# TODO(toni) Deprecate this one.
+@app.post('/reflect/ask_for_thought')
+@validate_twilio_request
+def ask_for_thought_v2():
+	"""Asks user for their thoughts, belief or self-talk."""
+
+	# Retrieve data from the request sent by Twilio
+	message_body = request.json
+	user_event = message_body['user_event']
+	history = message_body['history']
+	last_user_response = message_body['last_user_response']
+
+	if last_user_response:
+		history.append({"role": "user", "content": last_user_response})
+
+	# Generate a question to ask the user for their thoughts about an event.
+	messages= [
+		{"role": "system", "content": _ASK_FOR_THOUGHT_SYSTEM_PROMPT_V2},
+		{"role": "assistant", "content": _REFLECT_ASSISANT_ASK_FOR_EVENT},
+		{"role": "user", "content": user_event},
+	]
+
+	model_output = utils.chat_completion(
+		model="gpt-3.5-turbo-0613",
+		messages=messages,
+		max_tokens=1024,
+		temperature=1.0,
+		)
+
+	question = model_output['choices'][0]['message']['content']
+
+	def _check_if_asked_for_belief(question):
+		"""Check if Bobby has asked about belief."""
+		if 'thought' in question:
+			return True
+		if 'belief' in question:
+			return True
+		if ('self-talk' in question) or ('self talk' in question):
+			return True
+		return False
+
+	is_done = _check_if_asked_for_belief(question)
+
+	return jsonify(
+		question=question,
+		messages=messages,
+		history=json.dumps(history),
+		is_done=is_done)
+
+
 _DISTORTION_SYSTEM_PROMPT = """
 The user has shared a belief with you. The assistant must identify a distortion in the users thinking and ask the user short questions to help them realise that distortion. This should be framed in a friendly way and take the side of the user.
 
