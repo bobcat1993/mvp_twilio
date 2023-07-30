@@ -367,9 +367,9 @@ explain to the user that you are going to help them reflect on this event. To st
 This should be contained in a single, friendly and brief response that ends with a question."""
 
 # TODO(toni) Deprecate this one.
-@app.post('/reflect/ask_for_thought')
+@app.post('/reflect/ask_for_belief_loop')
 @validate_twilio_request
-def ask_for_thought_v2():
+def ask_for_belief_loop():
 	"""Asks user for their thoughts, belief or self-talk."""
 
 	# Retrieve data from the request sent by Twilio
