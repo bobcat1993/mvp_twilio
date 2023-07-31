@@ -432,7 +432,7 @@ Only ask one question at a time and keep all responses short and friendly.
 
 _ANYTHING_ELSE = """Is there anything else about this situation that you would like to discuss or explore further?"""
 
-@app.post('/distortion_loop')
+@app.post('/reflect/distortion_loop')
 @validate_twilio_request
 def distortion_loop():
 	"""Asks the users question to help identify distortions.
