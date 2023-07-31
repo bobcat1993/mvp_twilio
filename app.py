@@ -421,16 +421,10 @@ def ask_for_belief_loop():
 
 
 _DISTORTION_SYSTEM_PROMPT = """
-In this coaching session, the assistant is helping the user identify and challenge unhelpful thoughts.
+The user has shared a belief with you. You must now identify a distortion in their thinking (no need to share it with them) and ask them short questions to help them realise that distortion. This should be framed in a friendly way and take the side of the user.
 
-Referring to the situation or event described by the user, the assistant must ask the users short, friendly questions to help them, indirectly, identify any distortions in their thinking, anything that may be unhelpful. Always take the side of the user.
-
-When the session is finished the assistant should say "SESSION FINISHED".
-
-Only ask one question at a time and keep all responses short and friendly.
+The conversation must finish after no more than six turns. Respond with "SESSION FINISHED" when the user has identified the distortion and say something appropriate to end the conversation on this turn. Do not include any questions on this turn.
 """
-
-_ANYTHING_ELSE = """Is there anything else about this situation that you would like to discuss or explore further?"""
 
 @app.post('/reflect/distortion_loop')
 @validate_twilio_request
@@ -478,7 +472,6 @@ def distortion_loop():
 		)
 
 	next_question = model_output['choices'][0]['message']['content']
-	next_question = next_question.replace(_ANYTHING_ELSE, '')
 	history.append({"role": "assistant", "content": next_question})
 
 	# Check if there is an event detected.
