@@ -129,20 +129,20 @@ class TestApp(unittest.TestCase):
 		# Twilio
 
 		payload = {
-    "user_feeling": "A bit worried ",
-    "user_belief": "I'm worried that VC's might be right.",
-    "user_event": "User is feeling worried due to VCs expressing scepticism about their company's go-to-market strategy",
-    "distortion_history": [
+    "user_event": "I have a ton of work and I just got an email with many more TODO's ",
+    "belief_history": [
         {
             "role": "assistant",
-            "content": "Ah, I see. So you're concerned about the opinions or judgments of venture capitalists. Can you tell me more about why their opinions hold so much weight for you?"
+            "content": "I understand that receiving an overwhelming amount of work and a new set of tasks can be quite stressful. Can you tell me what thoughts or beliefs come up for you when faced with this situation?"
         }
     ],
-    "last_user_response": "Well they do this stuff all the time, they must know something right?"
+    "user_belief": "I'm worried that because things keep changing it's hard for me to give definitive answers.",
+    "distortion_history": [],
+    "last_user_response": None
     }
 
 		# Send a POST request to the endpoint with the sample payload
-		response = self.app.post('/distortion_loop', json=payload)
+		response = self.app.post('/reflect/distortion_loop', json=payload)
 		app.logger.info('response %s', response)
 
 		# Assert the response status code
