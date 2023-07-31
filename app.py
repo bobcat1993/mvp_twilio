@@ -421,9 +421,16 @@ def ask_for_belief_loop():
 
 
 _DISTORTION_SYSTEM_PROMPT = """
-The user has shared a belief with you. The assistant must identify a distortion in the users thinking and ask the user short questions to help them realise that distortion. This should be framed in a friendly way and take the side of the user.
+In this coaching session, the assistant is helping the user identify and challenge unhelpful thoughts.
 
-Respond with "DONE" when the user has identified the distortion and say something appropriate to end the conversation on this turn. At the end of the conversation, do not ask about another problem."""
+Referring to the situation or event described by the user, the assistant must ask the users short, friendly questions to help them, indirectly, identify any distortions in their thinking, anything that may be unhelpful. Always take the side of the user.
+
+When the session is finished the assistant should say "SESSION FINISHED".
+
+Only ask one question at a time and keep all responses short and friendly.
+"""
+
+_ANYTHING_ELSE = """Is there anything else about this situation that you would like to discuss or explore further?"""
 
 @app.post('/distortion_loop')
 @validate_twilio_request
@@ -435,24 +442,31 @@ def distortion_loop():
 	"""
 	message_body = request.json
 
-	user_feeling = message_body['user_feeling']
 	user_event = message_body['user_event']
+	# belief_history does not include final user response.
+	belief_history = message_body['belief_history']
+	# user_belief is the final user response.
 	user_belief = message_body['user_belief']
 	history = message_body['distortion_history']
 
-	current_user_response = message_body['last_user_response']
+	# Append the user response to the belief history.
+	belief_history.append({"role": "user", "content": user_belief})
 
 	# Add the previous user response to the end of the history.
+	current_user_response = message_body['last_user_response']
 	if current_user_response:
 		history.append({"role": "user", "content": current_user_response})
 
 	app.logger.info('[distortion_loop] history: %s', history)
 
-	# TODO(toni) Use the previous histories.
+	print("belief_history:", belief_history)
+	print("history:", history)
 
 	messages= [
 		{"role": "system", "content": _DISTORTION_SYSTEM_PROMPT},
-		{"role": "user", "content": user_belief},
+		{"role": "assistant", "content": _REFLECT_ASSISANT_ASK_FOR_EVENT},
+		{"role": "user", "content": user_event},
+		*belief_history,
 		*history,
 	]
 
@@ -464,16 +478,18 @@ def distortion_loop():
 		)
 
 	next_question = model_output['choices'][0]['message']['content']
+	next_question = next_question.replace(_ANYTHING_ELSE, '')
 	history.append({"role": "assistant", "content": next_question})
 
 	# Check if there is an event detected.
-	is_done = True if 'DONE' in next_question else False
+	is_done = True if 'SESSION FINISHED' in next_question else False
 
+	# If there is no question, then consider the loop done.
 	if '?' not in next_question:
 		is_done = True
 
 	if is_done:
-		next_question = next_question.replace('DONE', '')
+		next_question = next_question.replace('SESSION FINISHED', '')
 	
 	return jsonify(
 		is_done=is_done,
