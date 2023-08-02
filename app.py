@@ -114,6 +114,16 @@ class ProfileDatum(db.Model):
 	user_wix_id = db.Column(db.String, nullable=True)
 
 
+class UserFeedbackDatum(db.Model):
+	"""A user profile."""
+
+	id = db.Column(db.Integer, primary_key=True)
+	time = db.Column(db.DateTime, nullable=True)
+	flow_name = db.Column(db.String, nullable=True)
+	user_feedback = db.Column(db.String, nullable=True)
+	
+
+
 @app.before_first_request
 def init_app():
 	flags.FLAGS(sys.argv)
@@ -829,6 +839,24 @@ def save_goal_data():
 		return jsonify({'message': f'Flow data saved.'})
 	except Exception as e:
 		return jsonify({'error': str(e)})
+
+
+@app.post('/save_user_feedback')
+@validate_twilio_request
+def save_user_feedback():
+	"""Saves feedback from the user at the end of the skill."""
+
+	message_body = request.json
+
+	# Get the current time.
+	now = datetime.datetime.now()
+	message_body['time'] = now
+
+	user_feedback_datum = UserFeedbackDatum(**message_body)
+	db.session.add(user_feedback_datum)
+	db.session.commit()
+
+	return jsonify({'message': 'User data feedback saved.'})
 
 
 @app.post('/new_user')
