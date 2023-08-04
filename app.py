@@ -24,6 +24,8 @@ from utils import validate_twilio_request
 import openai
 import ast
 
+import create_post
+
 
 from absl import flags
 
@@ -723,6 +725,93 @@ def goal_loop():
 		history=json.dumps(history),  # Be sure to dump!!
 		messages=messages,
 	)
+
+
+def _days_since_start():
+	# Replace 'YYYY-MM-DD' with your desired start date in the format 'YYYY-MM-DD'
+	start_date_str = '2023-08-07'
+
+	# Convert the start date string to a datetime object
+	start_date = datetime.datetime.strptime(start_date_str, '%Y-%m-%d')
+
+	# Get the current date
+	current_date = datetime.datetime.today()
+
+	# Compute the difference between the current date and the start date
+	days_difference = (current_date - start_date).days
+
+	# Make sure it's in range.
+	days_difference = max(0, days_difference)
+	days_difference = min(len(_GRATITUDE_PROMPTS), days_difference)
+
+	return days_difference
+
+_GRATITUDE_PROMPTS = [
+	"What simple pleasure are you grateful for today, and why?",
+	"What’s something that you’re grateful to have today that you didn’t have a year ago?",
+	"What top three things/people make your home feel special?",
+	"Open your phone or photo album and find a photo that you like. Why are you grateful for this photo? What are you grateful for in the photo?",
+	"What’s something or someone that makes you feel safe?",
+	"How are you able to help others and how does that make you grateful?",
+	"What mistake or failure are you grateful for?",
+	"What skill(s) do you have that you’re grateful for?",
+	"Which decisions you made in the past are you grateful for today?",
+	"Write down an action to do this week, that your future self will be grateful for",
+	"Which childhood memories are you grateful for?",
+	"Which personality trait of yours are you are most thankful for?",
+	"What is something or someone that you take for granted. How can you express more appreciation for this thing or person?",
+	"What has been the highlight of your day today?",
+	"Name something that always put a smile on your face."
+]
+
+@app.post('/gratitude_challenge/get_gratitude_prompt')
+@validate_twilio_request
+def get_gratitude_prompt():
+	"""Give the gratitude prompt of the day."""
+
+	# Get the day number/ index.
+	day_index = _days_since_start()
+
+	# Get the prompt based on the day.
+	prompt = _GRATITUDE_PROMPTS[day_index]
+	
+	return jsonify(
+		day=str(day_index + 1),
+		prompt=prompt
+	)
+
+
+_SHARE_GRATITUDE_PROMPTS = [
+"Here's a snapshot of your gratitude. Consider sharing it with your friends and colleagues to brighten their day too!",
+"Did you know that when your friends and colleagues see what you are grateful for, they get the same positive benefits as you? Consider sharing this snapshot of your gratitude with others.",
+"They say, 'Sharing is Caring' even more so when you share what you are grateful for. Consider sharing this snapshot of your gratitude with others.",
+"When you share your gratitude with others, it can inspire them to notice and appreciate the good things in their lives too. Consider sharing this snapshot of your gratitude with others.",
+"You've just expressed something you're grateful for – now take a moment to share it with a friend. Spread the positivity and let them know what's brightening your day!",
+"Share what you're thankful for with a friend and challenge them to pass on their own moments of gratitude. Let's create a ripple of appreciation together.",
+"Your gratitude is a gift worth sharing. Consider sharing this snapshot of your gratitude with others."
+]
+
+@app.post('/gratitude_challenge/create_post')
+@validate_twilio_request
+def create_gratitude_post():
+	"""Give the gratitude prompt of the day."""
+
+	message_body = request.json
+	response = message_body['response']
+
+	# Get the call to action for the user to share their gratitude.
+	day_index = _days_since_start()
+	share_prompt = _SHARE_GRATITUDE_PROMPTS[day_index]
+
+	# Create the post.
+	image_url = create_post.dynapictures_api(response)
+
+	return jsonify(
+		image_url=image_url,
+		share_prompt=share_prompt)
+
+
+
 
 
 def string_hash(string):
