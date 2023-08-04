@@ -24,19 +24,16 @@ def template_api(text: str):
 			]
 		}
 
-		# response = requests.post(
-		# 		F"https://rest.apitemplate.io/v2/create-image?template_id={template_id}",
-		# 		headers = {"X-API-KEY": F"{api_key}"},
-		# 		json= data
-		# )
+		response = requests.post(
+				F"https://rest.apitemplate.io/v2/create-image?template_id={template_id}",
+				headers = {"X-API-KEY": F"{api_key}"},
+				json= data
+		)
 
-		# response = response.json()
-		# image = response['download_url_png']
+		response = response.json()
+		image = response['download_url_png']
 
-		# return image
-
-		return _TEST_URL
-
+		return image
 
 def dynapictures_api(text: str):
 		api_key = os.getenv("DYNAPICTURES_API_KEY")
@@ -73,17 +70,16 @@ def dynapictures_api(text: str):
 			]
 		}
 
-		# response = requests.post(
-		# 		F"https://api.dynapictures.com/designs/{template_id}",
-		# 		headers = {"Authorization": f"Bearer {api_key}"},
-		# 		json= data
-		# )
+		response = requests.post(
+				F"https://api.dynapictures.com/designs/{template_id}",
+				headers = {"Authorization": f"Bearer {api_key}"},
+				json= data
+		)
 
-		# repsponse = response.json()
-		# image = response['imageUrl']
-		# return image
-
-		return _TEST_URL
+		response = response.json()
+		print(response)
+		image = response['imageUrl']
+		return image
 
 if __name__ == "__main__":
 		url = dynapictures_api('I\'m grateful for coffee')
