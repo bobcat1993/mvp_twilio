@@ -952,10 +952,23 @@ def save_user_feedback():
 def new_user():
 	"""Adds new users to the user DB: receives a webhook from Wix."""
 
+	# These key's can be found within the Wix automations;
+	# there is an option to see the data structure.
 	message_body = request.json['data']
-	user_number = message_body['field:comp-lipwozdh']
-	user_email = message_body['field:comp-like94pe']
-	user_wix_id = message_body['contact.Id']
+	if 'field:comp-lipwozdh' in message_body:	
+		user_number = message_body['field:comp-lipwozdh']
+	else: 
+		user_number = message_body['field:comp-ll3zlzex1']
+	
+	if 'field:comp-like94pe' in message_body:
+		user_email = message_body['field:comp-like94pe']
+	else:
+		user_email = message_body['field:comp-ll3zlzeo']
+
+	if 'contact.Id' in message_body:
+		user_wix_id = message_body['contact.Id']
+	else:
+		user_wix_id = 'none'
 
 	# Post-process the user number.
 	if user_number:
@@ -964,8 +977,11 @@ def new_user():
 		# From (+44) 7479812734 -->   whatsapp:+447479812734
 		user_number = user_number.replace('(', '')
 		user_number = user_number.replace(')', '')
-		user_number = user_number.replace(' ', '')
-		user_number = f'whatsapp:{user_number}'
+		# user_number = user_number.replace(' ', '')
+		code, number = user_number.split(' ')
+		if number.startswith('0'):
+			number = number.lstrip('0')
+		user_number = f'whatsapp:{code}{number}'
 
 		# The data: giving everyone 30 tokens.
 		data = dict(
