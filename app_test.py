@@ -223,6 +223,32 @@ class TestApp(unittest.TestCase):
 		# Assert the response status code -- succeeded.
 		self.assertEqual(response.status_code, 200)
 
+	def test_summarise_outside(self):
+		payload = {
+    "user_event": "Overwhelmed by my workload.",
+    "user_identifies_person": "",
+    "history": [
+        {
+            "role": "assistant",
+            "content": "I understand, feeling overwhelmed by your workload can be quite stressful. Let's break it down. To begin with, could you tell me what specifically within your workload is causing you to feel overwhelmed?"
+        },
+        {
+            "role": "assistant",
+            "content": "What are the things or tasks in your workload that you have little or no control over?"
+        },
+        {
+            "role": "assistant",
+            "content": "Do you have control over setting the deadlines for your tasks?"
+        }
+    ],
+    "last_user_response": 'Yes.'
+    }
+
+		response = self.app.post('/sphere_of_influence/summarise_outside', json=payload)
+
+		# Assert the response status code -- succeeded.
+		self.assertEqual(response.status_code, 200)
+
 
 	def test_save_goal_data(self):
 

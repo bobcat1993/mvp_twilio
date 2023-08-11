@@ -819,6 +819,12 @@ def outside_loop():
 	"""Identify what is outside of the users control."""
 	return sphere_of_influence.outside_loop(request)
 
+@app.post('/sphere_of_influence/summarise_outside')
+@validate_twilio_request
+def summarise_outside():
+	"""Identify what is outside of the users control."""
+	return sphere_of_influence.summarise_outside(request)
+
 
 def string_hash(string):
 	return md5(string.encode()).hexdigest()
