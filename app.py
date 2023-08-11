@@ -26,6 +26,9 @@ import ast
 
 import create_post
 
+# Import features.
+from features import sphere_of_influence
+
 
 from absl import flags
 
@@ -810,8 +813,11 @@ def create_gratitude_post():
 		image_url=image_url,
 		share_prompt=share_prompt)
 
-
-
+@app.post('/sphere_of_influence/outside_loop')
+@validate_twilio_request
+def outside_loop():
+	"""Identify what is outside of the users control."""
+	return sphere_of_influence.outside_loop(request)
 
 
 def string_hash(string):

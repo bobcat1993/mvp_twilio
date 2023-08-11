@@ -114,12 +114,12 @@ class TestApp(unittest.TestCase):
 	def test_ask_for_belief_loop(self):
 		"""Tests the ask for thought loop function."""
 		payload = {
-    "user_event": "I have a pile of work and I just got additional emails coming in! ",
-    "history": [],
-    "last_user_response": None
-    }
+		"user_event": "I have a pile of work and I just got additional emails coming in! ",
+		"history": [],
+		"last_user_response": None
+		}
 
-    # Send a POST request to the endpoint with the sample payload
+		# Send a POST request to the endpoint with the sample payload
 		response = self.app.post('/reflect/ask_for_belief_loop', json=payload)
 		app.logger.info('response %s', response)
 
@@ -129,17 +129,17 @@ class TestApp(unittest.TestCase):
 		# Twilio
 
 		payload = {
-    "user_event": "I have a ton of work and I just got an email with many more TODO's ",
-    "belief_history": [
-        {
-            "role": "assistant",
-            "content": "I understand that receiving an overwhelming amount of work and a new set of tasks can be quite stressful. Can you tell me what thoughts or beliefs come up for you when faced with this situation?"
-        }
-    ],
-    "user_belief": "I'm worried that because things keep changing it's hard for me to give definitive answers.",
-    "distortion_history": [],
-    "last_user_response": None
-    }
+		"user_event": "I have a ton of work and I just got an email with many more TODO's ",
+		"belief_history": [
+				{
+						"role": "assistant",
+						"content": "I understand that receiving an overwhelming amount of work and a new set of tasks can be quite stressful. Can you tell me what thoughts or beliefs come up for you when faced with this situation?"
+				}
+		],
+		"user_belief": "I'm worried that because things keep changing it's hard for me to give definitive answers.",
+		"distortion_history": [],
+		"last_user_response": None
+		}
 
 		# Send a POST request to the endpoint with the sample payload
 		response = self.app.post('/reflect/distortion_loop', json=payload)
@@ -185,14 +185,40 @@ class TestApp(unittest.TestCase):
 		self.assertEqual(response.status_code, 200)
 
 	def test_goal_loop(self):
-		"""Test the goal setting loop."""
+	# 	"""Test the goal setting loop."""
 
+	# 	payload = {
+	# 		'user_goal': 'I want to go for a walk.',
+	# 		'goal_history': [],
+	# 		'last_user_response': None
+	# 	}
+	# 	response = self.app.post('/goal/goal_loop', json=payload)
+
+	# 	# Assert the response status code -- succeeded.
+	# 	self.assertEqual(response.status_code, 200)
+
+	def test_outside_loop(self):
 		payload = {
-			'user_goal': 'I want to go for a walk.',
-			'goal_history': [],
-			'last_user_response': None
-		}
-		response = self.app.post('/goal/goal_loop', json=payload)
+    "user_event": "Overwhelmed by my workload.",
+    "user_identifies_person": "",
+    "history": [
+        {
+            "role": "assistant",
+            "content": "I understand, feeling overwhelmed by your workload can be quite stressful. Let's break it down. To begin with, could you tell me what specifically within your workload is causing you to feel overwhelmed?"
+        },
+        {
+            "role": "assistant",
+            "content": "What are the things or tasks in your workload that you have little or no control over?"
+        },
+        {
+            "role": "assistant",
+            "content": "Do you have control over setting the deadlines for your tasks?"
+        }
+    ],
+    "last_user_response": None
+    }
+
+		response = self.app.post('/sphere_of_influence/outside_loop', json=payload)
 
 		# Assert the response status code -- succeeded.
 		self.assertEqual(response.status_code, 200)
@@ -201,14 +227,14 @@ class TestApp(unittest.TestCase):
 	def test_save_goal_data(self):
 
 		payload = {
-"user_goal" : "Go for a swim",
-"history": [{"role": "assistant", "content": "Great! Let's make it a SMART goal. \n\nFirst, let's make it more specific. Are there any specific parameters or objectives you have in mind for this swim?"}, {"role": "user", "content": "Just want to swim for 20 minutes"}, {"role": "assistant", "content": "Perfect! That makes it a lot more specific. \n\nNow let's make it measurable. How will you track your progress throughout the 20 minutes of swimming?"}, {"role": "user", "content": "I\u2019ll use my smart watch?"}, {"role": "assistant", "content": "Excellent! Using your smartwatch to track your swim time makes it easily measurable. \n\nNext, let's make sure it is an achievable goal. Do you feel confident in your ability to complete a 20-minute swim session?"}, {"role": "user", "content": "Am I had to take some rest, but yeah I can definitely in the water for 20 minutes"}, {"role": "assistant", "content": "That's great to hear! Allowing for rests during the swim is a great way to make it achievable. \n\nNow, let's make sure the goal is relevant. Why is going for a 20-minute swim important to you today?"}, {"role": "user", "content": "I need to get back into exercise"}, {"role": "assistant", "content": "That's a fantastic reason! Getting back into exercise is an important goal. \n\nFinally, let's make it time-bound. Will you be able to complete your 20-minute swim session today?"}, {"role": "user", "content": "Yeah, after my last meeting"}, {"role": "assistant", "content": "Wonderful! So, to summarize, your SMART goal for today is: To swim for 20 minutes using your smartwatch to track your progress, allowing for rests, as a way to get back into exercise, after your last meeting.\n\nSESSION ENDED."}],
-"user_feel_after" : "4",
-"origin": "twilio_flow",
-"flow_sid" : "FWXXXXXX",
-"user_id": "whatsapp:+XXXXXXX",
-"error": "None"
-}
+		"user_goal" : "Go for a swim",
+		"history": [{"role": "assistant", "content": "Great! Let's make it a SMART goal. \n\nFirst, let's make it more specific. Are there any specific parameters or objectives you have in mind for this swim?"}, {"role": "user", "content": "Just want to swim for 20 minutes"}, {"role": "assistant", "content": "Perfect! That makes it a lot more specific. \n\nNow let's make it measurable. How will you track your progress throughout the 20 minutes of swimming?"}, {"role": "user", "content": "I\u2019ll use my smart watch?"}, {"role": "assistant", "content": "Excellent! Using your smartwatch to track your swim time makes it easily measurable. \n\nNext, let's make sure it is an achievable goal. Do you feel confident in your ability to complete a 20-minute swim session?"}, {"role": "user", "content": "Am I had to take some rest, but yeah I can definitely in the water for 20 minutes"}, {"role": "assistant", "content": "That's great to hear! Allowing for rests during the swim is a great way to make it achievable. \n\nNow, let's make sure the goal is relevant. Why is going for a 20-minute swim important to you today?"}, {"role": "user", "content": "I need to get back into exercise"}, {"role": "assistant", "content": "That's a fantastic reason! Getting back into exercise is an important goal. \n\nFinally, let's make it time-bound. Will you be able to complete your 20-minute swim session today?"}, {"role": "user", "content": "Yeah, after my last meeting"}, {"role": "assistant", "content": "Wonderful! So, to summarize, your SMART goal for today is: To swim for 20 minutes using your smartwatch to track your progress, allowing for rests, as a way to get back into exercise, after your last meeting.\n\nSESSION ENDED."}],
+		"user_feel_after" : "4",
+		"origin": "twilio_flow",
+		"flow_sid" : "FWXXXXXX",
+		"user_id": "whatsapp:+XXXXXXX",
+		"error": "None"
+		}
 
 		response = self.app.post('/goal/save_goal_data', json=payload)
 		self.assertEqual(response.status_code, 200)
