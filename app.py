@@ -1005,8 +1005,7 @@ def new_user():
 		logging.info("[RECORD] %s", record)
 
 		if record:
-			record.update({ProfileDatum.user_number: user_number},
-				synchronize_session = False)
+			record.user_number = user_number
 			db.session.commit()
 
 		else:
