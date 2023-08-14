@@ -743,10 +743,6 @@ def _days_since_start():
 	# Compute the difference between the current date and the start date
 	days_difference = (current_date - start_date).days
 
-	# Make sure it's in range.
-	days_difference = max(0, days_difference)
-	days_difference = min(len(_GRATITUDE_PROMPTS), days_difference)
-
 	return days_difference
 
 _GRATITUDE_PROMPTS = [
@@ -759,7 +755,7 @@ _GRATITUDE_PROMPTS = [
 	"What mistake or failure are you grateful for?",
 	"What skill(s) do you have that you’re grateful for?",
 	"Which decisions you made in the past are you grateful for today?",
-	"Write down an action to do this week, that your future self will be grateful for",
+	"Write down an action to do this week, that your future self will be grateful for.",
 	"Which childhood memories are you grateful for?",
 	"Which personality trait of yours are you are most thankful for?",
 	"What is something or someone that you take for granted. How can you express more appreciation for this thing or person?",
@@ -776,7 +772,7 @@ def get_gratitude_prompt():
 	day_index = _days_since_start()
 
 	# Get the prompt based on the day.
-	prompt = _GRATITUDE_PROMPTS[day_index]
+	prompt = _GRATITUDE_PROMPTS[day_index % len(_GRATITUDE_PROMPTS)]
 	
 	return jsonify(
 		day=str(day_index + 1),
@@ -804,7 +800,7 @@ def create_gratitude_post():
 
 	# Get the call to action for the user to share their gratitude.
 	day_index = _days_since_start()
-	share_prompt = _SHARE_GRATITUDE_PROMPTS[day_index]
+	share_prompt = _SHARE_GRATITUDE_PROMPTS[day_index % len(_SHARE_GRATITUDE_PROMPTS)]
 
 	# Create the post.
 	image_url = create_post.dynapictures_api(response)

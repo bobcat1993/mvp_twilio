@@ -250,6 +250,31 @@ class TestApp(unittest.TestCase):
 		self.assertEqual(response.status_code, 200)
 
 
+	# TODO(toni) Parametrize this.
+	def test_days_since_start(self):
+		# freeze_time args: YYYY-MM-DD
+		with freeze_time('2023-08-31'):
+			diff = my_app._days_since_start()
+			logging.info(f'diff={diff}')
+			assert diff == 24
+
+	def test_get_gratitude_prompt(self):
+		with freeze_time('2023-08-31'):
+			response = self.app.post('/gratitude_challenge/get_gratitude_prompt')
+
+			# Assert the response status code -- succeeded.
+			self.assertEqual(response.status_code, 200)
+
+	def test_create_gratitude_post(self):
+		with freeze_time('2023-08-31'):
+
+			paylod = {"response": "Grateful for my co-founder."}
+			response = self.app.post('/gratitude_challenge/create_post', json=paylod)
+
+			# Assert the response status code -- succeeded.
+			self.assertEqual(response.status_code, 200)
+
+
 	def test_save_goal_data(self):
 
 		payload = {
@@ -327,7 +352,8 @@ class TestApp(unittest.TestCase):
 
 
 if __name__ == '__main__':
-		unittest.main()
+	unittest.main()
+
 
 
 
