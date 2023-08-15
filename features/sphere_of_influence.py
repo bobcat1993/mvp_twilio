@@ -94,51 +94,6 @@ def outside_loop(request):
 	)
 
 
-_SUMMARISE_OUTSIDE_SYSTEM_PROMPT = """The assistant is guiding the user step-by-step through the outer ring of the Sphere of Influence - the things the user cannot control.
-
-The assistant has helped the user discover what they cannot control. The assistant must help the user let go with a short simple response.
-
-The assistant must not ask a question."""
-
-_MAX_RETRIES = 5
-
-def summarise_outside(request):
-	"""Summarise what is outside of the users control."""
-
-	# Get the inputs.
-	message_body = request.json
-	user_event = message_body['user_event']
-	history = message_body['history']
-	last_user_response = message_body['last_user_response']
-
-	messages = [
-	{'role': 'system', 'content': _SUMMARISE_OUTSIDE_SYSTEM_PROMPT},
-	{'role': 'assistant', 'content': _ASK_FOR_EVENT_TEXT},
-	{'role': 'user', 'content': user_event},
-	*history
-	]
-
-	messages.append({'role': 'user', 'content': last_user_response})
-
-	model_output = utils.chat_completion(
-		model='gpt-3.5-turbo-0613',
-		messages=messages,
-		max_tokens=1024,
-		temperature=0.5,  # Low temp -- close to being deterministic!
-		)
-
-	response = model_output['choices'][0]['message']['content']
-
-	# Remove any questions from the output.
-	response = _remove_questions(response)
-
-	if response:
-		return jsonify(response=response)
-
-	logging.warn(f'Question detected in response:\n{response}')
-	return jsonify(response=_DEFAULT_SUMMARY)
-
-
 _INSIDE_SYSTEM_PROMPT = """The assistant is guiding the user step-by-step through the inner ring of the Sphere of Influence.
 
 The user has shared what they are worried about and the assistant must ask short questions to help the user identify the things that are in the inner circle; things that they can control.
