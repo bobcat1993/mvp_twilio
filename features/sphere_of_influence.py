@@ -22,11 +22,21 @@ _WELCOME_TEXT = ""
 
 _ASK_FOR_EVENT_TEXT = """To start off, please tell be about a specific challenge or issue you'd like to focus on today, something that's been on your mind?"""
 
-_OUTSIDE_SYSTEM_PROMPT = """The assistant is guiding the user step-by-step through the outer ring of the Sphere of Influence.
+_OUTSIDE_SYSTEM_PROMPT = """The kind and friendly assistant is guiding the user step-by-step through the outer ring of the Sphere of Influence.
 
-The user has shared what they are worried about and the assistant must ask short questions to help the user identify the things that are in the outer circle; things that are outside of their control.
+In this, the first step, the assistant 
+
+The user has shared a specific challenge or issue that they would like help with. The assistant must ask short questions to help the user identify the things that they cannot control in this situation and encourage them to let go of those things.
 
 After a few turns the assistant must respond "STEP COMPLETE"."""
+
+_DEFAULT_SUMMARY = """It can be challenging when you feel like you have little control over your tasks and responsibilities. Sometimes, it can help to let go of the things we cannot control and focus on what we can control."""
+
+def _remove_questions(text):
+	sentences = re.split(r'(?<=[.!?]) +', text)  # Split the text into sentences
+	non_question_sentences = [sentence for sentence in sentences if not sentence.endswith("?")]
+	result = ' '.join(non_question_sentences)
+	return result
 
 def outside_loop(request):
 	"""Identifies what is outside the users control."""
@@ -60,6 +70,14 @@ def outside_loop(request):
 	# Check if there is an event detected.
 	is_done = True if 'STEP COMPLETE' in next_question else False
 
+	if is_done:
+		next_question = next_question.replace('STEP COMPLETE', '')
+		next_question = next_question.strip('\n')
+		next_question = _remove_questions(next_question)
+
+	if not next_question:
+		next_question = _DEFAULT_SUMMARY
+
 	# If there is no question in "next_question" also set is_done to True.
 	if '?' not in next_question:
 		is_done = True
@@ -83,14 +101,6 @@ The assistant has helped the user discover what they cannot control. The assista
 The assistant must not ask a question."""
 
 _MAX_RETRIES = 5
-
-_DEFAULT_SUMMARY = """It can be challenging when you feel like you have little control over your tasks and responsibilities. Sometimes, it can help to let go of the things we cannot control and focus on what we can control."""
-
-def _remove_questions(text):
-	sentences = re.split(r'(?<=[.!?]) +', text)  # Split the text into sentences
-	non_question_sentences = [sentence for sentence in sentences if not sentence.endswith("?")]
-	result = ' '.join(non_question_sentences)
-	return result
 
 def summarise_outside(request):
 	"""Summarise what is outside of the users control."""
