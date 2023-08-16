@@ -915,7 +915,7 @@ def save_cheer_data():
 @app.post('/goal/save_goal_data')
 @validate_twilio_request
 def save_goal_data():
-	"""Saves data at the end of the Cheerleader chat."""
+	"""Saves data at the end of the Daily goal setting chat."""
 	# Retrieve data from the request sent by Twilio
 	try:
 		message_body = request.json
@@ -942,6 +942,12 @@ def save_goal_data():
 		return jsonify({'message': f'Flow data saved.'})
 	except Exception as e:
 		return jsonify({'error': str(e)})
+
+
+@app.post('/sphere_of_influence/save_control_data')
+@validate_twilio_request
+def save_control_data():
+	return sphere_of_influence.save_control_data(request)
 
 
 @app.post('/save_user_feedback')
