@@ -16,12 +16,11 @@ import create_post
 # Import features.
 from features import sphere_of_influence
 
-
 _WELCOME_TEXT = ""
 
 _ASK_FOR_EVENT_TEXT = """To start off, please tell be about a specific challenge or issue you'd like to focus on today, something that's been on your mind?"""
 
-_OUTSIDE_SYSTEM_PROMPT = """The kind and friendly assistant is guiding the user step-by-step through the outer ring of the Sphere of Influence.
+_OUTSIDE_SYSTEM_PROMPT = """The kind and friendly assistant is guiding the user step-by-step through the outer ring of the Sphere of Influence -- understanding what the user cannot control.
 
 The user has shared a specific challenge or issue that they would like help with. The assistant must ask short questions to help the user identify the things that they cannot control in this situation and encourage them to let go of those things.
 
@@ -56,7 +55,7 @@ def outside_loop(request):
 	]
 
 	model_output = utils.chat_completion(
-		model="gpt-4-0631",
+		model="gpt-3-turbo-0631",
 		messages=messages,
 		max_tokens=256,
 		temperature=1.0,
@@ -122,14 +121,18 @@ def inside_loop(request):
 	*history
 	]
 
-	model_output = utils.chat_completion(
-		model="gpt-4-0631",
-		messages=messages,
-		max_tokens=256,
-		temperature=1.0,
-		)
+	if len(history) == 0:
+		next_question = """Let's switch to focusing on what you can control. What are some of the things you feel that you can control in this situation?"""
+	else:
 
-	next_question = model_output['choices'][0]['message']['content']
+		model_output = utils.chat_completion(
+			model="gpt-3-turbo-0631",
+			messages=messages,
+			max_tokens=256,
+			temperature=1.0,
+			)
+
+		next_question = model_output['choices'][0]['message']['content']
 
 	# Check if there is an event detected.
 	is_done = True if 'SESSION COMPLETE' in next_question else False
@@ -152,3 +155,5 @@ def inside_loop(request):
 		history=json.dumps(history),  # Be sure to dump!!
 		messages=messages,
 	)
+
+def save_control_data()
