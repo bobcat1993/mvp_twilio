@@ -16,6 +16,28 @@ import create_post
 # Import features.
 from features import sphere_of_influence
 
+# create the extension
+db = SQLAlchemy()
+
+class ControlFlowDatum(db.Model):
+	"""Stores the data from the SMART goal setting flow."""
+
+	id = db.Column(db.Integer, primary_key=True)
+	user_event = db.Column(db.String, nullable=True)
+	outside_loop_history = db.Column(db.String, nullable=True)
+	inside_loop_history = db.Column(db.String, nullable=True)
+	user_feel_after = db.Column(db.String, nullable=True)
+	flow_sid = db.Column(db.String, nullable=True)
+	origin = db.Column(db.String, nullable=True)
+	user_id = db.Column(db.String, nullable=True)
+	error = db.Column(db.String, nullable=True)
+	time = db.Column(db.DateTime, nullable=True)
+
+
+# TODO(toni) Add this to a utils.py file.
+def string_hash(string):
+	return md5(string.encode()).hexdigest()
+
 _WELCOME_TEXT = ""
 
 _ASK_FOR_EVENT_TEXT = """To start off, please tell be about a specific challenge or issue you'd like to focus on today, something that's been on your mind?"""
@@ -122,9 +144,10 @@ def inside_loop(request):
 	]
 
 	if len(history) == 0:
+		# If it's the fist turn on the inner loop use a pre-written question.
 		next_question = """Let's switch to focusing on what you can control. What are some of the things you feel that you can control in this situation?"""
 	else:
-
+		# If it's a any other turn use the LLM.
 		model_output = utils.chat_completion(
 			model="gpt-3-turbo-0631",
 			messages=messages,
@@ -156,4 +179,32 @@ def inside_loop(request):
 		messages=messages,
 	)
 
-def save_control_data()
+def save_control_data(request):
+	"""Saves data at the end of the Spheres of Influence chat."""
+	# Retrieve data from the request sent by Twilio
+	try:
+		message_body = request.json
+
+		# Hash the user_id so that the data is pseudo-anonyms.
+		message_body['user_id'] = string_hash(message_body['user_id'])
+
+		# Get the current time.
+		now = datetime.datetime.now()
+		message_body['time'] = now
+
+		# Dump the history (into dicts).
+		for key in ['inside_loop_history', 'outside_loop_history']:
+			history = message_body[key]
+			message_body[key] = json.dumps(history)
+
+			logging.info("%s: %s", key, history)
+
+
+		flow_datum = ControlFlowDatum(**message_body)
+		db.session.add(flow_datum)
+		db.session.commit()
+
+		return jsonify({'message': f'Flow data saved.'})
+	except Exception as e:
+		return jsonify({'error': str(e)})
+
