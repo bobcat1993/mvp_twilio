@@ -8,6 +8,7 @@ import os
 import sys
 import datetime
 from hashlib import md5
+from flask_sqlalchemy import SQLAlchemy
 import re
 
 import create_post
@@ -15,8 +16,6 @@ import create_post
 # Import features.
 from features import sphere_of_influence
 
-
-from absl import flags
 
 _WELCOME_TEXT = ""
 
@@ -57,9 +56,9 @@ def outside_loop(request):
 	]
 
 	model_output = utils.chat_completion(
-		model="gpt-4",
+		model="gpt-4-0631",
 		messages=messages,
-		max_tokens=1024,
+		max_tokens=256,
 		temperature=1.0,
 		)
 
@@ -67,6 +66,11 @@ def outside_loop(request):
 
 	# Check if there is an event detected.
 	is_done = True if 'STEP COMPLETE' in next_question else False
+
+	if is_done:
+		next_question = next_question.replace('STEP COMPLETE', '')
+		next_question = next_question.strip('\n')
+		next_question = _remove_questions(next_question)
 
 	if not next_question:
 		next_question = _DEFAULT_OUTTER_SUMMARY
@@ -119,20 +123,20 @@ def inside_loop(request):
 	]
 
 	model_output = utils.chat_completion(
-		model="gpt-4",
+		model="gpt-4-0631",
 		messages=messages,
-		max_tokens=1024,
+		max_tokens=256,
 		temperature=1.0,
 		)
 
 	next_question = model_output['choices'][0]['message']['content']
 
 	# Check if there is an event detected.
-	is_done = True if 'STEP COMPLETE' in next_question else False
+	is_done = True if 'SESSION COMPLETE' in next_question else False
 
 	if is_done:
-		next_question = next_question.replace('STEP COMPLETE', '')
-		next_question = next_question.strip('\n')
+		next_question = next_question.replace('SESSION COMPLETE', '')
+		next_question = next_question.strip('\n .')
 		next_question = _remove_questions(next_question)
 
 	# If there is no question in "next_question" also set is_done to True.
