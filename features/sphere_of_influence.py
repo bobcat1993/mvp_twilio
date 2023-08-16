@@ -28,7 +28,7 @@ The user has shared a specific challenge or issue that they would like help with
 
 After a few turns the assistant must respond "STEP COMPLETE"."""
 
-_DEFAULT_SUMMARY = """It can be challenging when you feel like you have little control over your tasks and responsibilities. Sometimes, it can help to let go of the things we cannot control and focus on what we can control."""
+_DEFAULT_OUTTER_SUMMARY = """It can be challenging when you feel like you have little control over your tasks and responsibilities. Sometimes, it can help to let go of the things we cannot control and focus on what we can control."""
 
 def _remove_questions(text):
 	sentences = re.split(r'(?<=[.!?]) +', text)  # Split the text into sentences
@@ -57,7 +57,7 @@ def outside_loop(request):
 	]
 
 	model_output = utils.chat_completion(
-		model="gpt-3.5-turbo-0613",
+		model="gpt-4",
 		messages=messages,
 		max_tokens=1024,
 		temperature=1.0,
@@ -68,21 +68,15 @@ def outside_loop(request):
 	# Check if there is an event detected.
 	is_done = True if 'STEP COMPLETE' in next_question else False
 
-	if is_done:
-		next_question = next_question.replace('STEP COMPLETE', '')
-		next_question = next_question.strip('\n')
-		next_question = _remove_questions(next_question)
-
 	if not next_question:
-		next_question = _DEFAULT_SUMMARY
+		next_question = _DEFAULT_OUTTER_SUMMARY
 
 	# If there is no question in "next_question" also set is_done to True.
 	if '?' not in next_question:
 		is_done = True
 
-	if not is_done:
-		# If the conversation is not done, add the question to the history.
-		history.append({"role": "assistant", "content": next_question})
+	# Add the question to the history.
+	history.append({"role": "assistant", "content": next_question})
 	
 	return jsonify(
 		is_done=is_done,
@@ -92,17 +86,22 @@ def outside_loop(request):
 	)
 
 
-_INSIDE_SYSTEM_PROMPT = """The assistant is guiding the user step-by-step through the inner ring of the Sphere of Influence.
+_INSIDE_SYSTEM_PROMPT = """The kind and friendly assistant is guiding the user step-by-step through the inner ring of the Sphere of Influence.
 
-The user has shared what they are worried about and the assistant must ask short questions to help the user identify the things that are in the inner circle; things that they can control.
+The user has shared a specific challenge or situation that they would like help with. The assistant asks short questions to help the user identify the things that they can control in that situation and help them to focus their efforts and energy there.
 
-After a few turns the assistant must respond "STEP COMPLETE"."""
+The assistant always asks kind, short questions and always takes the side of the user. The assistant should also recognise that there may be systematic biases that make it harder for some users to have control.
+
+Keep the session short and focused. When the session ends the assistant must respond "SESSION COMPLETE"."""
+
+_DEFAULT_INNER_SUMMARY = """Remember, don't waste your energy on things that are outside of your control and focus your energy on the things you can control."""
 
 def inside_loop(request):
 	"""Identifies what is outside the users control."""
 
 	# Get the inputs.
 	message_body = request.json
+	# The history includes the inside loop history.
 	history = message_body['history']
 	user_event = message_body['user_event']
 	current_user_response = message_body['last_user_response']
@@ -120,7 +119,7 @@ def inside_loop(request):
 	]
 
 	model_output = utils.chat_completion(
-		model="gpt-3.5-turbo-0613",
+		model="gpt-4",
 		messages=messages,
 		max_tokens=1024,
 		temperature=1.0,
@@ -131,13 +130,17 @@ def inside_loop(request):
 	# Check if there is an event detected.
 	is_done = True if 'STEP COMPLETE' in next_question else False
 
+	if is_done:
+		next_question = next_question.replace('STEP COMPLETE', '')
+		next_question = next_question.strip('\n')
+		next_question = _remove_questions(next_question)
+
 	# If there is no question in "next_question" also set is_done to True.
 	if '?' not in next_question:
 		is_done = True
 
-	if not is_done:
-		# If the conversation is not done, add the question to the history.
-		history.append({"role": "assistant", "content": next_question})
+	#Add the question to the history.
+	history.append({"role": "assistant", "content": next_question})
 	
 	return jsonify(
 		is_done=is_done,
