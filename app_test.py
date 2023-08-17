@@ -341,6 +341,42 @@ class TestApp(unittest.TestCase):
 		app.logger.info('response %s', response)
 		self.assertEqual(response.status_code, 200)
 
+	def test_save_control_data(self):
+		# Create a sample request payload to simulate the data sent by 
+		# Twilio
+		payload = {
+	    "user_event": "I didn't get a promotion that I thought I deserved.",
+	    "inside_loop_history": [
+	        {
+	            "role": "assistant",
+	            "content": "What aspects of the promotion process do you have control over?"
+	        },
+	        {
+	            "role": "user",
+	            "content": "I can choose when I go for promo."
+	        },
+	    ],
+	    "outside_loop_history": [
+	        {
+	            "role": "assistant",
+	            "content": "What aspects of the promotion process do you not have control over?"
+	        },
+	        {
+	            "role": "user",
+	            "content": "The criteria for promo."
+	        },
+	    ],
+	    "user_feel_after": "",
+	    "origin": "twilio_flow",
+	    "flow_sid": "FW8f2ae7cf1a24a3feadc1c46fbea6816d",
+	    "user_id": "whatsapp:+447479813767",
+	    "error": "None"
+	    }
+
+		response = self.app.post('/sphere_of_influence/save_control_data', json=payload)
+		app.logger.info('response %s', response)
+		self.assertEqual(response.status_code, 200)
+
 
 
 if __name__ == '__main__':
