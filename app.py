@@ -101,6 +101,20 @@ class GoalFlowDatum(db.Model):
 	time = db.Column(db.DateTime, nullable=True)
 
 
+class ControlFlowDatum(db.Model):
+	"""Stores the data from the SMART goal setting flow."""
+
+	id = db.Column(db.Integer, primary_key=True)
+	user_event = db.Column(db.String, nullable=True)
+	history = db.Column(db.String, nullable=True)
+	user_feel_after = db.Column(db.String, nullable=True)
+	flow_sid = db.Column(db.String, nullable=True)
+	origin = db.Column(db.String, nullable=True)
+	user_id = db.Column(db.String, nullable=True)
+	error = db.Column(db.String, nullable=True)
+	time = db.Column(db.DateTime, nullable=True)
+
+
 class UserDatum(db.Model):
 
 	id = db.Column(db.Integer, primary_key=True)
@@ -828,6 +842,13 @@ def inside_loop():
 	return sphere_of_influence.inside_loop(request)
 
 
+@app.post('/sphere_of_influence/control_loop')
+@validate_twilio_request
+def control_loop():
+	"""Identify what is outside and inside of the users control."""
+	return sphere_of_influence.control_loop(request)
+
+
 def string_hash(string):
 	return md5(string.encode()).hexdigest()
 
@@ -944,12 +965,6 @@ def save_goal_data():
 		return jsonify({'error': str(e)})
 
 
-@app.post('/sphere_of_influence/save_control_data')
-@validate_twilio_request
-def save_control_data():
-	return sphere_of_influence.save_control_data(request)
-
-
 @app.post('/save_user_feedback')
 @validate_twilio_request
 def save_user_feedback():
@@ -966,6 +981,38 @@ def save_user_feedback():
 	db.session.commit()
 
 	return jsonify({'message': 'User data feedback saved.'})
+
+@app.post('/sphere_of_influence/save_control_data')
+@validate_twilio_request
+def save_control_data():
+	"""Saves data at the end of the Spheres of Influence chat."""
+	# Retrieve data from the request sent by Twilio
+	try:
+		message_body = request.json
+
+		# Hash the user_id so that the data is pseudo-anonyms.
+		message_body['user_id'] = string_hash(message_body['user_id'])
+
+		# Get the current time.
+		now = datetime.datetime.now()
+		message_body['time'] = now
+
+		# Dump the history (into dicts).
+		history = message_body['history']
+		message_body['history'] = json.dumps(history)
+
+		logging.info("history: %s", history)
+
+
+		flow_datum = ControlFlowDatum(**message_body)
+		db.session.add(flow_datum)
+		db.session.commit()
+
+		return jsonify({'message': f'Flow data saved.'})
+	except Exception as e:
+		return jsonify({'error': str(e)})
+
+
 
 
 @app.post('/new_user')

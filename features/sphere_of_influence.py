@@ -24,8 +24,7 @@ class ControlFlowDatum(db.Model):
 
 	id = db.Column(db.Integer, primary_key=True)
 	user_event = db.Column(db.String, nullable=True)
-	outside_loop_history = db.Column(db.String, nullable=True)
-	inside_loop_history = db.Column(db.String, nullable=True)
+	history = db.Column(db.String, nullable=True)
 	user_feel_after = db.Column(db.String, nullable=True)
 	flow_sid = db.Column(db.String, nullable=True)
 	origin = db.Column(db.String, nullable=True)
@@ -179,6 +178,71 @@ def inside_loop(request):
 		messages=messages,
 	)
 
+_CONTROL_LOOP_SYSTEM_PROMPT = """The kind and friendly assistant is guiding the user step-by-step through the the Sphere of Influence.
+
+The user has shared a specific challenge or situation that they would like help with. 
+
+First, the assistant must ask short questions to help the user identify two things that they cannot control in this situation and encourage them to let go of those things.
+
+Next, the assistant must ask short questions to help the user identify at least two things that they can control in that situation and help them to focus their efforts and energy there.
+
+The assistant always asks kind, short questions and always takes the side of the user. The assistant should also recognise that there may be systematic biases that make it harder for some users to have control.
+
+When the session ends the assistant must respond "SESSION COMPLETE" ."""
+
+def control_loop(request):
+	"""Identifies what is outside the users control."""
+
+	# Get the inputs.
+	message_body = request.json
+	# The history includes the inside loop history.
+	history = message_body['history']
+	user_event = message_body['user_event']
+	current_user_response = message_body['last_user_response']
+
+	# Add the previous user response to the end of the history.
+	if current_user_response:
+		history.append({"role": "user", "content": current_user_response})
+
+	# TODO(toni) Include all the previous history!
+	messages = [
+	{"role": "system", "content": _CONTROL_LOOP_SYSTEM_PROMPT},
+	{"role": "assistant", "content": _ASK_FOR_EVENT_TEXT},
+	{"role": "user", "content": user_event},
+	*history
+	]
+
+	model_output = utils.chat_completion(
+		model="gpt-3.5-turbo-0613",
+		messages=messages,
+		max_tokens=256,
+		temperature=1.0,
+		)
+
+	next_question = model_output['choices'][0]['message']['content']
+
+	# Check if there is an event detected.
+	is_done = True if 'SESSION COMPLETE' in next_question else False
+
+	if is_done:
+		next_question = next_question.replace('SESSION COMPLETE', '')
+		next_question = next_question.strip('\n .')
+		next_question = _remove_questions(next_question)
+
+	# If there is no question in "next_question" also set is_done to True.
+	if '?' not in next_question:
+		is_done = True
+
+	#Add the question to the history.
+	history.append({"role": "assistant", "content": next_question})
+	
+	return jsonify(
+		is_done=is_done,
+		question=next_question,
+		history=json.dumps(history),  # Be sure to dump!!
+		messages=messages,
+	)
+
 def save_control_data(request):
 	"""Saves data at the end of the Spheres of Influence chat."""
 	# Retrieve data from the request sent by Twilio
@@ -193,11 +257,10 @@ def save_control_data(request):
 		message_body['time'] = now
 
 		# Dump the history (into dicts).
-		for key in ['inside_loop_history', 'outside_loop_history']:
-			history = message_body[key]
-			message_body[key] = json.dumps(history)
+		history = message_body['history']
+		message_body['history'] = json.dumps(history)
 
-			logging.info("%s: %s", key, history)
+		logging.info("history: %s", history)
 
 
 		flow_datum = ControlFlowDatum(**message_body)
