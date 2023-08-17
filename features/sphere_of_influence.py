@@ -16,22 +16,6 @@ import create_post
 # Import features.
 from features import sphere_of_influence
 
-# create the extension
-db = SQLAlchemy()
-
-class ControlFlowDatum(db.Model):
-	"""Stores the data from the SMART goal setting flow."""
-
-	id = db.Column(db.Integer, primary_key=True)
-	user_event = db.Column(db.String, nullable=True)
-	history = db.Column(db.String, nullable=True)
-	user_feel_after = db.Column(db.String, nullable=True)
-	flow_sid = db.Column(db.String, nullable=True)
-	origin = db.Column(db.String, nullable=True)
-	user_id = db.Column(db.String, nullable=True)
-	error = db.Column(db.String, nullable=True)
-	time = db.Column(db.DateTime, nullable=True)
-
 
 # TODO(toni) Add this to a utils.py file.
 def string_hash(string):
@@ -221,6 +205,7 @@ def control_loop(request):
 
 	next_question = model_output['choices'][0]['message']['content']
 
+
 	# Check if there is an event detected.
 	is_done = True if 'SESSION COMPLETE' in next_question else False
 
@@ -242,32 +227,3 @@ def control_loop(request):
 		history=json.dumps(history),  # Be sure to dump!!
 		messages=messages,
 	)
-
-def save_control_data(request):
-	"""Saves data at the end of the Spheres of Influence chat."""
-	# Retrieve data from the request sent by Twilio
-	try:
-		message_body = request.json
-
-		# Hash the user_id so that the data is pseudo-anonyms.
-		message_body['user_id'] = string_hash(message_body['user_id'])
-
-		# Get the current time.
-		now = datetime.datetime.now()
-		message_body['time'] = now
-
-		# Dump the history (into dicts).
-		history = message_body['history']
-		message_body['history'] = json.dumps(history)
-
-		logging.info("history: %s", history)
-
-
-		flow_datum = ControlFlowDatum(**message_body)
-		db.session.add(flow_datum)
-		db.session.commit()
-
-		return jsonify({'message': f'Flow data saved.'})
-	except Exception as e:
-		return jsonify({'error': str(e)})
-
