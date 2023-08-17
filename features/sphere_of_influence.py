@@ -77,7 +77,7 @@ def outside_loop(request):
 	]
 
 	model_output = utils.chat_completion(
-		model="gpt-3.5-turbo-0631",
+		model="gpt-3.5-turbo-0613",
 		messages=messages,
 		max_tokens=256,
 		temperature=1.0,
@@ -149,7 +149,7 @@ def inside_loop(request):
 	else:
 		# If it's a any other turn use the LLM.
 		model_output = utils.chat_completion(
-			model="gpt-3.5-turbo-0631",
+			model="gpt-3.5-turbo-0613",
 			messages=messages,
 			max_tokens=256,
 			temperature=1.0,
