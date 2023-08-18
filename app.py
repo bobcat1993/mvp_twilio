@@ -28,6 +28,7 @@ import create_post
 
 # Import features.
 from features import sphere_of_influence
+from features import reminders
 
 
 from absl import flags
@@ -1075,6 +1076,10 @@ def new_user():
 	return jsonify({
 		'message': message_body,
 		'record': record})
+
+@app.post('/reminder')
+def reminder():
+	return reminders.reminder(request=request, db=db, UserDatum=UserDatum)
 
 
 if __name__ == "__main__":
