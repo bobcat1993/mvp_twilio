@@ -135,14 +135,22 @@ class ProfileDatum(db.Model):
 
 
 class UserFeedbackDatum(db.Model):
-	"""A user profile."""
+	"""A user feedback at the end of a chat."""
 
 	id = db.Column(db.Integer, primary_key=True)
 	time = db.Column(db.DateTime, nullable=True)
 	flow_name = db.Column(db.String, nullable=True)
 	user_feedback = db.Column(db.String, nullable=True)
-	
 
+
+class ReminderDatum(db.Model):
+	"""A reminders sent via WhatsApp"""
+
+	id = db.Column(db.Integer, primary_key=True)
+	user_number = db.Column(db.String, nullable=True)
+	message = db.Column(db.String, nullable=True)
+	time = db.Column(db.DateTime, nullable=True)
+	
 
 @app.before_first_request
 def init_app():
@@ -1079,7 +1087,7 @@ def new_user():
 
 @app.post('/reminder')
 def reminder():
-	return reminders.reminder(request=request, db=db, UserDatum=UserDatum)
+	return reminders.reminder(request=request, db=db, UserDatum=UserDatum, ReminderDatum=ReminderDatum)
 
 
 if __name__ == "__main__":

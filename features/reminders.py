@@ -34,12 +34,21 @@ def _clean_user_number(user_number):
 	return f'whatsapp:{code}{number}'
 
 
-def reminder(request, db, UserDatum):
+_REMINDER_MESSAGES = [
+"Hi, Bobby here. What's on your mind today? I'm here anytime you need to talk, just say 'Hi'.",
+"Hello, hope your day is going well. Need a little confidence boost? Let's do a cheerleader session together. Just say 'Hi' to get started.",
+"Hey, when faced with a problem sometimes it helps to take a step back. Do you want to try a reflection? Just say 'Hi' to get started.",
+"Hello, where are you at with your goals for this week? Anything still on your to-do list? Just say 'Hi' if you want help setting a goal.",
+"Hi, just checking in to see how you are. I'm always here if you need to talk -- no judgement. Just's say 'Hi' when you're ready to start.",
+]
+
+
+def reminder(request, db, UserDatum, ReminderDatum):
 	
 	message_body = request.json['data']
 	print(message_body)
 	user_number = message_body['phone']
-	message = message_body['message']
+	idx = message_body['idx']
 
 	user_number = _clean_user_number(user_number)
 	user_id = string_hash(user_number)
@@ -51,19 +60,39 @@ def reminder(request, db, UserDatum):
 		UserDatum.time >= today_date, UserDatum.user_number == user_id)
 	).all()
 
+	# Get the message.
+	message = _REMINDER_MESSAGES[int(idx) - 1]
+
 	whatsapp_from = os.environ['WHATSAPP_NUMBER']
 
 	if len(today_rows) > 0:
+
+		# Save info about reminder message not set.
+		reminder_datum = ReminderDatum(
+			message='No message sent.',
+			user_number=user_number,
+			time=datetime.now())
+		db.session.add(reminder_datum)
+		db.session.commit()
+
 		return jsonify(
 			message='No message sent.')
 	else:
+		# Save info about reminder message sent.
 		client = Client(account_sid, auth_token)
-		message = client.messages.create(
+		response = client.messages.create(
 			from_=f"whatsapp:{whatsapp_from}",
 			body=message,
 			to=user_number,
 		)
-		logging.info('Reminder message stats:', message)
+		logging.info('Reminder message response: %s', response)
+
+		reminder_datum = ReminderDatum(
+			message=message,
+			user_number=user_number,
+			time=datetime.now())
+		db.session.add(reminder_datum)
+		db.session.commit()
 		return jsonify(
 			message=f'Message sent to {user_number}.')
 	return jsonify(message='error')
