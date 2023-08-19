@@ -35,11 +35,11 @@ def _clean_user_number(user_number):
 
 
 _REMINDER_MESSAGES = [
-"Hi, Bobby here. What's on your mind today? I'm here anytime you need to talk, just say 'Hi'.",
-"Hello, hope your day is going well. Need a little confidence boost? Let's do a cheerleader session together. Just say 'Hi' to get started.",
-"Hey, when faced with a problem sometimes it helps to take a step back. Do you want to try a reflection? Just say 'Hi' to get started.",
-"Hello, where are you at with your goals for this week? Anything still on your to-do list? Just say 'Hi' if you want help setting a goal.",
-"Hi, just checking in to see how you are. I'm always here if you need to talk -- no judgement. Just's say 'Hi' when you're ready to start.",
+'Hi, Bobby here. What\'s on your mind today? I\'m here anytime you need to talk. Just say "Hi" to start a conversation with Bobby.',
+'Hello, hope your day is going well. Need a little confidence boost? Let\'s do a cheerleader session together. Just say "Hi" to start a conversation with Bobby.',
+'Hey, when faced with a problem sometimes it helps to take a step back. Do you want to try a reflection?  I\'ll guide you through it. Just say "Hi" to start a conversation with Bobby.',
+'Hello, where are you at with your goals for this week? Anything still on your to-do list? I can help. Just say "Hi" to start a conversation with Bobby.',
+'Hi, just checking in to see how you are. I\'m always here if you need to talk -- no judgement. Just say "Hi" to start a conversation with Bobby.',
 ]
 
 
