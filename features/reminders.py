@@ -26,6 +26,7 @@ def string_hash(string):
 
 def _clean_user_number(user_number):
 	"""Converts from From (+44) 7479812734 to  whatsapp:+447479812734"""
+	user_number = user_number.strip()
 	user_number = user_number.replace('(', '')
 	user_number = user_number.replace(')', '')
 	code, number = user_number.split(' ')
