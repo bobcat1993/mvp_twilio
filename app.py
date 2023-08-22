@@ -1081,9 +1081,7 @@ def new_user():
 			db.session.add(profile_datum)
 			db.session.commit()
 
-	return jsonify({
-		'message': message_body,
-		'record': record})
+	return jsonify({'message': message_body})
 
 @app.post('/reminder')
 def reminder():
