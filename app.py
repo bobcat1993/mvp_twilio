@@ -29,6 +29,7 @@ import create_post
 # Import features.
 from features import sphere_of_influence
 from features import reminders
+from features import challenge
 
 
 from absl import flags
@@ -1021,9 +1022,6 @@ def save_control_data():
 	except Exception as e:
 		return jsonify({'error': str(e)})
 
-
-
-
 @app.post('/new_user')
 def new_user():
 	"""Adds new users to the user DB: receives a webhook from Wix."""
@@ -1086,6 +1084,11 @@ def new_user():
 @app.post('/reminder')
 def reminder():
 	return reminders.reminder(request=request, db=db, UserDatum=UserDatum, ReminderDatum=ReminderDatum)
+
+@app.post('/challenge/get_streak_infographic')
+@validate_twilio_request
+def get_streak_infographic():
+	return challenge.get_streak_infographic(request=request, db=db, UserDatum=UserDatum)
 
 
 if __name__ == "__main__":

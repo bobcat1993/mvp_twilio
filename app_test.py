@@ -377,6 +377,19 @@ class TestApp(unittest.TestCase):
 
 		self.assertEqual(response.status_code, 200)
 
+	# TODO(toni) Make tests for different dates based on 
+	# past dates with known number of interactions.
+	def test_get_streak_infographic(self):
+		payload  = {
+		'user_number': 'whatsapp:+447479813767'
+		}
+
+		# freeze_time args: YYYY-MM-DD
+		with freeze_time('2023-07-01'):
+			response = self.app.post('/challenge/get_streak_infographic', json=payload)
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.json['image_url'], 'https://storage.googleapis.com/bobby-chat-goals/daydefault_of_5.png')
+
 
 if __name__ == '__main__':
 	unittest.main()
