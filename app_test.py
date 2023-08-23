@@ -388,7 +388,7 @@ class TestApp(unittest.TestCase):
 		with freeze_time('2023-07-01'):
 			response = self.app.post('/challenge/get_streak_infographic', json=payload)
 		self.assertEqual(response.status_code, 200)
-		self.assertEqual(response.json['image_url'], 'https://storage.googleapis.com/bobby-chat-goals/daydefault_of_5.png')
+		self.assertEqual(response.json['image_url'], 'https://storage.googleapis.com/bobby-chat-goals/daydefault_of_7.png')
 
 
 if __name__ == '__main__':
