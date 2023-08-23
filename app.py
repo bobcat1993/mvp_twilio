@@ -23,6 +23,7 @@ from dotenv import load_dotenv
 from utils import validate_twilio_request
 import openai
 import ast
+import requests
 
 import create_post
 
@@ -33,6 +34,7 @@ from features import challenge
 
 
 from absl import flags
+
 
 flags.DEFINE_string('file_name', None, 'Name of the file where data will be stored')
 
@@ -1079,7 +1081,28 @@ def new_user():
 			db.session.add(profile_datum)
 			db.session.commit()
 
-	return jsonify({'message': message_body})
+		# Add contact to EmailOctopus
+		api_key = str(os.environ['EMAIL_OCTOPUS_API_KEY']).strip()
+
+		headers = {
+			'Content-Type': 'application/json',
+		}
+
+		data = (
+			'{"api_key":'
+			f'"{api_key}",'
+			f'"email_address": "{user_email}",'
+			'"status":"SUBSCRIBED"}'
+			)
+
+		list_id = "6a120b2e-2c6a-11ee-b889-9147f389737a"
+		response = requests.post(f'https://emailoctopus.com/api/1.6/lists/{list_id}/contacts', headers=headers, data=data)
+                
+		response_dict = json.loads(response.text)
+		logging.info(response_dict)
+		logging.info('Request to EmailOctopus: %s', str(response.status_code))
+
+	return jsonify({'message': message_body, 'eo_response':response_dict})
 
 @app.post('/reminder')
 def reminder():
