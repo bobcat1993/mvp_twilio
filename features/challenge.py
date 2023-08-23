@@ -18,9 +18,9 @@ load_dotenv()
 # The max. number of visits that get rewarded each week.
 _MAX_STRIKE_VALUE = 3
 
-_STRIKE_IMAGE_LINK = """https://storage.googleapis.com/bobby-chat-goals/day{day}_of_5.png"""
+_STRIKE_IMAGE_LINK = """https://storage.googleapis.com/bobby-chat-goals/day_{day}_of_3.jpeg"""
 
-_BACKUP_STRIKE_IMAGE_LINK = """https://storage.googleapis.com/bobby-chat-goals/daydefault_of_5.png"""
+_BACKUP_STRIKE_IMAGE_LINK = """https://storage.googleapis.com/bobby-chat-goals/day_default_of_7.png"""
 
 # TODO(toni) Add this to a utils.py file.
 def string_hash(string):
@@ -63,7 +63,9 @@ def get_streak_infographic(request, db, UserDatum):
 
 	# The number of visits should never be less than one since this should only be used after a user has had an interaction.
 	if number_of_visits < 1:
-		raise ValueError('number of visits is %s which is less than 1.', str(number_of_visits))
+		# raise ValueError('number of visits is %s which is less than 1.', str(number_of_visits))
+		logging.warning('number of visits is %s which is less than 1.', str(number_of_visits))
+		number_of_visits = 1
 
 	if number_of_visits < _MAX_STRIKE_VALUE:
 		image_url = _STRIKE_IMAGE_LINK.format(day=number_of_visits)
