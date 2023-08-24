@@ -69,7 +69,7 @@ def get_streak_infographic(request, db, UserDatum):
 		logging.warning('number of visits is %s which is less than 1.', str(number_of_visits))
 		number_of_visits = 1
 
-	if number_of_visits < _MAX_STRIKE_VALUE:
+	if number_of_visits <= _MAX_STRIKE_VALUE:
 		image_url = _STRIKE_IMAGE_LINK.format(day=number_of_visits)
 	else:
 		image_url = _BACKUP_STRIKE_IMAGE_LINK
