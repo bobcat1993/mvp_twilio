@@ -21,7 +21,7 @@ _MAX_STRIKE_VALUE = 3
 _STRIKE_IMAGE_LINK = """https://storage.googleapis.com/bobby-chat-goals/day_{day}_of_3.jpeg"""
 
 # TODO(toni) Update this image and the test.
-_BACKUP_STRIKE_IMAGE_LINK = """https://storage.googleapis.com/bobby-chat-goals/daydefault_of_7.png"""
+_BACKUP_STRIKE_IMAGE_LINK = """https://storage.googleapis.com/bobby-chat-goals/day_default_of_3.png"""
 
 # TODO(toni) Add this to a utils.py file.
 def string_hash(string):
