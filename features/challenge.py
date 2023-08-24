@@ -39,6 +39,7 @@ def get_number_of_visits(db, user_number, UserDatum):
 
 	# TODO(toni) Only count one visit per day. Right now it counts multiple per day.
 	logging.info('start date: %s, end date: %s', str(start_of_week), str(end_of_week))
+	logging.info('len(UserDatum): %s', len(db.session.query(UserDatum).all()))
 	visits_this_week = db.session.query(UserDatum).filter(
 		and_(
 			UserDatum.time >= start_of_week,
