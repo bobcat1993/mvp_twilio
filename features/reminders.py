@@ -45,9 +45,10 @@ _REMINDER_MESSAGES = [
 
 
 def reminder(request, db, UserDatum, ReminderDatum):
+
+	logging.info('Reminder being initiated.')
 	
 	message_body = request.json['data']
-	print(message_body)
 	user_number = message_body['phone']
 	idx = message_body['idx']
 
@@ -69,6 +70,7 @@ def reminder(request, db, UserDatum, ReminderDatum):
 	if len(today_rows) > 0:
 
 		# Save info about reminder message not set.
+
 		reminder_datum = ReminderDatum(
 			message='No message sent.',
 			user_number=user_number,
