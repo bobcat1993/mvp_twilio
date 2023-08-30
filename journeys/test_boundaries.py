@@ -16,7 +16,7 @@ class TestBoundaries(unittest.TestCase):
 		test_request = Mock()
 		test_request.json = {}
 		test_request.json['results'] = [
-		"Yes", "yes", "YES", "yes!", "no", "No"]
+		"Yes", "yes", "YES", "yes!", "no", "No", 'blah']
 		test_request.json['user_number'] = 'whatsapp:+447987654321' 
 		expected_output = {
 			"num_yes": 4,

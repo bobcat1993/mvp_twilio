@@ -2,6 +2,7 @@
 from flask import jsonify, request
 from absl import logging
 import pygal
+from pygal.style import Style
 from google.cloud import storage
 import datetime
 from hashlib import md5
@@ -9,6 +10,20 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
+
+_STYLE = custom_style = Style(
+  background='transparent',
+  plot_background='transparent',
+  foreground='#171D3A',
+  foreground_strong='#171D3A',
+  foreground_subtle='#171D3A',
+  opacity='.6',
+  opacity_hover='.9',
+  transition='400ms ease-in',
+  colors=('#F598FF', '#CCCCFF', '#E5E9FD', '#171D3A'),
+  font_family='googlefont:Raleway',
+  title_font_family='googlefont:Raleway')
+
 
 # TODO(toni) Add this to a utils.py file.
 def string_hash(string):
@@ -25,7 +40,8 @@ def get_quiz_infographic(request):
 
 	# Count the "Yes"s and the "No"s.
 	results = [r.lower() for r in results]
-	results = ['yes' if 'yes' in r else 'no' for r in results]
+	results = ['yes' if 'yes' in r else r for r in results]
+	results = ['no' if 'no' in r else r for r in results]
 	num_yes = float(results.count('yes'))
 	num_no = float(results.count('no'))
 
@@ -40,7 +56,7 @@ def get_quiz_infographic(request):
 		title = 'It sounds like you really struggle to set boundaries, but don\'t worry. This series will help you set boundaries and even see how your boundaries can benefit those around you!'
 
 	# Make a plot.
-	pie_chart = pygal.Pie(half_pie=True)
+	pie_chart = pygal.Pie(half_pie=True, style=_STYLE)
 	pie_chart.title = title
 	pie_chart.add('Yes', num_yes)
 	pie_chart.add('No', num_no)
