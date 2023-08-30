@@ -23,7 +23,7 @@ def get_quiz_infographic(request):
 	pie_chart.add('Yes', num_yes)
 	pie_chart.add('No', num_no)
 	pie_chart.add('Other', len(results) - (num_yes + num_no))
-	pie_chart.render_in_browser()
+	# pie_chart.render_in_browser()
 
 	return jsonify(
 		num_yes=num_yes,
