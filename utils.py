@@ -130,7 +130,7 @@ def call_api(
 	origin: str,
 	out_dir: str,
 	prompt: str,
-	model="gpt-3.5-turbo",
+	model="gpt-3.5-turbo-0613",
 	max_tokens=1024,
 	temperature=1,
 	) -> str:
