@@ -68,9 +68,13 @@ def get_quiz_infographic(request):
 	api_key = os.environ['GOOGLE_API_KEY']
 	client = storage.Client(project='bobby-chat', client_options={"api_key": api_key})
 	bucket = client.get_bucket('bobby-chat-boundaries')
-	blob = bucket.blob(f'{user_id}_.svg')  
+	path = f'{user_id}_.svg'
+	blob = bucket.blob(path)  
 	blob.upload_from_string(svg_bytes, content_type='image/svg')
+
+	image_url = f'https://storage.cloud.google.com/bobby-chat-boundaries/{path}'
 
 	return jsonify(
 		num_yes=num_yes,
-		num_no=num_no)
+		num_no=num_no,
+		image_url=image_url)
