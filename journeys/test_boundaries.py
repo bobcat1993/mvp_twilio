@@ -1,12 +1,13 @@
+"""Tests for the boundaries journey."""
 import unittest
 from unittest.mock import Mock
-from boundaries import get_quiz_infographic  # Replace with the actual import path
+import boundaries
 from flask import Flask, jsonify, request
 from absl import logging
+import os
 
-# See all the logs.
-my_app = Flask(__name__)
-my_app.logger.setLevel(logging.INFO)
+
+app = app = Flask(__name__)
 
 class TestBoundaries(unittest.TestCase):
 
@@ -23,8 +24,8 @@ class TestBoundaries(unittest.TestCase):
 			"num_no": 2
 		}
 
-		with my_app.app_context():
-			response = get_quiz_infographic(test_request)
+		with app.app_context():
+			response = boundaries.get_quiz_infographic(test_request)
 
 		response = response.json
 		self.assertEqual(
