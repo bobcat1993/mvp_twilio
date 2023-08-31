@@ -24,6 +24,7 @@ from utils import validate_twilio_request
 import openai
 import ast
 import requests
+import pygal
 
 import create_post
 
@@ -31,6 +32,9 @@ import create_post
 from features import sphere_of_influence
 from features import reminders
 from features import challenge
+
+# Import journeys
+from journeys import boundaries
 
 
 from absl import flags
@@ -1112,6 +1116,13 @@ def reminder():
 @validate_twilio_request
 def get_streak_infographic():
 	return challenge.get_streak_infographic(request=request, db=db, UserDatum=UserDatum)
+
+########## Boundaries Journey ########
+@app.post('/boundaries_journey/stage1/get_quiz_infographic')
+@validate_twilio_request
+def get_quiz_infographic():
+	return boundaries.get_quiz_infographic(request=request)
+
 
 
 if __name__ == "__main__":
