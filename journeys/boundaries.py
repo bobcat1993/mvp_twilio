@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import os
 import matplotlib.pyplot as plt
 import io
+import tempfile
 
 load_dotenv()
 
@@ -66,12 +67,16 @@ def get_quiz_infographic(request):
 	# Unique file name for each user.
 	path = f'{user_id}.png'
 	temp_path = f'temp/{path}'
+  
+	temp = tempfile.NamedTemporaryFile()
+	temp_path = temp.name
 
 	# plot
 	fig = plt.figure(figsize=(6,6), dpi=150)
 	ax = fig.add_subplot(1,1,1)
 	ax.pie(val, labels=label, colors=_COLORS)
 	ax.add_artist(plt.Circle((0, 0), 0.6, color='white'))
+	ax.set_title('Your responses', wrap=True)
 	fig.savefig(temp_path)
 
 
@@ -83,6 +88,8 @@ def get_quiz_infographic(request):
 
 
 	image_url = f'https://storage.googleapis.com/bobby-chat-boundaries/{path}'
+
+	temp.close()
 
 	return jsonify(
 		num_yes=num_yes,
