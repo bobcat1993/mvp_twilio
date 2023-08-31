@@ -158,6 +158,8 @@ class ReminderDatum(db.Model):
 	message = db.Column(db.String, nullable=True)
 	time = db.Column(db.DateTime, nullable=True)
 	
+# Datum for the journeys.
+BoundariesStageOneDatum = boundaries.get_BoundariesStageOneDatum(db)
 
 @app.before_first_request
 def init_app():
@@ -1123,6 +1125,11 @@ def get_streak_infographic():
 def get_quiz_infographic():
 	return boundaries.get_quiz_infographic(request=request)
 
+@app.post('/boundaries_journey/stage1/save_data')
+@validate_twilio_request
+def save_boundaries_stage1_data():
+	# Retrieve data from the request sent by Twilio
+	return boundaries.save_stage1_data(request=request, db=db, BoundariesStageOneDatum=BoundariesStageOneDatum)
 
 
 if __name__ == "__main__":

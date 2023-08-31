@@ -391,6 +391,27 @@ class TestApp(unittest.TestCase):
 		self.assertEqual(response.json['image_url'], 'https://storage.googleapis.com/bobby-chat-goals/day_default_of_3.jpeg')
 
 
+	def test_save_boundaries_stage1_data(self):
+		# Create a sample request payload to simulate the data sent by 
+		# Twilio
+		payload = {
+	    "results": [
+	    	["Q1", "yes"], ["Q2", "no"], ["Q3", "yes"]
+	    	],
+	    "user_feel_after": "5",
+	    "origin": "twilio_flow",
+	    "flow_sid": "FW8f2ae7cf1a24a3feadc1c46fbea6816d",
+	    "user_id": "whatsapp:+447479813767",
+	    "error": "None"
+	    }
+
+		response = self.app.post('/boundaries_journey/stage1/save_data', json=payload)
+		app.logger.info('response %s', response)
+		self.assertEqual(response.status_code, 200)
+
+	
+
+
 if __name__ == '__main__':
 	unittest.main()
 

@@ -9,23 +9,30 @@ import os
 import matplotlib.pyplot as plt
 import io
 import tempfile
+import json
 
 load_dotenv()
 
-# _STYLE = custom_style = Style(
-#   background='transparent',
-#   plot_background='transparent',
-#   foreground='#171D3A',
-#   foreground_strong='#171D3A',
-#   foreground_subtle='#171D3A',
-#   opacity='.6',
-#   opacity_hover='.9',
-#   transition='400ms ease-in',
-#   colors=('#F598FF', '#CCCCFF', '#E5E9FD', '#171D3A'),
-#   font_family='googlefont:Raleway',
-#   title_font_family='googlefont:Raleway')
-
 _COLORS = '#F598FF', '#CCCCFF', '#E5E9FD', '#171D3A'
+
+
+def get_BoundariesStageOneDatum(db):
+	class BoundariesStageOneDatum(db.Model):
+		"""Stores the data from the SMART goal setting flow."""
+
+		__tablename__ = 'boundaries_stage_one_datum'
+
+		id = db.Column(db.Integer, primary_key=True)
+		results = db.Column(db.String, nullable=True)
+		user_feel_after = db.Column(db.String, nullable=True)
+		flow_sid = db.Column(db.String, nullable=True)
+		origin = db.Column(db.String, nullable=True)
+		user_id = db.Column(db.String, nullable=True)
+		error = db.Column(db.String, nullable=True)
+		time = db.Column(db.DateTime, nullable=True)
+		time_spent_on_video = db.Column(db.DateTime, nullable=True)
+
+	return BoundariesStageOneDatum
 
 
 # TODO(toni) Add this to a utils.py file.
@@ -95,3 +102,28 @@ def get_quiz_infographic(request):
 		num_no=num_no,
 		image_url=image_url,
 		title=title)
+
+
+def save_stage1_data(request, db, BoundariesStageOneDatum):
+	"""Saves data at the end of stage 1 of the boundaries journey."""
+	# Retrieve data from the request sent by Twilio
+	message_body = request.json
+
+	# Hash the user_id so that the data is pseudo-anonyms.
+	message_body['user_id'] = string_hash(message_body['user_id'])
+
+	# Get the current time.
+	now = datetime.datetime.now()
+	message_body['time'] = now
+
+	# Dump the history (into dicts).
+	results = message_body['results']
+	message_body['results'] = json.dumps(results)
+
+	logging.info("results: %s", results)
+
+	datum = BoundariesStageOneDatum(**message_body)
+	db.session.add(datum)
+	db.session.commit()
+
+	return jsonify({'message': f'Flow data saved.'})
