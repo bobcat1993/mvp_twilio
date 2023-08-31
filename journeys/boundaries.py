@@ -67,8 +67,7 @@ def get_quiz_infographic(request):
 	# Unique file name for each user.
 	path = f'{user_id}.png'
   
-	temp = tempfile.NamedTemporaryFile()
-	temp_path = temp.name
+	temp_path = path
 
 	# plot
 	fig = plt.figure(figsize=(6,6), dpi=150)
@@ -88,7 +87,8 @@ def get_quiz_infographic(request):
 
 	image_url = f'https://storage.googleapis.com/bobby-chat-boundaries/{path}'
 
-	temp.close()
+	# Remove the image once done.
+	os.remove(temp_path)
 
 	return jsonify(
 		num_yes=num_yes,
