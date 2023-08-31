@@ -66,7 +66,6 @@ def get_quiz_infographic(request):
 
 	# Unique file name for each user.
 	path = f'{user_id}.png'
-	temp_path = f'temp/{path}'
   
 	temp = tempfile.NamedTemporaryFile()
 	temp_path = temp.name
