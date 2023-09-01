@@ -60,9 +60,9 @@ def get_quiz_infographic(request):
 	# Make the title depending on the score.
 	if percent_yes == 1.0:
 		title = 'It looks like you are great at setting boundaries!\nThis series will help you refine this skill!'
-	elif float(num_yes)/num_no >= 0.5:
+	elif percent_yes >= 0.5:
 		title = 'It looks like you are good at setting boundaries but could still do with a little help. This series is here for you.'
-	elif float(num_yes)/num_no >= 0.2:
+	elif percent_yes >= 0.2:
 		title = 'It sounds like you are able to set some boundaries but still need some help with others.\nThis series will help you do just that!'
 	else:
 		title = 'It sounds like you really struggle to set boundaries, but don\'t worry. This series will help you set boundaries and even see how your boundaries can benefit those around you!'
