@@ -23,7 +23,7 @@ _COLORS = '#F598FF', '#CCCCFF', '#E5E9FD', '#171D3A'
 
 def get_BoundariesStageOneDatum(db):
 	class BoundariesStageOneDatum(db.Model):
-		"""Stores the data from the SMART goal setting flow."""
+		"""Stores the data Boundaries-Stage1 flow."""
 
 		__tablename__ = 'boundaries_stage_one_datum'
 
@@ -38,6 +38,28 @@ def get_BoundariesStageOneDatum(db):
 		time_spent_on_video = db.Column(db.DateTime, nullable=True)
 
 	return BoundariesStageOneDatum
+
+
+def get_BoundariesStageTwoDatum(db):
+	class BoundariesStageTwoDatum(db.Model):
+		"""Stores the data Boundaries-Stage2 flow."""
+
+		__tablename__ = 'boundaries_stage_two_datum'
+
+		id = db.Column(db.Integer, primary_key=True)
+		history = db.Column(db.String, nullable=True)
+		user_event = db.Column(db.String, nullable=True)
+		last_bot_response = db.Column(db.String, nullable=True)
+		user_boundary = db.Column(db.String, nullable=True)
+		user_feel_after = db.Column(db.String, nullable=True)
+		flow_sid = db.Column(db.String, nullable=True)
+		origin = db.Column(db.String, nullable=True)
+		user_id = db.Column(db.String, nullable=True)
+		error = db.Column(db.String, nullable=True)
+		time = db.Column(db.DateTime, nullable=True)
+		time_spent_on_video = db.Column(db.DateTime, nullable=True)
+
+	return BoundariesStageTwoDatum
 
 
 # TODO(toni) Add this to a utils.py file.
@@ -187,6 +209,7 @@ def resentmemt_loop(request):
 		)
 
 	next_question = model_output['choices'][0]['message']['content']
+	# Warning: This is the raw next question. If this is the last step it will include 'SESSION FINISHED'.
 	history.append({"role": "assistant", "content": next_question})
 
 	# Check if there is an event detected.
@@ -214,3 +237,26 @@ def resentmemt_loop(request):
 		history=json.dumps(history),  # Be sure to dump!!
 		messages=messages,
 	)
+
+
+def save_stage2_data(request, db, BoundariesStageTwoDatum):
+	"""Saves data at the end of stage 2 of the boundaries journey."""
+	# Retrieve data from the request sent by Twilio
+	message_body = request.json
+
+	# Hash the user_id so that the data is pseudo-anonyms.
+	message_body['user_id'] = string_hash(message_body['user_id'])
+
+	# Get the current time.
+	now = datetime.datetime.now()
+	message_body['time'] = now
+
+	# Dump the history (into dicts).
+	history = message_body['history']
+	message_body['history'] = json.dumps(history)
+
+	datum = BoundariesStageTwoDatum(**message_body)
+	db.session.add(datum)
+	db.session.commit()
+
+	return jsonify({'message': f'Flow data saved.'})
