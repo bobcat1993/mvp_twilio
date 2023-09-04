@@ -1,6 +1,8 @@
 """The Boundaries Journey"""
 from flask import jsonify, request
 from absl import logging
+import json
+import sys
 from google.cloud import storage
 import datetime
 from hashlib import md5
@@ -9,7 +11,10 @@ import os
 import matplotlib.pyplot as plt
 import io
 import tempfile
-import json
+import re
+
+sys.path.append('..')
+import utils
 
 load_dotenv()
 
@@ -39,6 +44,15 @@ def get_BoundariesStageOneDatum(db):
 def string_hash(string):
 	return md5(string.encode()).hexdigest()
 
+# TODO(toni) Add this to a utils.py file.
+def _remove_questions(text):
+	sentences = re.split(r'(?<=[.!?]) +', text)  # Split the text into sentences
+	non_question_sentences = [sentence for sentence in sentences if not sentence.endswith("?")]
+	result = ' '.join(non_question_sentences)
+	return result
+
+
+####### STAGE 1 ######
 def get_quiz_infographic(request):
 
 	# Get the inputs.
@@ -102,7 +116,6 @@ def get_quiz_infographic(request):
 		image_url=image_url,
 		title=title)
 
-
 def save_stage1_data(request, db, BoundariesStageOneDatum):
 	"""Saves data at the end of stage 1 of the boundaries journey."""
 	# Retrieve data from the request sent by Twilio
@@ -126,3 +139,78 @@ def save_stage1_data(request, db, BoundariesStageOneDatum):
 	db.session.commit()
 
 	return jsonify({'message': f'Flow data saved.'})
+
+
+
+####### STAGE 2 #######
+_FOLLOW_THE_RESENTMENT_SYSTEM_PROMPT = """
+In this coaching session, the assistant is going to guide the user through the "Follow The Resentment" exercise. On every turn the assistant asks short, friendly questions. 
+
+First the assistant will ask the user to identify a situation where they felt some resentment. For example, did the user say yes to something  that they later wish they had said no to.
+
+Then the assistant will dig deeper to understand what is pushing the users buttons, how they responded in the moment, what the user wishes they had done differently and finally, where the users wants to feel more boundaried in this situation.
+
+The assistant asks short, friendly questions. Once the user has identified where they want to be more boundaried the assistant will respond "SESSION FINISHED"."""
+
+_ASSISTANT_ASK_FOR_RESENTMENT = """It's not always easy to see where your boundaries are being pushed. I'm going to help you "follow the resentment" to figure out where your boundaries may have been pushed. To get started, can you think of a recent situation where you felt some resentment?"""
+
+_FINAL_RESETMENT_TURN = """Well done for "following the resentment" to identify where your boundaries are being pushed."""
+
+MAX_RESETMENT_STEPS = 30
+MIN_RESETMENT_STEPS = 15
+
+def resentmemt_loop(request):
+	"""Gets the user to Follow the Resentment to identify where their boundaries have been pushed."""
+
+	# Get the inputs.
+	message_body = request.json
+	history = message_body['history']
+	user_event = message_body['user_event']
+	current_user_response = message_body['last_user_response']
+
+	# Add the previous user response to the end of the history.
+	if current_user_response:
+		history.append({"role": "user", "content": current_user_response})
+
+	messages = [
+	{"role": "system", "content": _FOLLOW_THE_RESENTMENT_SYSTEM_PROMPT},
+	{"role": "assistant", "content": _ASSISTANT_ASK_FOR_RESENTMENT},
+	{"role": "user", "content": user_event},
+	*history
+	]
+
+	model_output = utils.chat_completion(
+		model="gpt-3.5-turbo-0613",
+		messages=messages,
+		max_tokens=1024,
+		temperature=1.0,
+		)
+
+	next_question = model_output['choices'][0]['message']['content']
+	history.append({"role": "assistant", "content": next_question})
+
+	# Check if there is an event detected.
+	is_done = True if 'SESSION FINISHED' in next_question else False
+
+	if len(messages) == MAX_RESETMENT_STEPS:
+		app.logger.warn(f'is_done != True, but has reached {MAX_CHEER_STEPS} messages.')
+		is_done = True
+
+	if is_done:
+		next_question = next_question.split('SESSION FINISHED')[0]
+		next_question = next_question.strip(' .\n')
+		next_question = _remove_questions(next_question)
+
+	# If there is no question in "next_question" also set is_done to True.
+	if ('?' not in next_question) and (len(messages) > MIN_RESETMENT_STEPS):
+		is_done = True
+
+	if next_question == '':
+		next_question = _DEFAULT_FINAL_RESETMENT_TURN
+	
+	return jsonify(
+		is_done=is_done,
+		question=next_question,
+		history=json.dumps(history),  # Be sure to dump!!
+		messages=messages,
+	)

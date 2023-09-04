@@ -1131,6 +1131,12 @@ def save_boundaries_stage1_data():
 	# Retrieve data from the request sent by Twilio
 	return boundaries.save_stage1_data(request=request, db=db, BoundariesStageOneDatum=BoundariesStageOneDatum)
 
+@app.post('/boundaries_journey/stage2/resentmemt_loop')
+@validate_twilio_request
+def resentmemt_loop():
+	# Retrieve data from the request sent by Twilio
+	return boundaries.resentmemt_loop(request=request)
+
 
 if __name__ == "__main__":
 	app.run(debug=True, use_debugger=True, port=8000)

@@ -409,7 +409,6 @@ class TestApp(unittest.TestCase):
 		app.logger.info('response %s', response)
 		self.assertEqual(response.status_code, 200)
 
-	
 
 
 if __name__ == '__main__':
