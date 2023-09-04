@@ -73,7 +73,6 @@ def get_quiz_infographic(request):
 
 	# Unique file name for each user.
 	path = f'{user_id}.png'
-  
 	temp_path = path
 
 	# plot
@@ -88,11 +87,11 @@ def get_quiz_infographic(request):
 	api_key = os.environ['GOOGLE_API_KEY']
 	client = storage.Client(project='bobby-chat', client_options={"api_key": api_key})
 	bucket = client.get_bucket('bobby-chat-boundaries')
-	blob = bucket.blob(path)  
-	blob.upload_from_filename(temp_path, content_type='image/png')
+	blob = bucket.blob(f'temp/{path}')  
+	blob.upload_from_filename(f'{temp_path}', content_type='image/png')
 
 
-	image_url = f'https://storage.googleapis.com/bobby-chat-boundaries/{path}'
+	image_url = f'https://storage.googleapis.com/bobby-chat-boundaries/temp/{path}'
 
 	# Remove the image once done.
 	os.remove(temp_path)
