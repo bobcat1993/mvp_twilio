@@ -52,6 +52,7 @@ def get_BoundariesStageTwoDatum(db):
 		last_bot_response = db.Column(db.String, nullable=True)
 		user_boundary = db.Column(db.String, nullable=True)
 		user_feel_after = db.Column(db.String, nullable=True)
+		summary = db.Column(db.String, nullable=True)
 		flow_sid = db.Column(db.String, nullable=True)
 		origin = db.Column(db.String, nullable=True)
 		user_id = db.Column(db.String, nullable=True)
@@ -176,7 +177,7 @@ The assistant asks short, friendly questions. Once the user has identified where
 
 _ASSISTANT_ASK_FOR_RESENTMENT = """It's not always easy to see where your boundaries are being pushed. I'm going to help you "follow the resentment" to figure out where your boundaries may have been pushed. To get started, can you think of a recent situation where you felt some resentment?"""
 
-_FINAL_RESETMENT_TURN = """Well done for "following the resentment" to identify where your boundaries are being pushed."""
+_DEFAULT_FINAL_RESETMENT_TURN = """Well done for "following the resentment" to identify where your boundaries are being pushed."""
 
 MAX_RESETMENT_STEPS = 30
 MIN_RESETMENT_STEPS = 15
@@ -189,6 +190,9 @@ def resentmemt_loop(request):
 	history = message_body['history']
 	user_event = message_body['user_event']
 	current_user_response = message_body['last_user_response']
+
+	# Set the default summary to None.
+	summary = None
 
 	# Add the previous user response to the end of the history.
 	if current_user_response:
@@ -224,6 +228,9 @@ def resentmemt_loop(request):
 		next_question = next_question.strip(' .\n')
 		next_question = _remove_questions(next_question)
 
+		# Compute a summary of the situation.
+		summary = _summarise_boundary(user_event=user_event, history=history)
+
 	# If there is no question in "next_question" also set is_done to True.
 	if ('?' not in next_question) and (len(messages) > MIN_RESETMENT_STEPS):
 		is_done = True
@@ -236,7 +243,41 @@ def resentmemt_loop(request):
 		question=next_question,
 		history=json.dumps(history),  # Be sure to dump!!
 		messages=messages,
+		summary=summary
 	)
+
+_SUMMARISE_BOUNDARY_SYSTEM_PROMPT = """If the user has answered the assistants question, summarise the user response in the second person keep it as close to the original as possible. Otherwise return "NONE".
+
+Start the response with \"In a recent experience, you felt that your boundaries were pushed when\""""
+
+def _summarise_boundary(user_event: str, history: list):
+	"""Detects what the user event was and summarises it."""
+
+	candidate_events = [h['content'] for h in history if h['role'] == 'user']
+
+	candidate_events = [user_event, *candidate_events]
+
+	summary = None
+
+	for event in candidate_events:
+		# Try summarising the event, stop when one can be summarised.
+		messages = [
+		{"role": "system", "content": _SUMMARISE_BOUNDARY_SYSTEM_PROMPT},
+		{"role": "assistant", "content": _ASSISTANT_ASK_FOR_RESENTMENT},
+		{"role": "user", "content": event},
+		]
+
+		model_output = utils.chat_completion(
+			model="gpt-3.5-turbo-0613",
+			messages=messages,
+			max_tokens=256,
+			temperature=1.0,
+			)
+		summary = model_output['choices'][0]['message']['content']
+
+		if 'NONE' not in summary:
+			return summary
+	return summary
 
 
 def save_stage2_data(request, db, BoundariesStageTwoDatum):
