@@ -413,24 +413,25 @@ class TestApp(unittest.TestCase):
 		# Create a sample request payload to simulate the data sent by 
 		# Twilio
 		payload = {
-			"user_event" : "Yeah... I ended up doing Bob's work while he was on holiday.",
+			"user_event": "I had to do all of Bob's work while they were off on holiday!",
 			"history": [
-				{
-						"role": "assistant",
-						"content": "I can understand why that might have caused some resentment. When you were doing Bob's work, what specifically pushed your buttons or made you feel uncomfortable?"
-				},
-				{
-						"role": "user",
-						"content": "I had my own work to do and I was not able to priotitise it."
-				}],
-			"last_bot_response" : "I see. So the feeling of not being able to prioritize your own work was what pushed your buttons. In that moment, how did you respond to the situation?",
-			"user_feel_after" : "4",
-			"user_boundary": "time",
+					{
+							"role": "assistant",
+							"content": "I can understand why that situation might have caused some resentment. Can you tell me more about what specifically pushed your buttons in this situation? What was it about having to do all of Bob's work that bothered you?"
+					},
+					{
+							"role": "user",
+							"content": "It didn't give me enough time for my own work!"
+					},
+			],
+			"last_bot_response": "Alright then, we'll focus on the situation you shared today. Remember, setting boundaries and saying no can take practice, but it's an important skill for your well-being. If you find yourself in a similar situation in the future, remember that you have the right to prioritize your own work and set limits",
+			"user_feel_after": "5",
+			"user_boundary": "TIME!",
 			"origin": "twilio_flow",
-			"flow_sid" : "1234",
-			"user_id": "whatsapp:+447987654321",
+			"flow_sid": "FW56a94a032e23563e51c693e871e52931",
+			"user_id": "whatsapp:+447479813767",
 			"error": "None"
-		}
+			}
 
 
 		response = self.app.post('/boundaries_journey/stage2/save_data', json=payload)
