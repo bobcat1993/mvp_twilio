@@ -305,6 +305,70 @@ def save_stage2_data(request, db, BoundariesStageTwoDatum):
 
 
 ####### STAGE 3 #######
+def _i_statement_loop(request):
+	"""Gets the user to practice using 'I' statements."""
+
+	# Get the inputs.
+	message_body = request.json
+	history = message_body['history']
+	user_event = message_body['user_event']
+	current_user_response = message_body['last_user_response']
+
+	# Set the default summary to None.
+	summary = None
+
+	# Add the previous user response to the end of the history.
+	if current_user_response:
+		history.append({"role": "user", "content": current_user_response})
+
+	messages = [
+	{"role": "system", "content": _FOLLOW_THE_RESENTMENT_SYSTEM_PROMPT},
+	{"role": "assistant", "content": _ASSISTANT_ASK_FOR_RESENTMENT},
+	{"role": "user", "content": user_event},
+	*history
+	]
+
+	model_output = utils.chat_completion(
+		model="gpt-3.5-turbo-0613",
+		messages=messages,
+		max_tokens=1024,
+		temperature=1.0,
+		)
+
+	next_question = model_output['choices'][0]['message']['content']
+	# Warning: This is the raw next question. If this is the last step it will include 'SESSION FINISHED'.
+	history.append({"role": "assistant", "content": next_question})
+
+	# Check if there is an event detected.
+	is_done = True if 'SESSION FINISHED' in next_question else False
+
+	if len(messages) == MAX_RESETMENT_STEPS:
+		app.logger.warn(f'is_done != True, but has reached {MAX_CHEER_STEPS} messages.')
+		is_done = True
+
+	if is_done:
+		next_question = next_question.split('SESSION FINISHED')[0]
+		next_question = next_question.strip(' .\n')
+		next_question = _remove_questions(next_question)
+
+		# Compute a summary of the situation.
+		summary = _summarise_boundary(user_event=user_event, history=history)
+
+	# If there is no question in "next_question" also set is_done to True.
+	if ('?' not in next_question) and (len(messages) > MIN_RESETMENT_STEPS):
+		is_done = True
+
+	if next_question == '':
+		next_question = _DEFAULT_FINAL_RESETMENT_TURN
+	
+	return jsonify(
+		is_done=is_done,
+		question=next_question,
+		history=json.dumps(history),  # Be sure to dump!!
+		messages=messages,
+		summary=summary
+	)
+
 def _retrieve_the_summary(user_number: str, db, BoundariesStageTwoDatum):
 	"""Retrieve the last boundary summary based on the user's number."""
 
