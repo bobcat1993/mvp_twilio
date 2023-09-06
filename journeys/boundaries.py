@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import io
 import tempfile
 import re
+from sqlalchemy import desc
 
 sys.path.append('..')
 import utils
@@ -301,3 +302,27 @@ def save_stage2_data(request, db, BoundariesStageTwoDatum):
 	db.session.commit()
 
 	return jsonify({'message': f'Flow data saved.'})
+
+
+####### STAGE 3 #######
+def _retrieve_the_summary(user_number: str, db, BoundariesStageTwoDatum):
+	"""Retrieve the last boundary summary based on the user's number."""
+
+	# If the user_number has not been turned into a hash, hash it.
+	if 'whatsapp' in user_number:
+		user_number = string_hash(user_number)
+
+	# Take the last entry in the boundary_stage_two_datum for the user.
+	row = db.session.query(BoundariesStageTwoDatum).filter(
+		BoundariesStageTwoDatum.user_id == user_number).all()
+
+	print('row:', row)
+
+	# If there is no row, this is suspicious!
+	if row:
+		return row[-1].summary
+	else:
+		return None
+
+
+
