@@ -316,7 +316,7 @@ def ask_for_event(request):
 
 
 
-def retrieve_the_summary(user_number: str, db, BoundariesStageTwoDatum):
+def _retrieve_the_summary(user_number, db, BoundariesStageTwoDatum):
 	"""Retrieve the last boundary summary based on the user's number."""
 
 	# If the user_number has not been turned into a hash, hash it.
@@ -326,8 +326,6 @@ def retrieve_the_summary(user_number: str, db, BoundariesStageTwoDatum):
 	# Take the last entry in the boundary_stage_two_datum for the user.
 	row = db.session.query(BoundariesStageTwoDatum).filter(
 		BoundariesStageTwoDatum.user_id == user_number).all()
-
-	print('row:', row)
 
 	# If there is no row, this is suspicious!
 	if row:

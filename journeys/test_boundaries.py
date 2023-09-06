@@ -134,7 +134,7 @@ class TestRetrieveSummaryFunction(unittest.TestCase):
 		self.session.commit()
 
 		# Make sure we retrieve data for the correct user.
-		result = boundaries.retrieve_the_summary(user_id, db=self, BoundariesStageTwoDatum=BoundariesStageTwoDatum)
+		result = boundaries._retrieve_the_summary(user_id, db=self, BoundariesStageTwoDatum=BoundariesStageTwoDatum)
 		self.assertEqual(result, 'This is a test summary')
 
 	def test_gets_latest_summary(self):
@@ -149,7 +149,7 @@ class TestRetrieveSummaryFunction(unittest.TestCase):
 		self.session.commit()
 
 		# Make sure we retrieve the latest summary.
-		result = boundaries.retrieve_the_summary(
+		result = boundaries._retrieve_the_summary(
 			user_id,
 			db=self,
 			BoundariesStageTwoDatum=BoundariesStageTwoDatum)
@@ -163,7 +163,7 @@ class TestRetrieveSummaryFunction(unittest.TestCase):
 		self.session.add(summary_data)
 
 		# Make sure we retrieve the latest summary.
-		result = boundaries.retrieve_the_summary(
+		result = boundaries._retrieve_the_summary(
 			user_number,
 			db=self,
 			BoundariesStageTwoDatum=BoundariesStageTwoDatum)
