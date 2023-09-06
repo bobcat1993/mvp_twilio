@@ -1144,6 +1144,19 @@ def save_boundaries_stage2_data():
 	# Retrieve data from the request sent by Twilio
 	return boundaries.save_stage2_data(request=request, db=db, BoundariesStageTwoDatum=BoundariesStageTwoDatum)
 
+@app.post('/boundaries_journey/stage3/retrieve_the_summary')
+@validate_twilio_request
+def retrieve_the_summary():
+	# Retrieve the summary of the situation from stage 2.
+	return boundaries.retrieve_the_summary(request=request, db=db, BoundariesStageTwoDatum=BoundariesStageTwoDatum)
+
+
+@app.post('/boundaries_journey/stage3/i_statement_loop')
+@validate_twilio_request
+def i_statement_loop():
+	# Guide the user through how to construct "I" statements.
+	return boundaries.i_statement_loop(request=request)
+
 
 if __name__ == "__main__":
 	app.run(debug=True, use_debugger=True, port=8000)

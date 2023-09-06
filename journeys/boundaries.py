@@ -180,8 +180,8 @@ _ASSISTANT_ASK_FOR_RESENTMENT = """It's not always easy to see where your bounda
 
 _DEFAULT_FINAL_RESETMENT_TURN = """Well done for "following the resentment" to identify where your boundaries are being pushed."""
 
-MAX_RESETMENT_STEPS = 30
 MIN_RESETMENT_STEPS = 15
+MAX_RESETMENT_STEPS = 30
 
 def resentmemt_loop(request):
 	"""Gets the user to Follow the Resentment to identify where their boundaries have been pushed."""
@@ -316,6 +316,16 @@ def ask_for_event(request):
 
 
 
+def retrieve_the_summary(request, db, BoundariesStageTwoDatum):
+	"""Retrieve the last boundary summary based on the user's number."""
+
+	message_body = request.json
+	user_number = message_body['user_number']
+	summary = _retrieve_the_summary(user_number, db, BoundariesStageTwoDatum)
+
+	return jsonify(summary=summary)
+
+
 def _retrieve_the_summary(user_number, db, BoundariesStageTwoDatum):
 	"""Retrieve the last boundary summary based on the user's number."""
 
@@ -332,6 +342,96 @@ def _retrieve_the_summary(user_number, db, BoundariesStageTwoDatum):
 		return row[-1].summary
 	else:
 		return None
+
+_I_STATEMENT_SYSTEM_PROMPT = """In this coaching session, the assistant is going to teach the user to use "I" statements to set a boundary.
+
+The assistant has summarised the users recent experience that they want help coming up with an "I" statement for.
+
+Tell the user to imagine they are talking to the person they want to address.
+
+The guide them step-by-step through constructing a sentence of the form "I feel X when Y because Z. I would like A."
+
+Get the user to practice using this statement and help them refine it.
+
+The assistant asks short, friendly questions. Once the user has completed the session the assistant will respond with  "SESSION FINISHED".
+"""
+
+_ASSISTANT_FIRST_RESPONSE = """Okay, let's work on crafting an "I" statement to address this situation. When we have finished you will have a sentence of the form: "I feel [emotion] when [event] because [reason]. I would like [change]."""
+
+_ASSISTANT_ASKS_FOR_EVENT = """In this session I'll help you use "I" statements to help you stand up for yourself in a way that is respectful to others.
+
+To get started can you please share an situation where you last found your boundaries being pushed?"""
+
+MIN_I_STATEMENT_STEPS = 15
+MAX_I_STATEMENTS_STEPS = 30
+
+def i_statement_loop(request):
+	"""Gets the user to practice using 'I' statements."""
+
+	# Get the inputs.
+	message_body = request.json
+	history = message_body['history']
+	user_event = message_body['user_event']
+	user_summary = message_body['user_summary']
+	current_user_response = message_body['last_user_response']
+
+	# Add the previous user response to the end of the history.
+	if current_user_response:
+		history.append({"role": "user", "content": current_user_response})
+
+	if user_summary:
+		# If there is a user summary the assistant will help the user
+		# work through that example.
+		messages = [
+		{"role": "system", "content": _I_STATEMENT_SYSTEM_PROMPT},
+		{"role": "assistant", "content": user_summary},
+		{"role": "assistant", "content": _ASSISTANT_FIRST_RESPONSE},
+		*history
+		]
+	else:
+		# If there is no user summary the assistant will need to ask the 
+		# user for a situation to work on.
+		messages = [
+		{"role": "system", "content": _I_STATEMENT_SYSTEM_PROMPT},
+		{"role": "assistant", "content": _ASSISTANT_ASKS_FOR_EVENT},
+		{"role": "user", "content": user_event},
+		*history
+		]
+
+	model_output = utils.chat_completion(
+		model="gpt-3.5-turbo-0613",
+		messages=messages,
+		max_tokens=1024,
+		temperature=1.0,
+		)
+
+	next_question = model_output['choices'][0]['message']['content']
+	# Warning: This is the raw next question. If this is the last step it will include 'SESSION FINISHED'.
+	history.append({"role": "assistant", "content": next_question})
+
+	# Check if there is an event detected.
+	is_done = True if 'SESSION FINISHED' in next_question else False
+
+	if len(messages) == MAX_I_STATEMENTS_STEPS:
+		app.logger.warn(f'is_done != True, but has reached {MAX_CHEER_STEPS} messages.')
+		is_done = True
+
+	if is_done:
+		next_question = next_question.split('SESSION FINISHED')[0]
+		next_question = next_question.strip(' .\n')
+		next_question = _remove_questions(next_question)
+
+	# If there is no question in "next_question" and there have been 
+	# a min number of steps, set is_done to True.
+	if ('?' not in next_question) and (len(messages) > MIN_I_STATEMENT_STEPS):
+		is_done = True
+	
+	return jsonify(
+		is_done=is_done,
+		question=next_question,
+		history=json.dumps(history),  # Be sure to dump!!
+		messages=messages,
+	)
 
 
 
