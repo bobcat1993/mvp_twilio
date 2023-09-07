@@ -457,22 +457,24 @@ def i_statement_loop(request):
 def save_stage3_data(request, db, BoundariesStageThreeDatum):
 	"""Saves data at the end of stage 2 of the boundaries journey."""
 	# Retrieve data from the request sent by Twilio
-	message_body = request.json
+	try:
+		message_body = request.json
 
-	# Hash the user_id so that the data is pseudo-anonyms.
-	message_body['user_id'] = string_hash(message_body['user_id'])
+		# Hash the user_id so that the data is pseudo-anonyms.
+		message_body['user_id'] = string_hash(message_body['user_id'])
 
-	# Get the current time.
-	now = datetime.datetime.now()
-	message_body['time'] = now
+		# Get the current time.
+		now = datetime.datetime.now()
+		message_body['time'] = now
 
-	# Dump the history (into dicts).
-	history = message_body['history']
-	message_body['history'] = json.dumps(history)
+		# Dump the history (into dicts).
+		history = message_body['history']
+		message_body['history'] = json.dumps(history)
 
-	datum = BoundariesStageThreeDatum(**message_body)
-	db.session.add(datum)
-	db.session.commit()
-
-	return jsonify({'message': f'Flow data saved.'})
+		datum = BoundariesStageThreeDatum(**message_body)
+		db.session.add(datum)
+		db.session.commit()
+		return jsonify({'message': f'Flow data saved.'})
+	except Exception as e:
+		return jsonify({'error': str(e)})
 
