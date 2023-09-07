@@ -64,6 +64,28 @@ def get_BoundariesStageTwoDatum(db):
 	return BoundariesStageTwoDatum
 
 
+def get_BoundariesStageThreeDatum(db):
+	class BoundariesStageThreeDatum(db.Model):
+		"""Stores the data Boundaries-Stage3 flow."""
+
+		__tablename__ = 'boundaries_stage_three_datum'
+
+		id = db.Column(db.Integer, primary_key=True)
+		history = db.Column(db.String, nullable=True)
+		user_event = db.Column(db.String, nullable=True)
+		user_summary = db.Column(db.String, nullable=True)
+		last_bot_response = db.Column(db.String, nullable=True)
+		user_feel_after = db.Column(db.String, nullable=True)
+		flow_sid = db.Column(db.String, nullable=True)
+		origin = db.Column(db.String, nullable=True)
+		user_id = db.Column(db.String, nullable=True)
+		error = db.Column(db.String, nullable=True)
+		time = db.Column(db.DateTime, nullable=True)
+		time_spent_on_video = db.Column(db.DateTime, nullable=True)
+
+	return BoundariesStageThreeDatum
+
+
 # TODO(toni) Add this to a utils.py file.
 def string_hash(string):
 	return md5(string.encode()).hexdigest()
@@ -314,8 +336,6 @@ _ASSISTANT_ASK_FOR_RESENTMENT_2 = """In our last session we followed the resentm
 def ask_for_event(request):
 	"""Ask the user if they want to use previous boundary example or a new one."""
 
-
-
 def retrieve_the_summary(request, db, BoundariesStageTwoDatum):
 	"""Retrieve the last boundary summary based on the user's number."""
 
@@ -324,7 +344,6 @@ def retrieve_the_summary(request, db, BoundariesStageTwoDatum):
 	summary = _retrieve_the_summary(user_number, db, BoundariesStageTwoDatum)
 
 	return jsonify(summary=summary)
-
 
 def _retrieve_the_summary(user_number, db, BoundariesStageTwoDatum):
 	"""Retrieve the last boundary summary based on the user's number."""
@@ -345,15 +364,19 @@ def _retrieve_the_summary(user_number, db, BoundariesStageTwoDatum):
 
 _I_STATEMENT_SYSTEM_PROMPT = """In this coaching session, the assistant is going to teach the user to use "I" statements to set a boundary.
 
-The user has told the assistant where they have felt their boundaries being pushed. The assistant must tell the user to imagine they are talking to the person they want to address and guide them step-by-step through constructing a sentence of the form "I feel X when Y because Z. I would like A."
+The user has told the assistant where they have felt their boundaries being pushed. The assistant must tell the user to imagine they are talking to the person they want to address and guide them step-by-step through constructing a sentence of the form "I feel [emotion] when [event] because [reason]. I would like [change]."
 
-The assistant asks short, friendly questions and refers back to the "I" statement every time. At the end of the session the assistant will respond with  "SESSION FINISHED"."""
+The assistant asks short, friendly questions and helps the user construct the "I" statement. Once the user has a completed "I" statement the assistant should respond  "SESSION FINISHED"."""
 
-_ASSISTANT_FIRST_RESPONSE = """Okay, let's work on crafting an "I" statement to address this situation. When we have finished you will have a sentence of the form: "I feel [emotion] when [event] because [reason]. I would like [change]."""
+_ASSISTANT_WELCOME = """Okay, let's work on crafting an "I" statement together. When we have finished you will have a sentence of the form: 
 
-_ASSISTANT_ASKS_FOR_EVENT = """In this session I'll help you use "I" statements to help you stand up for yourself in a way that is respectful to others.
+"I feel [emotion] when [event] because [reason]. I would like [change]."
 
-To get started can you please share an situation where you last found your boundaries being pushed?"""
+You'll be able to use this to assert your boundaries in a respectful way."""
+
+_ASSISTANT_ASKS_FOR_EVENT = """To get started can you please share an situation where you found your boundaries being pushed?"""
+
+_DEFAULT_FINAL_I_STATEMENT_TURN = """Great work!"""
 
 MIN_I_STATEMENT_STEPS = 15
 MAX_I_STATEMENTS_STEPS = 30
@@ -377,8 +400,8 @@ def i_statement_loop(request):
 		# work through that example.
 		messages = [
 		{"role": "system", "content": _I_STATEMENT_SYSTEM_PROMPT},
+		{"role": "assistant", "content": _ASSISTANT_WELCOME},
 		{"role": "assistant", "content": user_summary},
-		{"role": "assistant", "content": _ASSISTANT_FIRST_RESPONSE},
 		*history
 		]
 	else:
@@ -386,6 +409,7 @@ def i_statement_loop(request):
 		# user for a situation to work on.
 		messages = [
 		{"role": "system", "content": _I_STATEMENT_SYSTEM_PROMPT},
+		{"role": "assistant", "content": _ASSISTANT_WELCOME},
 		{"role": "assistant", "content": _ASSISTANT_ASKS_FOR_EVENT},
 		{"role": "user", "content": user_event},
 		*history
@@ -414,6 +438,10 @@ def i_statement_loop(request):
 		next_question = next_question.strip(' .\n')
 		next_question = _remove_questions(next_question)
 
+		# If the next_questio is just '' then return something else.
+		if not next_question:
+			return _DEFAULT_FINAL_I_STATEMENT_TURN
+
 	# If there is no question in "next_question" and there have been 
 	# a min number of steps, set is_done to True.
 	if ('?' not in next_question) and (len(messages) > MIN_I_STATEMENT_STEPS):
@@ -426,5 +454,25 @@ def i_statement_loop(request):
 		messages=messages,
 	)
 
+def save_stage3_data(request, db, BoundariesStageThreeDatum):
+	"""Saves data at the end of stage 2 of the boundaries journey."""
+	# Retrieve data from the request sent by Twilio
+	message_body = request.json
 
+	# Hash the user_id so that the data is pseudo-anonyms.
+	message_body['user_id'] = string_hash(message_body['user_id'])
+
+	# Get the current time.
+	now = datetime.datetime.now()
+	message_body['time'] = now
+
+	# Dump the history (into dicts).
+	history = message_body['history']
+	message_body['history'] = json.dumps(history)
+
+	datum = BoundariesStageThreeDatum(**message_body)
+	db.session.add(datum)
+	db.session.commit()
+
+	return jsonify({'message': f'Flow data saved.'})
 

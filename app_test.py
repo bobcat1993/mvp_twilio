@@ -240,7 +240,6 @@ class TestApp(unittest.TestCase):
 			# Assert the response status code -- succeeded.
 			self.assertEqual(response.status_code, 200)
 
-
 	def test_save_goal_data(self):
 
 		payload = {
@@ -255,7 +254,6 @@ class TestApp(unittest.TestCase):
 
 		response = self.app.post('/goal/save_goal_data', json=payload)
 		self.assertEqual(response.status_code, 200)
-
 
 	def test_save_abc_data(self):
 		# Create a sample request payload to simulate the data sent by 
@@ -390,7 +388,6 @@ class TestApp(unittest.TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertEqual(response.json['image_url'], 'https://storage.googleapis.com/bobby-chat-goals/day_default_of_3.jpeg')
 
-
 	def test_save_boundaries_stage1_data(self):
 		# Create a sample request payload to simulate the data sent by 
 		# Twilio
@@ -409,7 +406,7 @@ class TestApp(unittest.TestCase):
 		app.logger.info('response %s', response)
 		self.assertEqual(response.status_code, 200)
 
-	def test_save_boundaries_stage1_data(self):
+	def test_save_boundaries_stage2_data(self):
 		# Create a sample request payload to simulate the data sent by 
 		# Twilio
 		payload = {
@@ -436,6 +433,30 @@ class TestApp(unittest.TestCase):
 
 
 		response = self.app.post('/boundaries_journey/stage2/save_data', json=payload)
+		app.logger.info('response %s', response)
+		self.assertEqual(response.status_code, 200)
+	
+	def test_save_boundaries_stage3_data(self):
+		# Create a sample request payload to simulate the data sent by 
+		# Twilio
+		payload = {
+			"user_event": "",
+			"user_summary": "In a recent experience, you felt that your boundaries were pushed when you had to do all of Bob's work while they were off on holiday.",
+			"history": [
+					{
+							"role": "assistant",
+							"content": "Let's start by identifying the emotion you felt when your boundaries were pushed. How would you describe your emotion in that situation?"
+					}
+			],
+			"last_bot_response": "Let's start by identifying the emotion you felt when your boundaries were pushed. How would you describe your emotion in that situation?",
+			"user_feel_after": "5",
+			"origin": "twilio_flow",
+			"flow_sid": "FWc6127ed9c78fb9bb276eef11fad7a3cb",
+			"user_id": "whatsapp:+447479813767",
+			"error": "None"
+		}
+
+		response = self.app.post('/boundaries_journey/stage3/save_data', json=payload)
 		app.logger.info('response %s', response)
 		self.assertEqual(response.status_code, 200)
 
