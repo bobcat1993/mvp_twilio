@@ -345,16 +345,9 @@ def _retrieve_the_summary(user_number, db, BoundariesStageTwoDatum):
 
 _I_STATEMENT_SYSTEM_PROMPT = """In this coaching session, the assistant is going to teach the user to use "I" statements to set a boundary.
 
-The assistant has summarised the users recent experience that they want help coming up with an "I" statement for.
+The user has told the assistant where they have felt their boundaries being pushed. The assistant must tell the user to imagine they are talking to the person they want to address and guide them step-by-step through constructing a sentence of the form "I feel X when Y because Z. I would like A."
 
-Tell the user to imagine they are talking to the person they want to address.
-
-The guide them step-by-step through constructing a sentence of the form "I feel X when Y because Z. I would like A."
-
-Get the user to practice using this statement and help them refine it.
-
-The assistant asks short, friendly questions. Once the user has completed the session the assistant will respond with  "SESSION FINISHED".
-"""
+The assistant asks short, friendly questions and refers back to the "I" statement every time. At the end of the session the assistant will respond with  "SESSION FINISHED"."""
 
 _ASSISTANT_FIRST_RESPONSE = """Okay, let's work on crafting an "I" statement to address this situation. When we have finished you will have a sentence of the form: "I feel [emotion] when [event] because [reason]. I would like [change]."""
 
