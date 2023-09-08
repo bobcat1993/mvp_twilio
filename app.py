@@ -1176,6 +1176,12 @@ def worst_case_loop():
 	# Ask the user for a situation and worst case scenario.
 	return boundaries.worst_case_loop(request=request)
 
+@app.post('/boundaries_journey/stage5/empathetic_assertiveness_loop')
+@validate_twilio_request
+def empathetic_assertiveness_loop():
+	# Guide the user to construct a empathetic, assertive response.
+	return boundaries.empathetic_assertiveness_loop(request=request)
+
 
 if __name__ == "__main__":
 	app.run(debug=True, use_debugger=True, port=8000)

@@ -211,7 +211,8 @@ class TestEmpatheticAssertiveness(unittest.TestCase):
 	def setUp(self):
 		utils.setup_openai()
 
-	_PAYLOAD_FIRST = {
+	# Payloads for Worst Case (WC)
+	_WC_PAYLOAD_FIRST = {
 		"user_event": "I had to do all of Bob's work while he was off on holiday.",
 		"user_summary": "",
 		"history": [],
@@ -219,9 +220,49 @@ class TestEmpatheticAssertiveness(unittest.TestCase):
 		}
 
 	@parameterized.expand([
-		('first', _PAYLOAD_FIRST, 1),
+		('first', _WC_PAYLOAD_FIRST, 1),
 		])
 	def test_worst_case_loop(self, name, payload, expected_len_history):
+		# Create a mock request object
+		test_request = Mock()
+
+		test_request.json = payload
+
+		with app.app_context():
+			response = boundaries.worst_case_loop(test_request)
+
+		response = response.json
+		history = json.loads(response['history'])
+		self.assertEqual(len(history), expected_len_history)
+
+	# Payloads for Empathetic Assertion (EA)
+	_EA_PAYLOAD_FIRST = {
+    "user_event": "I was given an assignment outside of my working hours",
+    "history": [
+        {
+            "role": "assistant",
+            "content": "I understand how that can feel like your boundaries were crossed. To help you identify who you need to talk to about this situation, could you please provide some more details? For example, who assigned you the task? Was it a supervisor, a colleague, or someone else?"
+        },
+        {
+            "role": "user",
+            "content": "My boss."
+        },
+        {
+            "role": "assistant",
+            "content": "Thank you for sharing that information. What is the absolute worst outcome you can envision if you were to talk to your boss about this matter?"
+        },
+        {
+            "role": "user",
+            "content": "They might tell me I’m lazy and don’t care about my job … when I really do"
+        },
+    ],
+    "last_user_response": None
+	}
+
+	@parameterized.expand([
+		('first', _EA_PAYLOAD_FIRST, 4),
+		])
+	def test_empathetic_assertion_loop(self, name, payload, expected_len_history):
 		# Create a mock request object
 		test_request = Mock()
 
