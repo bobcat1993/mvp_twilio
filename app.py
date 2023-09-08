@@ -1170,6 +1170,12 @@ def save_boundaries_stage4_data():
 	# Retrieve data from the request sent by Twilio
 	return boundaries.save_stage4_data(request=request, db=db, BoundariesStageFourDatum=BoundariesStageFourDatum)
 
+@app.post('/boundaries_journey/stage5/worst_case_loop')
+@validate_twilio_request
+def worst_case_loop():
+	# Ask the user for a situation and worst case scenario.
+	return boundaries.worst_case_loop(request=request)
+
 
 if __name__ == "__main__":
 	app.run(debug=True, use_debugger=True, port=8000)
