@@ -523,3 +523,82 @@ def save_stage4_data(request, db, BoundariesStageFourDatum):
 		logging.error('error: %s', str(e))
 		return jsonify({'error': str(e)})
 
+
+
+
+_WORST_CASE_SYSTEM_PROMPT = """The assistant will ask the user for a situation where their boundaries have been crossed and help the user identify who they need to talk to.
+
+The assistant must help the user come up with a worst case scenario. Once the user has shared a worst case scenario the assistant responds with \"WORST CASE DETECTED\"."""
+
+_WORST_CASE_START = """Please share a situation in which you felt your boundaries being crossed."""
+
+_EMPATHETIC_ASSERTION_SYSTEM_PROMPT = """In this coaching session, the assistant is teaching the user how to use empathetic assertive techniques. The user has described a situation and a worst case scenario.
+
+The assistant helps the user construct a "statement of understanding" for the other person in this situation with a short prompt.
+
+The user is familiar with "I-statements". The assistant helps the user construct an "I-statement" of the form "I feel [emotion] when [behaviour] because [reason]. I want [change]." with a short prompt.
+
+The assistant asks short, friendly questions to guide the user. The assistants responses should be short.
+
+Finally, the assistant presents the "statement of understanding" + and/but + "I-statement" and ends the response with "SESSION ENDED"."""
+
+
+MAX_WORSE_CASE_STEPS = 15
+
+def worst_case_loop(request):
+	"""Asks the user for a situation and worst case scenario."""
+
+	# Get the inputs.
+	message_body = request.json
+	history = message_body['history']
+	user_event = message_body['user_event']
+	current_user_response = message_body['last_user_response']
+
+	# Add the previous user response to the end of the history.
+	if current_user_response:
+		history.append({"role": "user", "content": current_user_response})
+
+	# Reconstruct the conversation so far.
+	messages = [
+	{"role": "system", "content": _WORST_CASE_SYSTEM_PROMPT},
+	{"role": "assistant", "content": _WORST_CASE_START},
+	{"role": "user", "content": user_event},
+	*history
+	]
+
+	model_output = utils.chat_completion(
+		model="gpt-3.5-turbo-0613",
+		messages=messages,
+		max_tokens=1024,
+		temperature=1.0,
+		)
+
+	next_question = model_output['choices'][0]['message']['content']
+	# Warning: This is the raw next question. If this is the last step it will include 'SESSION FINISHED'.
+	history.append({"role": "assistant", "content": next_question})
+
+	# Check if there is an event detected.
+	is_done = True if 'WORST CASE DETECTED' in next_question else False
+
+	if len(messages) == MAX_WORSE_CASE_STEPS:
+		app.logger.warn(f'is_done != True, but has reached {MAX_WORSE_CASE_STEPS} messages.')
+		is_done = True
+
+	# If there is no question in "next_question" and there have been 
+	# a min number of steps, set is_done to True.
+	if ('?' not in next_question) and (len(messages) > MIN_I_STATEMENT_STEPS):
+		is_done = True
+
+	# Note if is_done == True then next_question is not used in Twilio.
+	return jsonify(
+		is_done=is_done,
+		question=next_question,
+		history=json.dumps(history),  # Be sure to dump!!
+		messages=messages,
+	)
+
+
+
+
+
+
