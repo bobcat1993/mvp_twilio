@@ -474,7 +474,9 @@ def save_stage3_data(request, db, BoundariesStageThreeDatum):
 		datum = BoundariesStageThreeDatum(**message_body)
 		db.session.add(datum)
 		db.session.commit()
+
 		return jsonify({'message': f'Flow data saved.'})
 	except Exception as e:
+		logging.error('error: %s', str(e))
 		return jsonify({'error': str(e)})
 
