@@ -528,7 +528,7 @@ def save_stage4_data(request, db, BoundariesStageFourDatum):
 
 _WORST_CASE_SYSTEM_PROMPT = """The assistant will ask the user for a situation where their boundaries have been crossed and help the user identify who they need to talk to.
 
-The assistant must help the user come up with a worst case scenario. Once the user has shared a worst case scenario the assistant responds with \"WORST CASE DETECTED\"."""
+The assistant must help the user come up with a worst case scenario if they talk to this person. Once the user has shared a worst case scenario the assistant responds with \"WORST CASE DETECTED\"."""
 
 _WORST_CASE_START = """Please share a situation in which you felt your boundaries being crossed."""
 
