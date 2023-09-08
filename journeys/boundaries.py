@@ -86,6 +86,27 @@ def get_BoundariesStageThreeDatum(db):
 	return BoundariesStageThreeDatum
 
 
+def get_BoundariesStageFourDatum(db):
+	class BoundariesStageFourDatum(db.Model):
+		"""Stores the data Boundaries-Stage4 flow."""
+
+		__tablename__ = 'boundaries_stage_four_datum'
+
+		id = db.Column(db.Integer, primary_key=True)
+		user_feedback_0 = db.Column(db.String, nullable=True)
+		user_feedback_1 = db.Column(db.String, nullable=True)
+		user_feedback_2 = db.Column(db.String, nullable=True)
+		user_feedback_3 = db.Column(db.String, nullable=True)
+		flow_sid = db.Column(db.String, nullable=True)
+		origin = db.Column(db.String, nullable=True)
+		user_id = db.Column(db.String, nullable=True)
+		error = db.Column(db.String, nullable=True)
+		time = db.Column(db.DateTime, nullable=True)
+		time_spent_on_video = db.Column(db.DateTime, nullable=True)
+
+	return BoundariesStageFourDatum
+
+
 # TODO(toni) Add this to a utils.py file.
 def string_hash(string):
 	return md5(string.encode()).hexdigest()
@@ -455,7 +476,7 @@ def i_statement_loop(request):
 	)
 
 def save_stage3_data(request, db, BoundariesStageThreeDatum):
-	"""Saves data at the end of stage 2 of the boundaries journey."""
+	"""Saves data at the end of stage three of the boundaries journey."""
 	# Retrieve data from the request sent by Twilio
 	try:
 		message_body = request.json
@@ -472,6 +493,28 @@ def save_stage3_data(request, db, BoundariesStageThreeDatum):
 		message_body['history'] = json.dumps(history)
 
 		datum = BoundariesStageThreeDatum(**message_body)
+		db.session.add(datum)
+		db.session.commit()
+
+		return jsonify({'message': f'Flow data saved.'})
+	except Exception as e:
+		logging.error('error: %s', str(e))
+		return jsonify({'error': str(e)})
+
+def save_stage4_data(request, db, BoundariesStageFourDatum):
+	"""Saves data at the end of stage four of the boundaries journey."""
+	# Retrieve data from the request sent by Twilio
+	try:
+		message_body = request.json
+
+		# Hash the user_id so that the data is pseudo-anonyms.
+		message_body['user_id'] = string_hash(message_body['user_id'])
+
+		# Get the current time.
+		now = datetime.datetime.now()
+		message_body['time'] = now
+
+		datum = BoundariesStageFourDatum(**message_body)
 		db.session.add(datum)
 		db.session.commit()
 

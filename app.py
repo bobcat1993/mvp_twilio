@@ -162,6 +162,7 @@ class ReminderDatum(db.Model):
 BoundariesStageOneDatum = boundaries.get_BoundariesStageOneDatum(db)
 BoundariesStageTwoDatum = boundaries.get_BoundariesStageTwoDatum(db)
 BoundariesStageThreeDatum = boundaries.get_BoundariesStageThreeDatum(db)
+BoundariesStageFourDatum = boundaries.get_BoundariesStageFourDatum(db)
 
 @app.before_first_request
 def init_app():
@@ -1162,6 +1163,12 @@ def i_statement_loop():
 def save_boundaries_stage3_data():
 	# Retrieve data from the request sent by Twilio
 	return boundaries.save_stage3_data(request=request, db=db, BoundariesStageThreeDatum=BoundariesStageThreeDatum)
+
+@app.post('/boundaries_journey/stage4/save_data')
+@validate_twilio_request
+def save_boundaries_stage4_data():
+	# Retrieve data from the request sent by Twilio
+	return boundaries.save_stage4_data(request=request, db=db, BoundariesStageFourDatum=BoundariesStageFourDatum)
 
 
 if __name__ == "__main__":
