@@ -540,10 +540,11 @@ The user is familiar with "I-statements". The assistant helps the user construct
 
 The assistant asks short, friendly questions to guide the user. The assistants responses should be short.
 
-Finally, the assistant presents the "statement of understanding" + and/but + "I-statement" and ends the response with "SESSION ENDED"."""
+Finally, the assistant presents the "statement of understanding" + and/but + "I-statement" and ends the response with "SESSION FINISHED"."""
 
 
 MAX_WORSE_CASE_STEPS = 15
+MIN_EMPATHETIC_ASSERTIVENESS_STEPS = 20
 MAX_EMPATHETIC_ASSERTIVENESS_STEPS = 30
 
 def worst_case_loop(request):
@@ -633,10 +634,10 @@ def empathetic_assertiveness_loop(request):
 	history.append({"role": "assistant", "content": next_question})
 
 	# Check if there is an event detected.
-	is_done = True if 'WORST CASE DETECTED' in next_question else False
+	is_done = True if 'SESSION FINISHED' in next_question else False
 
-	if len(messages) == MAX_WORSE_CASE_STEPS:
-		app.logger.warn(f'is_done != True, but has reached {MAX_WORSE_CASE_STEPS} messages.')
+	if len(messages) == MAX_EMPATHETIC_ASSERTIVENESS_STEPS:
+		app.logger.warn(f'is_done != True, but has reached {MAX_EMPATHETIC_ASSERTIVENESS_STEPS} messages.')
 		is_done = True
 
 	if is_done:
@@ -647,11 +648,11 @@ def empathetic_assertiveness_loop(request):
 		# If the next_questio is just '' then return something else.
 		if not next_question:
 			# TODO(toni) Choose a better sentence.
-			return 'Practice this out loud.'
+			next_question = 'Practice this out loud.'
 
 	# If there is no question in "next_question" and there have been 
 	# a min number of steps, set is_done to True.
-	if ('?' not in next_question) and (len(messages) > MIN_I_STATEMENT_STEPS):
+	if ('?' not in next_question) and (len(messages) > MIN_EMPATHETIC_ASSERTIVENESS_STEPS):
 		is_done = True
 
 	return jsonify(
