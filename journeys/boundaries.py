@@ -663,6 +663,66 @@ def empathetic_assertiveness_loop(request):
 	)
 
 
+_STAGES = [
+'Day 1: How healthy are your boundaries?',
+'Day 2: Where are your boundaries being pushed?',
+'Day 3: How can I stand up for myself?',
+'Day 4: Are you a people pleaser?',
+'Day 5: How can I say no, but in a nice way?',
+'Day 6: What happens when no is not an option?',
+'Day 7: Practice being more assertive.',
+'Day 8: Ways to say no -- role play.',
+'Day 9: How do you deal with the guilt of letting people down?',
+'Day 10: How to get everyone ready for the new you!💗'
+]
+
+_LOCK = "🔒"
+_COMING_SOON_STAGE = 5
+
+def get_boundaries_stage(request, db, UserDatum):
+	"""Get the latest stage that the user had reached."""
+
+	# Get the inputs.
+	message_body = request.json
+	user_number = message_body['user_number']
+	user_number = string_hash(user_number)
+
+	user_sessions = db.session.query(UserDatum).filter(UserDatum.user_number == user_number).all()
+
+	# returns the stage as a integer and a list of the stages with 
+	# padlocks on those that are not accessible.
+	print("user_sessions:", user_sessions)
+	boundary_sessions = [s.flow_name for s in user_sessions if s.flow_name.startswith('boundaries-stage')]
+
+	boundary_sessions = [int(s.split('boundaries-stage')[-1]) for s in boundary_sessions]
+
+	latest_stage = max(boundary_sessions)
+
+	menu = ''
+	for i, stage in enumerate(_STAGES):
+
+		if i > latest_stage:
+			# If the user is not at that stage add a lock.
+			stage = _LOCK + '' + stage
+
+		elif i >= _COMING_SOON_STAGE:
+			# If the feature is still coming soon, use the lock too.
+			stage = _LOCK + '' + stage
+
+		if i == _COMING_SOON_STAGE:
+			menu += '\nComing soon...'
+
+		menu += f'\n{stage}'
+
+	print(menu)
+
+
+	print('Boundary sessions:', boundary_sessions)
+	return jsonify(
+		latest_stage=latest_stage,
+		menu=menu)
+
+
 
 
 
