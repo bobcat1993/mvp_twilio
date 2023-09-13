@@ -679,6 +679,7 @@ _STAGES = [
 _LOCK = "🔒"
 _COMING_SOON_STAGE = 5
 
+# TODO(toni) The user should only be able to progress one day at a time.
 def get_boundaries_stage(request, db, UserDatum):
 	"""Get the latest stage that the user had reached."""
 
@@ -689,16 +690,23 @@ def get_boundaries_stage(request, db, UserDatum):
 
 	user_sessions = db.session.query(UserDatum).filter(UserDatum.user_number == user_number).all()
 
-	# returns the stage as a integer and a list of the stages with 
-	# padlocks on those that are not accessible.
-	print("user_sessions:", user_sessions)
-	boundary_sessions = [s.flow_name for s in user_sessions if s.flow_name.startswith('boundaries-stage')]
-
+	# TODO(toni) Use one function here!
+	# Remove those that are None.
+	boundary_sessions = [s.flow_name for s in user_sessions if s.flow_name]
+	# Keep only those that start with 'boundaries-stage'
+	boundary_sessions = [s for s in boundary_sessions if s.startswith('boundaries-stage')]
+	# Get only the stage number.
 	boundary_sessions = [int(s.split('boundaries-stage')[-1]) for s in boundary_sessions]
 
-	latest_stage = max(boundary_sessions)
+	# If the user has not done any sessions, start them at stage 1.
+	# The latest stage them "completed" is 0.
+	if not boundary_sessions:
+		latest_stage = 0
+	else:
+		latest_stage = max(boundary_sessions)
 
-	menu = ''
+	# Create the menu list padlocks on the stages that are not accessible yet.
+	menu = '🙌 The Boundaries Challenge 🙌\nComplete the current stage to unlock the next one.'
 	for i, stage in enumerate(_STAGES):
 
 		if i > latest_stage:
@@ -714,13 +722,61 @@ def get_boundaries_stage(request, db, UserDatum):
 
 		menu += f'\n{stage}'
 
-	print(menu)
+	return jsonify(latest_stage=latest_stage, menu=menu)
+
+def is_valid_choice(request):
+	"""Checks if the user's choice is valid or not."""
+
+	# Get the inputs.
+	message_body = request.json
+	user_choice = message_body['user_choice']
+	latest_stage = message_body['latest_stage']
+
+	# If the user has chose 'home' use is_valid=False and say returning  home.
+	if 'home' in user_choice.lower():
+		return jsonify(
+			is_valid = True,
+			error_message='Returning you to the home page.',
+			redirect_home=True)
 
 
-	print('Boundary sessions:', boundary_sessions)
+	# Get the number from the user_choice 
+	user_choice = re.findall(r'\d+', user_choice)
+	if not user_choice:
+		return jsonify(
+		is_valid = False,
+		error_message = f'This was not a valid input, please enter the number for the day you would like to take part in.',
+		redirect_home = False)
+	else:
+		user_choice = int(user_choice[0])
+
+	# Check if the users choice is valid or not -- return an error message if not.
+	is_valid = False
+	error_message = None
+	redirect_home = False
+	# Check that the user_choice has not picked a day that's not available yet.
+	if user_choice > int(_COMING_SOON_STAGE):
+		is_valid = False
+		error_message = f'This session is not quite ready yet. We\'ll let you know when it is. In the meantime why not try a different tool. Feel free to reach out to us in the meantime if you have any questions, toni@bobby-chat.com.'
+		redirect_home = True
+		user_choice = None
+	elif user_choice > int(latest_stage) + 1:
+		is_valid = False
+		error_message = f'According to our records it looks like you are ready to start Day {int(latest_stage) + 1}. Please choose Day {int(latest_stage) + 1} (or earlier). Any questions, please reach out toni@bobby-chat.com.'
+		user_choice = None
+	else:
+		# The user_choice is valid and there's no error message.
+		is_valid = True
+		error_message = None
+		redirect_home = False
+		user_choice = user_choice
+
 	return jsonify(
-		latest_stage=latest_stage,
-		menu=menu)
+		is_valid=is_valid,
+		error_message=error_message,
+		redirect_home=redirect_home,
+		user_choice=user_choice)
+
 
 
 
