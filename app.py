@@ -1182,6 +1182,17 @@ def empathetic_assertiveness_loop():
 	# Guide the user to construct a empathetic, assertive response.
 	return boundaries.empathetic_assertiveness_loop(request=request)
 
+@app.post('/boundaries_journey/get_boundaries_stage')
+@validate_twilio_request
+def get_boundaries_stage():
+	return boundaries.get_boundaries_stage(request=request, db=db, UserDatum=UserDatum)
+
+
+@app.post('/boundaries_journey/is_valid_choice')
+@validate_twilio_request
+def is_valid_choice():
+	return boundaries.is_valid_choice(request=request)
+
 
 if __name__ == "__main__":
 	app.run(debug=True, use_debugger=True, port=8000)
