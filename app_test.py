@@ -478,7 +478,29 @@ class TestApp(unittest.TestCase):
 		app.logger.info('response %s', response)
 		self.assertEqual(response.status_code, 200)
 
+	def test_save_boundaries_stage5_data(self):
+		# Create a sample request payload to simulate the data sent by 
+		# Twilio
+		payload = {
+			"user_event": "",
+			"user_summary": "In a recent experience, you felt that your boundaries were pushed when you had to do all of Bob's work while they were off on holiday.",
+			"history": [
+					{
+							"role": "assistant",
+							"content": "Let's start by identifying the emotion you felt when your boundaries were pushed. How would you describe your emotion in that situation?"
+					}
+			],
+			"last_bot_response": "Let's start by identifying the emotion you felt when your boundaries were pushed. How would you describe your emotion in that situation?",
+			"user_feel_after": "5",
+			"origin": "twilio_flow",
+			"flow_sid": "FWc6127ed9c78fb9bb276eef11fad7a3cb",
+			"user_id": "whatsapp:+447479813767",
+			"error": "None"
+		}
 
+		response = self.app.post('/boundaries_journey/stage5/save_data', json=payload)
+		app.logger.info('response %s', response)
+		self.assertEqual(response.status_code, 200)
 if __name__ == '__main__':
 	unittest.main()
 

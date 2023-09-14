@@ -163,6 +163,7 @@ BoundariesStageOneDatum = boundaries.get_BoundariesStageOneDatum(db)
 BoundariesStageTwoDatum = boundaries.get_BoundariesStageTwoDatum(db)
 BoundariesStageThreeDatum = boundaries.get_BoundariesStageThreeDatum(db)
 BoundariesStageFourDatum = boundaries.get_BoundariesStageFourDatum(db)
+BoundariesStageFiveDatum = boundaries.get_BoundariesStageFiveDatum(db)
 
 @app.before_first_request
 def init_app():
@@ -1182,11 +1183,16 @@ def empathetic_assertiveness_loop():
 	# Guide the user to construct a empathetic, assertive response.
 	return boundaries.empathetic_assertiveness_loop(request=request)
 
+@app.post('/boundaries_journey/stage5/save_data')
+@validate_twilio_request
+def save_boundaries_staget_data():
+	# Retrieve data from the request sent by Twilio
+	return boundaries.save_stage5_data(request=request, db=db, BoundariesStageFiveDatum=BoundariesStageFiveDatum)
+
 @app.post('/boundaries_journey/get_boundaries_stage')
 @validate_twilio_request
 def get_boundaries_stage():
 	return boundaries.get_boundaries_stage(request=request, db=db, UserDatum=UserDatum)
-
 
 @app.post('/boundaries_journey/is_valid_choice')
 @validate_twilio_request

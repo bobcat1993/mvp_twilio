@@ -107,6 +107,27 @@ def get_BoundariesStageFourDatum(db):
 	return BoundariesStageFourDatum
 
 
+def get_BoundariesStageFiveDatum(db):
+	class BoundariesStageFiveDatum(db.Model):
+		"""Stores the data Boundaries-Stage5 flow."""
+
+		__tablename__ = 'boundaries_stage_five_datum'
+
+		id = db.Column(db.Integer, primary_key=True)
+		history = db.Column(db.String, nullable=True)
+		user_event = db.Column(db.String, nullable=True)
+		user_summary = db.Column(db.String, nullable=True)
+		last_bot_response = db.Column(db.String, nullable=True)
+		user_feel_after = db.Column(db.String, nullable=True)
+		flow_sid = db.Column(db.String, nullable=True)
+		origin = db.Column(db.String, nullable=True)
+		user_id = db.Column(db.String, nullable=True)
+		error = db.Column(db.String, nullable=True)
+		time = db.Column(db.DateTime, nullable=True)
+		time_spent_on_video = db.Column(db.DateTime, nullable=True)
+
+	return BoundariesStageFiveDatum
+
 # TODO(toni) Add this to a utils.py file.
 def string_hash(string):
 	return md5(string.encode()).hexdigest()
@@ -663,6 +684,32 @@ def empathetic_assertiveness_loop(request):
 	)
 
 
+def save_stage5_data(request, db, BoundariesStageFiveDatum):
+	"""Saves data at the end of stage five of the boundaries journey."""
+	# Retrieve data from the request sent by Twilio
+	try:
+		message_body = request.json
+
+		# Hash the user_id so that the data is pseudo-anonyms.
+		message_body['user_id'] = string_hash(message_body['user_id'])
+
+		# Get the current time.
+		now = datetime.datetime.now()
+		message_body['time'] = now
+
+		# Dump the history (into dicts).
+		history = message_body['history']
+		message_body['history'] = json.dumps(history)
+
+		datum = BoundariesStageFiveDatum(**message_body)
+		db.session.add(datum)
+		db.session.commit()
+
+		return jsonify({'message': f'Flow data saved.'})
+	except Exception as e:
+		logging.error('error: %s', str(e))
+		return jsonify({'error': str(e)})
+
 _STAGES = [
 'Day 1: How healthy are your boundaries?',
 'Day 2: Where are your boundaries being pushed?',
@@ -776,10 +823,3 @@ def is_valid_choice(request):
 		error_message=error_message,
 		redirect_home=redirect_home,
 		user_choice=user_choice)
-
-
-
-
-
-
-
