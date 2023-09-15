@@ -19,6 +19,10 @@ from app import BoundariesStageTwoDatum, UserDatum
 
 app = Flask(__name__)
 
+_TODAY_DATE = date.today()
+_USER_NUMBER = 'whatsapp:+44747981767'
+_USER_ID = boundaries.string_hash(_USER_NUMBER)
+
 
 class TestBoundaries(unittest.TestCase):
 
@@ -103,10 +107,6 @@ class TestBoundaries(unittest.TestCase):
 		history = json.loads(response['history'])
 		self.assertEqual(len(history), expected_len_history)
 
-today_date = date.today()
-user_number = 'whatsapp:+44747981767'
-user_id = boundaries.string_hash(user_number)
-
 
 class TestRetrieveSummaryFunction(unittest.TestCase):
 
@@ -125,32 +125,32 @@ class TestRetrieveSummaryFunction(unittest.TestCase):
 	def test_gets_correct_users_summary(self):
 		# Add two rows of data.
 		# The user data.
-		summary_data_1 = BoundariesStageTwoDatum(user_id=user_id, summary='This is a test summary', time=today_date)
+		summary_data_1 = BoundariesStageTwoDatum(user_id=_USER_ID, summary='This is a test summary', time=_TODAY_DATE)
 		self.session.add(summary_data_1)
 
 		# A distraction data.
-		summary_data_2 = BoundariesStageTwoDatum(user_id='1234', summary='This is a wrong summary', time=today_date)
+		summary_data_2 = BoundariesStageTwoDatum(user_id='1234', summary='This is a wrong summary', time=_TODAY_DATE)
 		self.session.add(summary_data_2)
 		self.session.commit()
 
 		# Make sure we retrieve data for the correct user.
-		result = boundaries._retrieve_the_summary(user_id, db=self, BoundariesStageTwoDatum=BoundariesStageTwoDatum)
+		result = boundaries._retrieve_the_summary(_USER_ID, db=self, BoundariesStageTwoDatum=BoundariesStageTwoDatum)
 		self.assertEqual(result, 'This is a test summary')
 
 	def test_gets_latest_summary(self):
 		# Add two rows of data.
 		# The first user data for the user_id.
-		summary_data_1 = BoundariesStageTwoDatum(user_id=user_id, summary='This an old summary', time=today_date)
+		summary_data_1 = BoundariesStageTwoDatum(user_id=_USER_ID, summary='This an old summary', time=_TODAY_DATE)
 		self.session.add(summary_data_1)
 
 		# The second user data at later time for the same user_id.
-		summary_data_2 = BoundariesStageTwoDatum(user_id=user_id, summary='This is the latest summary', time=today_date + timedelta(days=2))
+		summary_data_2 = BoundariesStageTwoDatum(user_id=_USER_ID, summary='This is the latest summary', time=_TODAY_DATE + timedelta(days=2))
 		self.session.add(summary_data_2)
 		self.session.commit()
 
 		# Make sure we retrieve the latest summary.
 		result = boundaries._retrieve_the_summary(
-			user_id,
+			_USER_ID,
 			db=self,
 			BoundariesStageTwoDatum=BoundariesStageTwoDatum)
 		self.assertEqual(result, 'This is the latest summary')
@@ -158,12 +158,12 @@ class TestRetrieveSummaryFunction(unittest.TestCase):
 	def test_gets_latest_summary(self):
 		# Add two rows of data.
 		# User data for the user_id.
-		summary_data = BoundariesStageTwoDatum(user_id=user_id, summary='This is test a summary', time=today_date)
+		summary_data = BoundariesStageTwoDatum(user_id=_USER_ID, summary='This is test a summary', time=_TODAY_DATE)
 		self.session.add(summary_data)
 
 		# Make sure we retrieve the latest summary.
 		result = boundaries._retrieve_the_summary(
-			user_number,
+			_USER_NUMBER,
 			db=self,
 			BoundariesStageTwoDatum=BoundariesStageTwoDatum)
 		self.assertEqual(result, 'This is test a summary')
@@ -292,10 +292,10 @@ class TestGetBoundariesStage(unittest.TestCase):
 	def test_get_boundaries_stage(self):
 		# Create some dummy data samples for UserDatum.
 		data = [
-			{'user_number': user_id, 'flow_name': 'boundaries-stage1'},
-			{'user_number': user_id, 'flow_name': 'boundaries-stage2'},
-			{'user_number': user_id, 'flow_name': 'boundaries-stage3'},
-			{'user_number': user_id, 'flow_name': 'boundaries-stage2'}
+			{'user_number': _USER_ID, 'flow_name': 'boundaries-stage1'},
+			{'user_number': _USER_ID, 'flow_name': 'boundaries-stage2'},
+			{'user_number': _USER_ID, 'flow_name': 'boundaries-stage3'},
+			{'user_number': _USER_ID, 'flow_name': 'boundaries-stage2'}
 		]
 
 		target_stage = 3
@@ -307,7 +307,7 @@ class TestGetBoundariesStage(unittest.TestCase):
 		self.session.commit()
 
 		# Make a dummy request.
-		payload = {'user_number': user_number}
+		payload = {'user_number': _USER_NUMBER}
 		test_request = Mock()
 		test_request.json = payload
 
