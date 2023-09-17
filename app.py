@@ -1194,6 +1194,11 @@ def save_boundaries_staget_data():
 def get_boundaries_stage():
 	return boundaries.get_boundaries_stage(request=request, db=db, UserDatum=UserDatum)
 
+@app.post('/boundaries_journey/is_valid_choice')
+@validate_twilio_request
+def is_valid_choice():
+	return boundaries.is_valid_choice(request=request)
+
 @app.post('/boundaries_journey/trigger_boundaries_menu')
 @validate_twilio_request
 def trigger_boundaries_menu():
