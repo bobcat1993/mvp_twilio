@@ -13,6 +13,7 @@ import io
 import tempfile
 import re
 from sqlalchemy import desc
+from twilio.rest import Client
 
 sys.path.append('..')
 import utils
@@ -20,6 +21,10 @@ import utils
 load_dotenv()
 
 _COLORS = '#F598FF', '#CCCCFF', '#E5E9FD', '#171D3A'
+
+account_sid = os.environ['TWILIO_ACCOUNT_SID']
+auth_token = os.environ['TWILIO_AUTH_TOKEN']
+whatsapp_from = os.environ['WHATSAPP_NUMBER']
 
 
 def get_BoundariesStageOneDatum(db):
@@ -823,3 +828,20 @@ def is_valid_choice(request):
 		error_message=error_message,
 		redirect_home=redirect_home,
 		user_choice=user_choice)
+
+def trigger_boundaries_menu(request):
+
+	client = Client(account_sid, auth_token)
+	message_body = request.json
+	boundary_menu_flow_id = "FW6f6cb29b18d6d9f9a8cb33b37005c8b0"
+	user_number = message_body['user_number']
+	bobby_number = message_body['bobby_number']
+
+	# Sending a call to the Bobby number from the user.
+	execution = client.studio.v2.flows(boundary_menu_flow_id).executions.create(parameters={"user_number": user_number}, to=user_number, from_=bobby_number)
+
+	return jsonify({'message': 'Menu triggered'})
+
+
+
+
