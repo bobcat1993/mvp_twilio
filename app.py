@@ -32,6 +32,7 @@ import create_post
 from features import sphere_of_influence
 from features import reminders
 from features import challenge
+from features import recommender
 
 # Import journeys
 from journeys import boundaries
@@ -1203,6 +1204,12 @@ def is_valid_choice():
 @validate_twilio_request
 def trigger_boundaries_menu():
 	return boundaries.trigger_boundaries_menu(request=request)
+
+########## Recommending a tool to a user ########
+@app.post('/recommend_tool')
+@validate_twilio_request
+def recommend_tool():
+	return recommender.recommend_tool(request=request)
 
 
 if __name__ == "__main__":
