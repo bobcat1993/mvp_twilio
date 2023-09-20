@@ -1051,7 +1051,7 @@ def new_user():
 	
 	if 'email' in message_body:
 		user_nunmber = message_body['email']
-	if 'field:comp-like94pe' in message_body:
+	elif 'field:comp-like94pe' in message_body:
 		user_email = message_body['field:comp-like94pe']
 	else:
 		user_email = message_body['field:comp-ll3zlzeo']
