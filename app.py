@@ -1043,14 +1043,14 @@ def new_user():
 	# there is an option to see the data structure.
 	message_body = request.json['data']
 	if 'phone' in message_body:
-		user_nunmber = message_body['phone']
+		user_number = message_body['phone']
 	elif 'field:comp-lipwozdh' in message_body:	
 		user_number = message_body['field:comp-lipwozdh']
 	else: 
 		user_number = message_body['field:comp-ll3zlzex1']
 	
 	if 'email' in message_body:
-		user_nunmber = message_body['email']
+		user_email = message_body['email']
 	elif 'field:comp-like94pe' in message_body:
 		user_email = message_body['field:comp-like94pe']
 	else:
