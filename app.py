@@ -1042,11 +1042,15 @@ def new_user():
 	# These key's can be found within the Wix automations;
 	# there is an option to see the data structure.
 	message_body = request.json['data']
-	if 'field:comp-lipwozdh' in message_body:	
+	if 'phone' in message_body:
+		user_nunmber = message_body['phone']
+	elif 'field:comp-lipwozdh' in message_body:	
 		user_number = message_body['field:comp-lipwozdh']
 	else: 
 		user_number = message_body['field:comp-ll3zlzex1']
 	
+	if 'email' in message_body:
+		user_nunmber = message_body['email']
 	if 'field:comp-like94pe' in message_body:
 		user_email = message_body['field:comp-like94pe']
 	else:
@@ -1057,11 +1061,17 @@ def new_user():
 	else:
 		user_wix_id = 'none'
 
+	if 'tag' in message_body:
+		tag = message_body['tag']
+	else:
+		tag = None
+
 	# Post-process the user number.
 	if user_number:
 		# Only add data if the user has provided a number
 
 		# From (+44) 7479812734 -->   whatsapp:+447479812734
+		user_number = user_number.strip()  # remove any white space.
 		user_number = user_number.replace('(', '')
 		user_number = user_number.replace(')', '')
 		# user_number = user_number.replace(' ', '')
@@ -1099,6 +1109,7 @@ def new_user():
 			'Content-Type': 'application/json',
 		}
 
+		# TODO(toni) Add a tag!
 		data = (
 			'{"api_key":'
 			f'"{api_key}",'
