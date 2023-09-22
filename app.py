@@ -33,6 +33,7 @@ from features import sphere_of_influence
 from features import reminders
 from features import challenge
 from features import recommender
+from features import welcome
 
 # Import journeys
 from journeys import boundaries
@@ -1221,6 +1222,12 @@ def trigger_boundaries_menu():
 @validate_twilio_request
 def recommend_tool():
 	return recommender.recommend_tool(request=request)
+
+########## Welcome sequence ########
+@app.post('/welcome/qanda_tool')
+@validate_twilio_request
+def qanda_tool():
+	return welcome.qanda_tool(request=request)
 
 
 if __name__ == "__main__":

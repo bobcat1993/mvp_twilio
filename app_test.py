@@ -349,6 +349,8 @@ class TestApp(unittest.TestCase):
 		app.logger.info('response %s', response)
 		self.assertEqual(response.status_code, 200)
 
+	# def test_new_user(self):
+
 	_TODAY = date.today()
 	logging.info(f'_TODAY: {_TODAY}')
 	_TOMORROW = _TODAY + timedelta(days=2)
