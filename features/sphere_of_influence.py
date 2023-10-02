@@ -24,6 +24,7 @@ def string_hash(string):
 
 _ASK_FOR_EVENT_TEXT = """To start off, please tell be about a specific challenge or issue you'd like to focus on today, something that's been on your mind?"""
 
+# TODO(toni) Move to utils.py file,
 def _remove_questions(text):
 	sentences = re.split(r'(?<=[.!?]) +', text)  # Split the text into sentences
 	non_question_sentences = [sentence for sentence in sentences if not sentence.endswith("?")]
