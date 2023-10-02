@@ -106,7 +106,7 @@ def get_burnout_infographic(request):
 
 	# Create a signed URL so that the data can only be accessed long 
 	# enough to share the image.
-	storage_client = storage.Client.from_service_account_json(os.environ['GOOGLE_CREDENTIALS'])
+	storage_client = storage.Client.from_service_account_json(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
 	image_url = blob.generate_signed_url(
 		expiration=timedelta(hours=1),
 		client=storage_client)
