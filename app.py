@@ -34,6 +34,7 @@ from features import reminders
 from features import challenge
 from features import recommender
 from features import welcome
+from features import burnout_survey
 
 # Import journeys
 from journeys import boundaries
@@ -1228,6 +1229,12 @@ def recommend_tool():
 @validate_twilio_request
 def qanda_tool():
 	return welcome.qanda_tool(request=request)
+
+########## Burnout Surveys ##########
+@app.post('/survey/get_burnout_infographic')
+@validate_twilio_request
+def get_burnout_infographic():
+	return burnout_survey.get_burnout_infographic(request=request)
 
 
 if __name__ == "__main__":
