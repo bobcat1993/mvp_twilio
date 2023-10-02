@@ -22,9 +22,9 @@ class TestBurnoutSurvey(unittest.TestCase):
 	# TODO(toni) Make parametrized.
 	@parameterized.expand([
 		# Valid user use choices.
-		('all_10s', ['10'] * 12, 1.0),
+		('all_5s', ['5'] * 12, 1.0),
 		('all_0s', ['0'] * 12, 0.0),
-		('some_missig', ['10', 'not sure', '4'], 14./20),
+		('some_missig', ['5', 'not sure', '3'], 8./10),
 		])
 	def test_get_burnout_infographic(self, name, results, target_score):
 		# Create a mock request object

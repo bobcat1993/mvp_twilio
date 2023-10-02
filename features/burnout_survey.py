@@ -10,6 +10,8 @@ from google.auth import compute_engine
 
 _COLORS = '#F598FF', '#CCCCFF', '#E5E9FD', '#171D3A'
 
+_MAX_BURNOUT_SCORE = 5
+
 # TODO(toni) Add this to a utils.py file.
 def string_hash(string):
 	return md5(string.encode()).hexdigest()
@@ -26,6 +28,8 @@ def get_burnout_infographic(request):
 	# Count up the score.
 	def get_score(x):
 		"""Get the score as an int from the string."""
+		if x is None:
+			return None
 		# Take the first number we find.
 		scores = re.findall(r'\d+', x)
 		if scores:
@@ -36,7 +40,7 @@ def get_burnout_infographic(request):
 	scores = [get_score(s) for s in results]   # Get the integer score.
 	scores = [s for s in scores if s != None]  # Remove any Nones.
 
-	percent_burnout = float(sum(scores)) / (10 * len(scores))
+	percent_burnout = float(sum(scores)) / (_MAX_BURNOUT_SCORE * len(scores))
 
 	# TODO: Make the title depending on the score.
 	title = 'Bobby can help you reduce your risk of burnout'
