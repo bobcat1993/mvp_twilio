@@ -168,6 +168,9 @@ BoundariesStageThreeDatum = boundaries.get_BoundariesStageThreeDatum(db)
 BoundariesStageFourDatum = boundaries.get_BoundariesStageFourDatum(db)
 BoundariesStageFiveDatum = boundaries.get_BoundariesStageFiveDatum(db)
 
+# Datum for other features.
+BurnoutSurveyDatum = burnout_survey.get_BurnoutSurveyDatum(db)
+
 @app.before_first_request
 def init_app():
 	flags.FLAGS(sys.argv)
@@ -1231,10 +1234,16 @@ def qanda_tool():
 	return welcome.qanda_tool(request=request)
 
 ########## Burnout Surveys ##########
-@app.post('/survey/get_burnout_infographic')
+@app.post('/burnout_survey/get_burnout_infographic')
 @validate_twilio_request
 def get_burnout_infographic():
 	return burnout_survey.get_burnout_infographic(request=request)
+
+@app.post('/burnout_survey/save_data')
+@validate_twilio_request
+def save_burnout_survey_data():
+	return burnout_survey.save_burnout_survey_data(request=request, db=db, BurnoutSurveyDatum=BurnoutSurveyDatum)
+
 
 
 if __name__ == "__main__":

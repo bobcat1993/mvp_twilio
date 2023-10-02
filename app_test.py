@@ -503,6 +503,25 @@ class TestApp(unittest.TestCase):
 		response = self.app.post('/boundaries_journey/stage5/save_data', json=payload)
 		app.logger.info('response %s', response)
 		self.assertEqual(response.status_code, 200)
+
+	def test_save_burnout_survey_data(self):
+		# Create a sample request payload to simulate the data sent by 
+		# Twilio
+		payload = {
+			"results": [
+				"1", "2", "5", "4"
+				],
+			"origin": "twilio_flow",
+			"flow_sid": "FW8f2ae7cf1a24a3feadc1c46fbea6816d",
+			"user_number": "whatsapp:+447479813767",
+			"error": "None"
+			}
+
+		response = self.app.post('/burnout_survey/save_data', json=payload)
+		app.logger.info('response %s', response)
+		self.assertEqual(response.status_code, 200)
+
+
 if __name__ == '__main__':
 	unittest.main()
 

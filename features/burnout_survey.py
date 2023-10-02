@@ -7,10 +7,27 @@ import re
 import os
 from datetime import datetime, timedelta
 from google.auth import compute_engine
+import json
+from absl import logging
 
 _COLORS = '#F598FF', '#CCCCFF', '#E5E9FD', '#171D3A'
 
 _MAX_BURNOUT_SCORE = 5
+
+
+def get_BurnoutSurveyDatum(db):
+	class BurnoutSurveyDatum(db.Model):
+		"""Stores the data Burnout-Survey flow."""
+
+		id = db.Column(db.Integer, primary_key=True)
+		results = db.Column(db.String, nullable=True)
+		flow_sid = db.Column(db.String, nullable=True)
+		origin = db.Column(db.String, nullable=True)
+		user_id = db.Column(db.String, nullable=True)
+		error = db.Column(db.String, nullable=True)
+		time = db.Column(db.DateTime, nullable=True)
+
+	return BurnoutSurveyDatum
 
 # TODO(toni) Add this to a utils.py file.
 def string_hash(string):
@@ -108,3 +125,32 @@ def get_burnout_infographic(request):
 		image_url=image_url,
 		title=title)
 
+
+
+
+def save_burnout_survey_data(request, db, BurnoutSurveyDatum):
+	"""Saves data from the burnout survey."""
+	# Retrieve data from the request sent by Twilio
+	message_body = request.json
+
+	# Hash the user_id so that the data is pseudo-anonyms.
+	message_body['user_id'] = string_hash(message_body['user_number'])
+
+	# Remove the user_number.
+	message_body.pop('user_number')
+
+	# Get the current time.
+	now = datetime.now()
+	message_body['time'] = now
+
+	# Dump the history (into dicts).
+	results = message_body['results']
+	message_body['results'] = json.dumps(results)
+
+	logging.info("results: %s", results)
+
+	datum = BurnoutSurveyDatum(**message_body)
+	db.session.add(datum)
+	db.session.commit()
+
+	return jsonify({'message': f'Flow data saved.'})
