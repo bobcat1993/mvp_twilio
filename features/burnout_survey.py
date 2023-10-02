@@ -44,6 +44,22 @@ def get_burnout_infographic(request):
 
 	# TODO: Make the title depending on the score.
 	title = 'Bobby can help you reduce your risk of burnout'
+	if percent_burnout > 0.8:
+		# User mostly responding with "often"/"always"
+		title = 'I\'m sorry that you are having a difficult time at the moment. Bobby can teach you skills to help you manage workplace stress and improve your wellbeing. However, if how you are feeling about your work is significantly affecting your mood or your function, please seek help from a professional. You can find some helpful links on our website, bobby-chat.com/help.'
+	elif percent_burnout > 0.6:
+		# User mostly responding with "sometimes"/"often"
+		title = 'I\'m sorry that you are having a tough time at the moment. Bobby can teach you skills to help you manage workplace stress and improve your wellbeing. However, if how you are feeling about your work is significantly affecting your mood or your function, please seek help from a professional. You can find some helpful links on our website, bobby-chat.com/help.'
+	elif percent_burnout > 0.4:
+		# User mostly responding with "rarely"/"sometimes"
+		title = 'It sounds like sometimes you could do will a little extra help to manage your work stress. The good news is, Bobby can help you with that and hopefully help you improve your wellbeing score over time. However, if how you are feeling about your work is significantly affecting your mood or your function, please seek help from a professional. You can find some helpful links on our website, bobby-chat.com/help.'
+	elif percent_burnout > 0.2:
+		# User mostly responding with "never" / "rarely"
+		title = 'It sounds like most of the time you are able to cope well at work, that\'s great. Bobby can help you in those isolated moments and can help you practice techniques to boost your confidence and help you set goals at work.'
+	else:
+		title = 'It sounds like most of the time you are able to cope well at work, that\'s great. Bobby can help you practice techniques to boost your confidence and help you set goals at work.'
+
+
 
 	# Unique file name for each user.
 	path = f'{user_id}.png'
@@ -56,7 +72,7 @@ def get_burnout_infographic(request):
 	val = [percent_burnout, wellbeing_score]
 	label = ['', '']
 
-	# plot
+	# Plot.
 	fig = plt.figure(figsize=(6,6), dpi=150)
 	ax = fig.add_subplot(1,1,1)
 	ax.pie(val, labels=label, colors=['#F598FF', '#CCCCFF'])
