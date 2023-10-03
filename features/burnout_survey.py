@@ -170,7 +170,7 @@ def get_burnout_breakdown_infographic(request):
 	emotional = _mean(scores[9:])
 	
 	# The Data:
-	categories = ['Exhaustion', 'Feeling Distanced', 'Cognitive Impairment', 'Emotional Impairment']
+	categories = ['Exhaustion', 'Feeling Distanced', 'Cognitive Fatigue', 'Emotional Fatigue']
 	values = [exhaustion, distance, cognitive, emotional]
 
 	# Define a colormap based on severity.
