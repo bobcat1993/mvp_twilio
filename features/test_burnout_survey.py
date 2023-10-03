@@ -43,5 +43,34 @@ class TestBurnoutSurvey(unittest.TestCase):
 		self.assertEqual(response['wellbeing_score'], 1 - target_score)
 
 
+	# TODO(toni) Make parametrized.
+	@parameterized.expand([
+		# Valid user use choices.
+		('all_5s', ['5'] * 12, [5, 5, 5, 5]),
+		('all_1s', ['1'] * 12, [1, 1, 1, 1]),
+		('some_missig', ['5', 'not sure', '3', '3', '', '', '', '', '', '2', '1', '1'], [4, 3, None, 1]),
+		])
+	def test_get_burnout_breakdown_infographic(self, name, results, target_scores):
+		# Create a mock request object
+		test_request = Mock()
+		test_request.json = {
+			'results': results,
+			'user_number': _USER_NUMBER
+			}
+
+		with app.app_context():
+			response = burnout_survey.get_burnout_breakdown_infographic(test_request)
+
+		response = response.json
+		self.assertIsNotNone(response)
+		scores = [
+			response['exhaustion'],
+			response['distance'],
+			response['cognitive'],
+			response['emotional']]
+		self.assertEqual(scores, target_scores)
+
+
+
 if __name__ == "__main__":
 	unittest.main()
