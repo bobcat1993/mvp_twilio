@@ -49,6 +49,7 @@ class TestBurnoutSurvey(unittest.TestCase):
 		('all_5s', ['5'] * 12, [5, 5, 5, 5]),
 		('all_1s', ['1'] * 12, [1, 1, 1, 1]),
 		('some_missig', ['5', 'not sure', '3', '3', '', '', '', '', '', '2', '1', '1'], [4, 3, None, 1]),
+		('none_missing', ['5', '5', '5', '3', '3', '3', '1', '1', '1', '2', '2', '2'], [5, 3, 1, 2]),
 		])
 	def test_get_burnout_breakdown_infographic(self, name, results, target_scores):
 		# Create a mock request object
