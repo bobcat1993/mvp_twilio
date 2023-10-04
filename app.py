@@ -178,6 +178,7 @@ BoundariesStageFiveDatum = boundaries.get_BoundariesStageFiveDatum(db)
 
 # Datum for other features.
 BurnoutSurveyDatum = burnout_survey.get_BurnoutSurveyDatum(db)
+CustomReminderDatum = custom_reminder.get_CustomReminderDatum(db)
 
 @app.before_first_request
 def init_app():
@@ -1268,6 +1269,11 @@ def save_burnout_survey_data():
 # @validate_twilio_request
 def set_custom_reminder():
 	return custom_reminder.set_custom_reminder(request=request, scheduler=scheduler)
+
+@app.post('/custom_reminder/save_data')
+# @validate_twilio_request
+def save_custom_reminder_date():
+	return custom_reminder.save_data(request=request, db=db, CustomReminderDatum=CustomReminderDatum)
 
 
 if __name__ == "__main__":

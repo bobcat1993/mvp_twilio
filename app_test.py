@@ -521,6 +521,23 @@ class TestApp(unittest.TestCase):
 		app.logger.info('response %s', response)
 		self.assertEqual(response.status_code, 200)
 
+	def test_save_burnout_survey_data(self):
+		# Create a sample request payload to simulate the data sent by 
+		# Twilio
+		payload = {
+			"is_reminder_set": "Yes",
+			"why_not_set_reminder": None,
+			"user_number_of_days": "5",
+			"origin": "twilio_flow",
+			"flow_sid": "FW8f2ae7cf1a24a3feadc1c46fbea6816d",
+			"user_id": "whatsapp:+447479813767",
+			"error": "None"
+			}
+
+		response = self.app.post('/custom_reminder/save_data', json=payload)
+		app.logger.info('response %s', response)
+		self.assertEqual(response.status_code, 200)
+
 	""" Do not include this function.
 	def test_set_custom_reminder(self):
 		# Create a sample request payload to simulate the data sent by 
