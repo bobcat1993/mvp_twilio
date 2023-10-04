@@ -137,7 +137,7 @@ def set_custom_reminder(request, scheduler):
 	user_number = message_body['user_number']
 
 	# Note to self: for early testing make days minutes.
-	trigger_date = datetime.now() + timedelta(minutes=float(user_number_of_days))
+	trigger_date = datetime.now() + timedelta(days=float(user_number_of_days))
 
 	# Create a DateTrigger for the specified date and time
 	trigger = DateTrigger(run_date=trigger_date)
