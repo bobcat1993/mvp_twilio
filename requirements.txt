@@ -141,3 +141,5 @@ widgetsnbextension==4.0.7
 yarl==1.9.2
 psycopg; sys_platform == "linux"
 psycopg[binary]; sys_platform != "linux"
+apscheduler==3.10.4
+tzlocal==5.0.1
