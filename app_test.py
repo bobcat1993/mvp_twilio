@@ -521,6 +521,19 @@ class TestApp(unittest.TestCase):
 		app.logger.info('response %s', response)
 		self.assertEqual(response.status_code, 200)
 
+	""" Do not include this function.
+	def test_set_custom_reminder(self):
+		# Create a sample request payload to simulate the data sent by 
+		# Twilio
+		payload = {
+			"user_number_of_days": 1,
+			"user_number": "whatsapp:+447479813767"
+			}
+
+		response = self.app.post('custom_reminder/set_custom_reminder', json=payload)
+		app.logger.info('response %s', response)
+		self.assertEqual(response.status_code, 200)"""
+
 
 if __name__ == '__main__':
 	unittest.main()

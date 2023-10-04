@@ -26,6 +26,10 @@ import ast
 import requests
 import pygal
 
+# Imports for scheduling reminders.
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+
 import create_post
 
 # Import features.
@@ -35,6 +39,7 @@ from features import challenge
 from features import recommender
 from features import welcome
 from features import burnout_survey
+from features import custom_reminder
 
 # Import journeys
 from journeys import boundaries
@@ -46,6 +51,9 @@ from absl import flags
 flags.DEFINE_string('file_name', None, 'Name of the file where data will be stored')
 
 load_dotenv()
+
+# Create the scheduler.
+scheduler = BackgroundScheduler()
 
 # create the extension
 db = SQLAlchemy()
@@ -193,6 +201,13 @@ def init_app():
 	with app.app_context():
 		db.create_all()
 
+	# Config the scheduler.
+	jobstores = {
+    'default': SQLAlchemyJobStore(url=database_url)
+	}
+	scheduler.configure(jobstores=jobstores)
+	scheduler.start()
+
 	# Setup the openai API.
 	utils.setup_openai()
 
@@ -200,6 +215,24 @@ def init_app():
 @app.route('/')
 def hello():
 	return 'Hello, World!'
+
+def _my_one_time_job():
+	logging.info('scheduled!')
+
+@app.route('/test_scheduler')
+def test_scheduler():
+
+	# job_date = datetime(2023, 10, 15, 12, 0, 0)  # October 15, 2023, at 12:00 PM
+	from datetime import timedelta
+	from apscheduler.triggers.date import DateTrigger
+	job_date = datetime.datetime.now() + timedelta(days=5)
+
+	# Create a DateTrigger for the specified date and time
+	trigger = DateTrigger(run_date=job_date)
+
+	# Add the job to the scheduler using the DateTrigger
+	scheduler.add_job(_my_one_time_job, trigger=trigger)
+	return 'Scheduled'
 
 
 @app.post('/user_feeling')
@@ -1244,6 +1277,12 @@ def get_burnout_infographic():
 def save_burnout_survey_data():
 	return burnout_survey.save_burnout_survey_data(request=request, db=db, BurnoutSurveyDatum=BurnoutSurveyDatum)
 
+
+########### Setting custom reminders #########
+@app.post('/custom_reminder/set_custom_reminder')
+# @validate_twilio_request
+def set_custom_reminder():
+	return custom_reminder.set_custom_reminder(request=request, scheduler=scheduler)
 
 
 if __name__ == "__main__":
