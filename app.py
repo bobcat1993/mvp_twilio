@@ -219,21 +219,6 @@ def hello():
 def _my_one_time_job():
 	logging.info('scheduled!')
 
-@app.route('/test_scheduler')
-def test_scheduler():
-
-	# job_date = datetime(2023, 10, 15, 12, 0, 0)  # October 15, 2023, at 12:00 PM
-	from datetime import timedelta
-	from apscheduler.triggers.date import DateTrigger
-	job_date = datetime.datetime.now() + timedelta(days=5)
-
-	# Create a DateTrigger for the specified date and time
-	trigger = DateTrigger(run_date=job_date)
-
-	# Add the job to the scheduler using the DateTrigger
-	scheduler.add_job(_my_one_time_job, trigger=trigger)
-	return 'Scheduled'
-
 
 @app.post('/user_feeling')
 def user_feeling():
