@@ -84,8 +84,8 @@ def get_burnout_infographic(request):
 	cmap = LinearSegmentedColormap.from_list('severity', ['#67d70d', '#8bd94c', '#d9d44c', '#ffb51c', '#ff3e3e'], N=6)
 
 	# Round the burnout score for the plot.
-	value = np.round(mean_burnout_score)
-	
+	value = int(np.round(mean_burnout_score))
+
 	# Create the figure.
 	fig, ax = plt.subplots()
 	ax.add_patch(plt.Circle((0, 0), 0.5, color='lightgray', lw=10, fill=False))
