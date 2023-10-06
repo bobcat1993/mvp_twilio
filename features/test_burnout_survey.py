@@ -39,7 +39,7 @@ class TestBurnoutSurvey(unittest.TestCase):
 
 		response = response.json
 		self.assertIsNotNone(response)
-		self.assertEqual(response['percent_burnout'], target_score)
+		self.assertEqual(response['mean_burnout_score'], target_score)
 
 	# TODO(toni) Make parametrized.
 	@parameterized.expand([

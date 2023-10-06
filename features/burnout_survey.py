@@ -126,7 +126,7 @@ def get_burnout_infographic(request):
 	os.remove(temp_path)
 
 	return jsonify(
-		percent_burnout=mean_burnout_score,
+		mean_burnout_score=mean_burnout_score,
 		image_url=image_url,
 		title=title)
 
