@@ -22,9 +22,9 @@ class TestBurnoutSurvey(unittest.TestCase):
 	# TODO(toni) Make parametrized.
 	@parameterized.expand([
 		# Valid user use choices.
-		('all_5s', ['5'] * 12, 1.0),
-		('all_0s', ['0'] * 12, 0.0),
-		('some_missig', ['5', 'not sure', '3'], 8./10),
+		('all_5s', ['5'] * 12, 5),
+		('all_0s', ['0'] * 12, 0),
+		('some_missig', ['5', 'not sure', '3'], 4),
 		])
 	def test_get_burnout_infographic(self, name, results, target_score):
 		# Create a mock request object
@@ -40,8 +40,6 @@ class TestBurnoutSurvey(unittest.TestCase):
 		response = response.json
 		self.assertIsNotNone(response)
 		self.assertEqual(response['percent_burnout'], target_score)
-		self.assertEqual(response['wellbeing_score'], 1 - target_score)
-
 
 	# TODO(toni) Make parametrized.
 	@parameterized.expand([

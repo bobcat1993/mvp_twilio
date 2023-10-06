@@ -59,44 +59,48 @@ def get_burnout_infographic(request):
 	scores = [get_score(s) for s in results]   # Get the integer score.
 	scores = [s for s in scores if s != None]  # Remove any Nones.
 
-	percent_burnout = float(sum(scores)) / (_MAX_BURNOUT_SCORE * len(scores))
+	mean_burnout_score = np.mean(scores)
 
 	# TODO: Make the title depending on the score.
 	title = 'Bobby can help you reduce your risk of burnout'
-	if percent_burnout > 0.8:
-		# User mostly responding with "often"/"always"
+	if mean_burnout_score > 2.96:
+		# User is at high risk of burnout
+		plot_title = 'High Risk'
 		title = 'I\'m sorry that you are having a difficult time at the moment. Bobby can teach you skills to help you manage workplace stress and improve your wellbeing. However, if how you are feeling about your work is significantly affecting your mood, your ability to look after yourself or your performance at work, please seek help from a professional. You can find some helpful links on our website, bobby-chat.com/help.'
-	elif percent_burnout > 0.6:
-		# User mostly responding with "sometimes"/"often"
+	elif mean_burnout_score > 2.54:
+		# User is at risk of burnout.
+		plot_title = 'At Risk'
 		title = 'I\'m sorry that you are having a tough time at the moment. Bobby can teach you skills to help you manage workplace stress and improve your wellbeing.However, if how you are feeling about your work is significantly affecting your mood, your ability to look after yourself or your performance at work, please seek help from a professional. You can find some helpful links on our website, bobby-chat.com/help.'
-	elif percent_burnout > 0.4:
-		# User mostly responding with "rarely"/"sometimes"
-		title = 'It sounds like sometimes you could do will a little extra help to manage your work stress. The good news is, Bobby can help you with that and hopefully help you improve your wellbeing score over time. However, if how you are feeling about your work is significantly affecting your mood, your ability to look after yourself or your performance at work, please seek help from a professional. You can find some helpful links on our website, bobby-chat.com/help.'
-	elif percent_burnout > 0.2:
-		# User mostly responding with "never" / "rarely"
-		title = 'It sounds like most of the time you are able to cope well at work, that\'s great. Bobby can help you in those isolated moments and can help you practice techniques to boost your confidence and help you set goals at work.'
 	else:
+		# User is at low risk of burnout.
+		plot_title = 'Low Risk'
 		title = 'It sounds like most of the time you are able to cope well at work, that\'s great. Bobby can help you practice techniques to boost your confidence and help you set goals at work.'
-
-
 
 	# Unique file name for each user.
 	path = f'{user_id}.png'
 	temp_path = path
 
-	# Compute wellbeing score as 1 - the burnout.
-	wellbeing_score = 1 - percent_burnout
+	# Define a colormap based on severity (adjust as needed)
+	cmap = LinearSegmentedColormap.from_list('severity', ['#67d70d', '#8bd94c', '#d9d44c', '#ffb51c', '#ff3e3e'], N=6)
 
-	# Create the values and labels.
-	val = [percent_burnout, wellbeing_score]
-	label = ['', '']
+	# Round the burnout score for the plot.
+	value = np.round(mean_burnout_score)
+	
+	# Create the figure.
+	fig, ax = plt.subplots()
+	ax.add_patch(plt.Circle((0, 0), 0.5, color='lightgray', lw=10, fill=False))
+	ax.add_patch(plt.Circle((0, 0), 0.5, color=cmap(value), lw=10, fill=False))
+	    
+	ax.text(0, 0, f'{value}', va='center', ha='center', fontsize=32)
+	ax.text(0, 0, f'          /5', va='center', ha='center', fontsize=12)
+	ax.text(0, -0.25, 'Burnout Score', va='center', ha='center', fontsize=12)
 
-	# Plot.
-	fig = plt.figure(figsize=(6,6), dpi=150)
-	ax = fig.add_subplot(1,1,1)
-	ax.pie(val, labels=label, colors=['#F598FF', '#CCCCFF'])
-	ax.add_artist(plt.Circle((0, 0), 0.6, color='white'))
-	ax.set_title(f'Your wellbeing score is {int(wellbeing_score * 100)} / 100', wrap=True)
+	ax.set_aspect('equal')
+	ax.set_xticks([])
+	ax.set_yticks([])
+	ax.set_xlim(-0.6, 0.6)
+	ax.set_ylim(-0.6, 0.6)
+	ax.set_title(plot_title)
 	fig.savefig(temp_path)
 
 
@@ -122,8 +126,7 @@ def get_burnout_infographic(request):
 	os.remove(temp_path)
 
 	return jsonify(
-		percent_burnout=percent_burnout,
-		wellbeing_score=wellbeing_score,
+		percent_burnout=mean_burnout_score,
 		image_url=image_url,
 		title=title)
 
