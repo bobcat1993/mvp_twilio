@@ -142,8 +142,11 @@ def ask_follow_up_questions_loop(request):
 	question = model_output['choices'][0]['message']['content']
 	history.append({"role": "assistant", "content": question})
 
-	# For now keep going until there is a time-out.
-	is_done = False
+	# If the model does not ask a question, end the session.
+	if '?' in question:
+		is_done = False
+	else:
+		is_done = True
 
 	# Note that the last output from this loop is a question from the 
 	# model, not a user response.
