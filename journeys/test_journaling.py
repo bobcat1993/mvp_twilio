@@ -66,6 +66,21 @@ class TestBoundaries(unittest.TestCase):
 			self.assertEqual(response['idx'], expected_idx)
 			self.assertEqual(response['prompt_url'], expected_url)
 
+	def test_ask_follow_questions_loop(self):
+
+		test_request = Mock()
+		test_request.json = {
+		"prompt": "How was your day?",
+		"user_event": "Fine",
+		"follow_up_questions": "What did you do?\nWho were you with?",
+		"history": [],
+		"last_user_response": None
+		}
+
+		with app.app_context():
+			response = journaling.ask_follow_up_questions_loop(test_request)
+
+
 if __name__ == '__main__':
 	unittest.main()
 

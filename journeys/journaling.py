@@ -1,6 +1,12 @@
 """A 7-day Journaling Challenge."""
 from datetime import datetime
 from flask import Flask, jsonify
+import json
+
+import sys
+sys.path.append('..')
+sys.path.append('.')
+import utils
 
 
 def _days_since_start():
@@ -72,5 +78,51 @@ def get_journal_prompt(request):
 		idx=idx,
 		prompt=prompt,
 		follow_up_questions=follow_up_questions,
-		prompt_url=_PROMPT_URL.format(day_no=day_index + 1)
+		prompt_url=_PROMPT_URL.format(day_no=day_index + 1),
+		time=datetime.now()
 	)
+
+
+def ask_follow_up_questions_loop(request):
+	"""Asks user for their thoughts, belief or self-talk."""
+
+	# Retrieve data from the request sent by Twilio
+	message_body = request.json
+	user_event = message_body['user_event']
+	prompt = message_body['prompt']
+	follow_up_questions = message_body['follow_up_questions']
+	history = message_body['history']
+	last_user_response = message_body['last_user_response']
+
+	if last_user_response:
+		history.append({"role": "user", "content": last_user_response})
+
+	# Generate a question to ask the user for their thoughts about an event.
+	messages= [
+		{"role": "system", "content": _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT.format(example_questions=follow_up_questions)},
+		{"role": "assistant", "content": prompt},
+		{"role": "user", "content": user_event},
+		*history
+	]
+
+	model_output = utils.chat_completion(
+		model="gpt-3.5-turbo-0613",
+		messages=messages,
+		max_tokens=1024,
+		temperature=1.0,
+		)
+
+	question = model_output['choices'][0]['message']['content']
+	history.append({"role": "assistant", "content": question})
+
+	# For now keep going until there is a time-out.
+	is_done = False
+
+	# Note that the last output from this loop is a question from the 
+	# model, not a user response.
+	return jsonify(
+		question=question,
+		messages=messages,
+		history=json.dumps(history),
+		is_done=is_done,
+		time=datetime.now())
