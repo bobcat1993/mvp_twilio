@@ -2,11 +2,38 @@
 from datetime import datetime
 from flask import Flask, jsonify
 import json
+from absl import logging
+from hashlib import md5
 
 import sys
 sys.path.append('..')
 sys.path.append('.')
 import utils
+
+# TODO(toni) Move to utils.
+def string_hash(string):
+	return md5(string.encode()).hexdigest()
+
+def get_JournalingDatum(db):
+	class JournalingDatum(db.Model):
+		"""Stores the data from the journaling journey flow."""
+
+		id = db.Column(db.Integer, primary_key=True)
+		user_event = db.Column(db.String, nullable=True)
+		start_time = db.Column(db.DateTime, nullable=True)
+		approx_end_time = db.Column(db.DateTime, nullable=True)
+		last_user_response = db.Column(db.String, nullable=True)
+		user_unsure = db.Column(db.String, nullable=True)
+		user_does_not_commit = db.Column(db.String, nullable=True)
+		user_feel_after = db.Column(db.String, nullable=True)
+		history = db.Column(db.String, nullable=True)
+		flow_sid = db.Column(db.String, nullable=True)
+		origin = db.Column(db.String, nullable=True)
+		user_id = db.Column(db.String, nullable=True)
+		error = db.Column(db.String, nullable=True)
+		time = db.Column(db.DateTime, nullable=True)
+
+	return JournalingDatum
 
 
 def _days_since_start():
@@ -126,3 +153,29 @@ def ask_follow_up_questions_loop(request):
 		history=json.dumps(history),
 		is_done=is_done,
 		time=datetime.now())
+
+def save_data(request, db, JournalingDatum):
+	"""Saves data at the end of a journaling session."""
+	# Retrieve data from the request sent by Twilio
+	try:
+		message_body = request.json
+
+		# Hash the user_id so that the data is pseudo-anonyms.
+		message_body['user_id'] = string_hash(message_body['user_id'])
+
+		# Get the current time.
+		now = datetime.now()
+		message_body['time'] = now
+
+		# Dump the history (into dicts).
+		history = message_body['history']
+		message_body['history'] = json.dumps(history)
+
+		datum = JournalingDatum(**message_body)
+		db.session.add(datum)
+		db.session.commit()
+		return jsonify({'message': f'Flow data saved.'}), 200
+
+	except Exception as e:
+		logging.error('error: %s', str(e))
+		return jsonify({'error': str(e)}), 400
