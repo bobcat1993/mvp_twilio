@@ -43,6 +43,7 @@ from features import custom_reminder
 
 # Import journeys
 from journeys import boundaries
+from journeys import journaling
 
 
 from absl import flags
@@ -1274,6 +1275,13 @@ def set_custom_reminder():
 # @validate_twilio_request
 def save_custom_reminder_date():
 	return custom_reminder.save_data(request=request, db=db, CustomReminderDatum=CustomReminderDatum)
+
+
+########## Journaling Journey ###########
+@app.post('/journaling_journey/get_journal_prompt')
+# @validate_twilio_request
+def get_journal_prompt():
+	return journaling.get_journal_prompt(request=request)
 
 
 if __name__ == "__main__":
