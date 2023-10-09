@@ -4,6 +4,7 @@ from flask import Flask, jsonify
 import json
 from absl import logging
 from hashlib import md5
+import numpy as np
 
 import sys
 sys.path.append('..')
@@ -109,6 +110,20 @@ def get_journal_prompt(request):
 		time=datetime.now()
 	)
 
+_DO_YOU_WANT_TO_CONTINUE = [
+	'Do you want to continue?',
+	'Are you ready for another question?',
+	'Do you feel like you\'ve captured your thoughts and feelings for today or would you like to continue?',
+	'Is there anything else you\'d like to touch upon before we finish?',
+	'Have you reached a good stopping point in your journaling?',
+	'Is there a closing reflection or insight you\'d like to add?',
+	'Have you expressed what you needed to in your journal?',
+	'Is there a final note or sentiment you\'d like to record before we wrap up?',
+	'Are you content with the progress you\'ve made in your journaling today or would you like to keep going?']
+
+# Check if the user wants to stop every _ASK_TO_CONTINUE_EVERY_N messages. This MUST BE EVEN.
+_ASK_TO_CONTINUE_EVERY_N = 6
+
 
 def ask_follow_up_questions_loop(request):
 	"""Asks user for their thoughts, belief or self-talk."""
@@ -132,14 +147,25 @@ def ask_follow_up_questions_loop(request):
 		*history
 	]
 
-	model_output = utils.chat_completion(
-		model="gpt-3.5-turbo-0613",
-		messages=messages,
-		max_tokens=1024,
-		temperature=1.0,
-		)
+	# Always an odd number of messages hence looking at == 1, rather than 0.
+	logging.info('Number of message: %s', len(messages))
+	logging.info('Eval: %s', (len(messages) > _ASK_TO_CONTINUE_EVERY_N) and (len(messages) % _ASK_TO_CONTINUE_EVERY_N == 1))
 
-	question = model_output['choices'][0]['message']['content']
+	if (len(messages) > _ASK_TO_CONTINUE_EVERY_N) and (len(messages) % _ASK_TO_CONTINUE_EVERY_N == 1):
+		# Ask the user (in a nice way) if they are done with journaling.
+		question = np.random.choice(_DO_YOU_WANT_TO_CONTINUE)
+	else:
+		# Otherwise continue asking questions.
+
+		model_output = utils.chat_completion(
+			model="gpt-3.5-turbo-0613",
+			messages=messages,
+			max_tokens=1024,
+			temperature=1.0,
+			)
+
+		question = model_output['choices'][0]['message']['content']
+	
 	history.append({"role": "assistant", "content": question})
 
 	# If the model does not ask a question, end the session.

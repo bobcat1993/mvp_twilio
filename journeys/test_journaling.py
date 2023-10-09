@@ -66,6 +66,7 @@ class TestBoundaries(unittest.TestCase):
 			self.assertEqual(response['idx'], expected_idx)
 			self.assertEqual(response['prompt_url'], expected_url)
 
+	# TODO(do a test where the history length is 8.)
 	def test_ask_follow_questions_loop(self):
 
 		test_request = Mock()
