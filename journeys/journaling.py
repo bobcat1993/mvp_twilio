@@ -59,7 +59,7 @@ _JOURNAL_PROMPTS = [
 	"""Relive a magical moment! Complete this sentence:  “One of the best experiences of my life was…”. Explain the experience and why you are grateful for it.""",
 	"""Write down one thing that brings you joy - these can be big or small! What is it about this that means so much to you?""",
 	"""What is one thing you do really well, and when is this thing most valuable to you?""",
-	"""What is one thing you achieved this week?""",
+	"""Write down one thing you achieved this week?""",
 	"""If you had all the time and resources you needed, what activities or hobbies would you pursue?""",
 	"""You are doing a great job! How does it feel to read this?""",
 	"""Write a short letter of thanks you’ve always wanted to send, but haven’t got round to doing.  This letter could be to someone else, but it could also be to yourself!"""
