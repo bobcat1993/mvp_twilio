@@ -56,7 +56,7 @@ def _days_since_start():
 	return days_difference
 
 _JOURNAL_PROMPTS = [
-	"""Relive a magical moment! Complete this sentence:  “One of the best experiences of my life was…”. Explain the experience and why you are grateful for it.""",
+	"""Relive a magical moment! Complete this sentence: “One of the best experiences of my life was…”. Explain the experience and why you are grateful for it.""",
 	"""Write down one thing that brings you joy - these can be big or small! What is it about this that means so much to you?""",
 	"""What is one thing you do really well, and when is this thing most valuable to you?""",
 	"""Write down one thing you achieved this week?""",
