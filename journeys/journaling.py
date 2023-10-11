@@ -59,7 +59,7 @@ _JOURNAL_PROMPTS = [
 	"""Relive a magical moment! Complete this sentence:  “One of the best experiences of my life was…”. Explain the experience and why you are grateful for it.""",
 	"""Write down one thing that brings you joy - these can be big or small! What is it about this that means so much to you?""",
 	"""What is one thing you do really well, and when is this thing most valuable to you?""",
-	"""What does success mean to you?""",
+	"""What is one thing you achieved this week?""",
 	"""If you had all the time and resources you needed, what activities or hobbies would you pursue?""",
 	"""You are doing a great job! How does it feel to read this?""",
 	"""Write a short letter of thanks you’ve always wanted to send, but haven’t got round to doing.  This letter could be to someone else, but it could also be to yourself!"""
@@ -71,8 +71,8 @@ Who was with you, and what did it mean to have them there?""",
 """How might you be able make more time for this?""",
 """How did you gain this strength?
 How do you use your strength to help others?""",
-"""What does society expect success to mean, and how does your version of success fit with this?
-What do you find valuable about society’s version of success, and what don’t you find valuable about it?""",
+"""What did you have to do to make that happen?
+How do you feel about your achievement?""",
 """Is there a way that you could try or learn this thing now?
   What’s stopping you or holding you back?
   How can you prioritise spending more time doing fun activities?""",
