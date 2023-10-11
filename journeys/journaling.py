@@ -76,7 +76,7 @@ What do you find valuable about society’s version of success, and what don’t
 """Is there a way that you could try or learn this thing now?
   What’s stopping you or holding you back?
   How can you prioritise spending more time doing fun activities?""",
-"""Do you believe it?
+"""Do you believe that you are doing a good job?
 When was the last time you said this or heard this?""",
 """What are you thankful for and why?"""
 ]
