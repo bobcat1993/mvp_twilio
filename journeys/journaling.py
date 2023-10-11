@@ -58,7 +58,7 @@ def _days_since_start():
 _JOURNAL_PROMPTS = [
 	"""Relive a magical moment! Complete this sentence:  “One of the best experiences of my life was…”. Explain the experience and why you are grateful for it.""",
 	"""Write down one thing that brings you joy - these can be big or small! What is it about this that means so much to you?""",
-	"""What three things do you do really well, and when are these things most valuable to you?""",
+	"""What is one thing you do really well, and when is this thing most valuable to you?""",
 	"""What does success mean to you?""",
 	"""If you had all the time and resources you needed, what activities or hobbies would you pursue?""",
 	"""You are doing a great job! How does it feel to read this?""",
@@ -69,8 +69,8 @@ _FOLLOW_UP_EXAMPLE_QUESTIONS = [
 """What was unique about this experience?
 Who was with you, and what did it mean to have them there?""",
 """How might you be able make more time for this?""",
-"""When are these strengths most useful?
-How do you use your strengths to help others?""",
+"""How did you gain this strength?
+How do you use your strength to help others?""",
 """What does society expect success to mean, and how does your version of success fit with this?
 What do you find valuable about society’s version of success, and what don’t you find valuable about it?""",
 """Is there a way that you could try or learn this thing now?
