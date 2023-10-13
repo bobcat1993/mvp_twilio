@@ -37,24 +37,6 @@ def get_JournalingDatum(db):
 	return JournalingDatum
 
 
-def _days_since_start():
-	# Replace 'YYYY-MM-DD' with your desired start date in the format 'YYYY-MM-DD'
-	start_date_str = '2023-10-09'
-
-	# Convert the start date string to a datetime object
-	start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-
-	# Get the current date
-	current_date = datetime.today()
-
-	# Compute the difference between the current date and the start date
-	days_difference = (current_date - start_date).days
-
-	# Don't allow negative days.
-	days_difference = max(0, days_difference)
-
-	return days_difference
-
 _JOURNAL_PROMPTS = [
 "What's one thing that made you smile today?",
 "Tell me about the weather outside and how it's affecting your mood.",
