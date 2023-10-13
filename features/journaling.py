@@ -1,4 +1,4 @@
-"""A 7-day Journaling Challenge."""
+"""Permanent Journaling Feature."""
 from datetime import datetime
 from flask import Flask, jsonify
 import json
@@ -56,44 +56,81 @@ def _days_since_start():
 	return days_difference
 
 _JOURNAL_PROMPTS = [
-	"""Relive a magical moment! Complete this sentence: “One of the best experiences of my life was…”. Explain the experience and why you are grateful for it.""",
-	"""Write down one thing that brings you joy - these can be big or small! What is it about this that means so much to you?""",
-	"""What is one thing you do really well, and when is this thing most valuable to you?""",
-	"""Write down one thing you achieved this week?""",
-	"""If you had all the time and resources you needed, what activities or hobbies would you pursue?""",
-	"""You are doing a great job! How does it feel to read this?""",
-	"""Write a short letter of thanks you’ve always wanted to send, but haven’t got round to doing.  This letter could be to someone else, but it could also be to yourself!"""
-]
-
-_FOLLOW_UP_EXAMPLE_QUESTIONS = [
-"""What was unique about this experience?
-Who was with you, and what did it mean to have them there?""",
-"""How might you be able make more time for this?""",
-"""How did you gain this strength?
-How do you use your strength to help others?""",
-"""What did you have to do to make that happen?
-How do you feel about your achievement?""",
-"""Is there a way that you could try or learn this thing now?
-  What’s stopping you or holding you back?
-  How can you prioritise spending more time doing fun activities?""",
-"""Do you believe that you are doing a good job?
-When was the last time you said this or heard this?""",
-"""What are you thankful for and why?"""
+"What's one thing that made you smile today?",
+"Tell me about the weather outside and how it's affecting your mood.",
+"Tell me about something you're looking forward to today.",
+"What's your favourite meal or snack from today, and why?:",
+"Document one small act of kindness you performed or witnessed today.",
+"Reflect on a recent conversation you had and how it made you feel.",
+"Share a short gratitude list for the people you interacted with today in person or virtually.",
+"What's one thing you achieved or completed today, no matter how small?",
+"Tell me about something you'd like to do for yourself this evening.",
+"What's one thing you learned today that you didn't know yesterday?",
+"Tell me about a challenge you faced today and how you managed it.",
+"Tell me about the most interesting or inspiring thing you saw today.",
+"Tell me about a small goal or intention for tomorrow.",
+"What was the most delicious thing you tasted today? Describe it to me.",
+"Where did you spend most of your time today? Describe it to me.",
+"Reflect on something that you read today. What did you take away from it?",
+"Write about a moment of joy or excitement from your day.",
+"Tell me about someone you interacted with today (it can be virtually) and how they made you feel.",
+"Tell me about an aspiration that crossed your mind today.",
+"Share a moment when you felt proud of yourself today.",
+"What's one simple thing you can do to improve your day right now?",
+"Sum up your day in one word. Why did you choose that word?",
+"Share one thing on your to do list?",
+"What thought is top of mind today?",
+"What challenge did you face today and how did you deal with it?",
+"Tell me about a conversation you had today that left an impression on you.",
+"What was the most unexpected thing that happened to you today?  Tell me about it.",
+"Reflect on your current goals. Have they changed or evolved recently?",
+"What's been on your mind a lot lately?",
+"Tell me about your current daily routine and one adjustment you would like to make.",
+"Tell me about a recent dream you had and any symbolism it may hold.",
+"When you think about current relationships, both with friends and family, what comes to mind?",
+"Please share with me a habit you'd like to cultivate or a bad habit you'd like to break.",
+"Describe someone who's supported or influenced you today, directly or indirectly.",
+"Tell me about something you did today that took you out of your comfort zone.",
+"Tell me about a goal or project you're working on and your progress so far.",
+"Share your thoughts on a news story or event that caught your attention today.",
+"Tell me about your plans for the next few days and how they make you feel.",
+"What is your favourite season? How does it affect your mood and outlook?",
+"What did you accomplish today? It can be anything small or large.",
+"Tell me about a challenge you'd like to tackle in the next few days.",
+"Tell me about a personal ritual or routine that brings you comfort. It could be as simple as making a morning coffee.",
+"Tell me about one thing that you're proud of in your life right now. Don’t be afraid to recognise your achievements.",
+"Please share with me any feeling or emotion that you're experiencing at this moment.",
+"Tell me about your day so far. Is there anything you would have liked to do differently?"
 ]
 
 _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT = """The assistant is helping the user journal. The assistant has given a prompt and will ask follow up question to help the user explore their thoughts. Questions should be short, friendly and thoughtful.
 
-Here are some example follow up questions, only ask one question at a time:
-{example_questions}"""
+Only ask one question at a time."""
 
-_PROMPT_URL = "https://storage.googleapis.com/bobby-chat-journaling/day{day_no}.png"
+def get_number_of_days_journaled(user_number, db, JournalingDatum):
+	"""Get the number of journal entries for the user."""
+
+	# Hash the user number to match it in the data frame.
+	user_id = string_hash(user_number)
+
+	# Getting the sessions where the user has journaled and written something down. If the user gets a prompt and does not write something it will not count as a day.
+	user_sessions = db.session.query(JournalingDatum).filter(JournalingDatum.user_id == user_id).all()
+
+	# The total number of days journaled.
+	print(user_sessions)
+	number_of_days_journaled = len(user_sessions)
+
+	return number_of_days_journaled
 
 
-def get_journal_prompt(request):
+def get_journal_prompt(request, db, JournalingDatum):
 	"""Give the journaling prompt of the day"""
 
+	message_body = request.json
+	user_number = message_body['user_number']
+
 	# Get the day number/ index.
-	day_index = _days_since_start()
+	day_index = _get_number_of_days_journaled(user_number, db, JournalingDatum)
 
 	# Get the prompt and follow up questions based on the day.
 	# Default to day one if the challenge has not started.
@@ -116,7 +153,6 @@ _DO_YOU_WANT_TO_CONTINUE = [
 	'Do you feel like you\'ve captured your thoughts and feelings for today or would you like to continue?',
 	'Is there anything else you\'d like to touch upon before we finish?',
 	'Have you reached a good stopping point in your journaling?',
-	'Is there a closing reflection or insight you\'d like to add?',
 	'Have you expressed what you needed to in your journal?',
 	'Is there a final note or sentiment you\'d like to record before we wrap up?',
 	'Are you content with the progress you\'ve made in your journaling today or would you like to keep going?']
