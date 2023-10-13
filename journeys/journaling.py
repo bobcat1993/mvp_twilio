@@ -116,7 +116,6 @@ _DO_YOU_WANT_TO_CONTINUE = [
 	'Do you feel like you\'ve captured your thoughts and feelings for today or would you like to continue?',
 	'Is there anything else you\'d like to touch upon before we finish?',
 	'Have you reached a good stopping point in your journaling?',
-	'Is there a closing reflection or insight you\'d like to add?',
 	'Have you expressed what you needed to in your journal?',
 	'Is there a final note or sentiment you\'d like to record before we wrap up?',
 	'Are you content with the progress you\'ve made in your journaling today or would you like to keep going?']
