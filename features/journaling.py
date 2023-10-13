@@ -130,20 +130,17 @@ def get_journal_prompt(request, db, JournalingDatum):
 	user_number = message_body['user_number']
 
 	# Get the day number/ index.
-	day_index = _get_number_of_days_journaled(user_number, db, JournalingDatum)
+	day_index = get_number_of_days_journaled(user_number, db, JournalingDatum) - 1
 
 	# Get the prompt and follow up questions based on the day.
 	# Default to day one if the challenge has not started.
 	idx = day_index % len(_JOURNAL_PROMPTS)
 	prompt = _JOURNAL_PROMPTS[idx]
-	follow_up_questions = _FOLLOW_UP_EXAMPLE_QUESTIONS[idx]
 	
 	return jsonify(
 		day=str(day_index + 1),
 		idx=idx,
 		prompt=prompt,
-		follow_up_questions=follow_up_questions,
-		prompt_url=_PROMPT_URL.format(day_no=day_index + 1),
 		time=datetime.now()
 	)
 
@@ -158,7 +155,7 @@ _DO_YOU_WANT_TO_CONTINUE = [
 	'Are you content with the progress you\'ve made in your journaling today or would you like to keep going?']
 
 # Check if the user wants to stop every _ASK_TO_CONTINUE_EVERY_N messages. This MUST BE EVEN.
-_ASK_TO_CONTINUE_EVERY_N = 6
+_ASK_TO_CONTINUE_EVERY_N = 8
 
 
 def ask_follow_up_questions_loop(request):

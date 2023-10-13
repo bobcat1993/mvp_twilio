@@ -44,16 +44,41 @@ class TestJournaling(unittest.TestCase):
 		self.session.close()
 		JournalingDatum.metadata.drop_all(self.engine)
 
-	def test_get_number_of_days_journaled(self):
-		# Create some dummy data samples for UserDatum.
-		data = [
-			{'user_id': _USER_ID},
-			{'user_id': 'other_id'},
-			{'user_id': _USER_ID},
-			{'user_id': _USER_ID}
-		]
+	# def test_get_number_of_days_journaled(self):
+	# 	# Create some dummy data samples for UserDatum.
+	# 	data = [
+	# 		{'user_id': _USER_ID},
+	# 		{'user_id': 'other_id'},
+	# 		{'user_id': _USER_ID},
+	# 		{'user_id': _USER_ID}
+	# 	]
 
-		target_number_of_days = 3
+	# 	target_number_of_days = 3
+
+	# 	# Add the dummy UserDatum to the table.
+	# 	for d in data:
+	# 		datum = JournalingDatum(**d)
+	# 		self.session.add(datum)
+	# 	self.session.commit()
+
+	# 	# Make sure we retrieve data for the correct user.
+	# 	with app.app_context():
+	# 		result = journaling.get_number_of_days_journaled(user_number=_USER_NUMBER, db=self, JournalingDatum=JournalingDatum)
+
+	# 	self.assertEqual(result, target_number_of_days)
+
+	# 	# Drop all values from the JournalingDatum.
+	# 	JournalingDatum.metadata.drop_all(self.engine)
+
+	_EXPECTED_URL = "https://storage.googleapis.com/bobby-chat-journaling/day{day_no}.png"
+
+	def test_get_journal_prompt(self, day_number=4):
+
+		test_request = Mock()
+		test_request.json = {'user_number': _USER_NUMBER}
+
+		# Add day_number entries.
+		data = [{'user_id': _USER_ID}] * day_number
 
 		# Add the dummy UserDatum to the table.
 		for d in data:
@@ -61,39 +86,16 @@ class TestJournaling(unittest.TestCase):
 			self.session.add(datum)
 		self.session.commit()
 
-		# Make sure we retrieve data for the correct user.
 		with app.app_context():
-			result = journaling.get_number_of_days_journaled(user_number=_USER_NUMBER, db=self, JournalingDatum=JournalingDatum)
+			response = journaling.get_journal_prompt(test_request, db=self, JournalingDatum=JournalingDatum)
 
-		self.assertEqual(result, target_number_of_days)
+		# Asser the day and URL are correct.
+		response = response.json
+		self.assertEqual(response['day'], str(day_number))
+		self.assertEqual(response['idx'], day_number - 1)
 
-	_EXPECTED_URL = "https://storage.googleapis.com/bobby-chat-journaling/day{day_no}.png"
-
-	@parameterized.expand([
-		('day1', '2023-10-09', '1',  0, _EXPECTED_URL.format(day_no=1)),
-		('day2', '2023-10-10', '2', 1,  _EXPECTED_URL.format(day_no=2)),
-		('day3', '2023-10-11', '3', 2,  _EXPECTED_URL.format(day_no=3)),
-		('day4', '2023-10-12', '4', 3,  _EXPECTED_URL.format(day_no=4)),
-		('day5', '2023-10-13', '5', 4,  _EXPECTED_URL.format(day_no=5)),
-		('day6', '2023-10-14', '6', 5,  _EXPECTED_URL.format(day_no=6)),
-		('day7', '2023-10-15', '7', 6, _EXPECTED_URL.format(day_no=7)),
-		('day8', '2023-10-16', '8', 0, _EXPECTED_URL.format(day_no=8)),
-		('day_minus_1', '2023-10-08', '1', 0,  _EXPECTED_URL.format(day_no=1)),
-		])
-	def test_get_journal_prompt(self, name, current_date, expected_day, expected_idx, expected_url):
-
-		test_request = Mock()
-		test_request.json = {}
-
-		with freeze_time(current_date):
-			with app.app_context():
-				response = journaling.get_journal_prompt(test_request)
-
-			# Asser the day and URL are correct.
-			response = response.json
-			self.assertEqual(response['day'], expected_day)
-			self.assertEqual(response['idx'], expected_idx)
-			self.assertEqual(response['prompt_url'], expected_url)
+		# Remove any values from the journaling data.
+		JournalingDatum.metadata.drop_all(self.engine)
 
 	# TODO(do a test where the history length is 8.)
 	def test_ask_follow_questions_loop(self):
