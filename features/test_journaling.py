@@ -44,31 +44,31 @@ class TestJournaling(unittest.TestCase):
 		self.session.close()
 		JournalingDatum.metadata.drop_all(self.engine)
 
-	# def test_get_number_of_days_journaled(self):
-	# 	# Create some dummy data samples for UserDatum.
-	# 	data = [
-	# 		{'user_id': _USER_ID},
-	# 		{'user_id': 'other_id'},
-	# 		{'user_id': _USER_ID},
-	# 		{'user_id': _USER_ID}
-	# 	]
+	def test_get_number_of_days_journaled(self):
+		# Create some dummy data samples for UserDatum.
+		data = [
+			{'user_id': _USER_ID},
+			{'user_id': 'other_id'},
+			{'user_id': _USER_ID},
+			{'user_id': _USER_ID}
+		]
 
-	# 	target_number_of_days = 3
+		target_number_of_days = 3
 
-	# 	# Add the dummy UserDatum to the table.
-	# 	for d in data:
-	# 		datum = JournalingDatum(**d)
-	# 		self.session.add(datum)
-	# 	self.session.commit()
+		# Add the dummy UserDatum to the table.
+		for d in data:
+			datum = JournalingDatum(**d)
+			self.session.add(datum)
+		self.session.commit()
 
-	# 	# Make sure we retrieve data for the correct user.
-	# 	with app.app_context():
-	# 		result = journaling.get_number_of_days_journaled(user_number=_USER_NUMBER, db=self, JournalingDatum=JournalingDatum)
+		# Make sure we retrieve data for the correct user.
+		with app.app_context():
+			result = journaling.get_number_of_days_journaled(user_number=_USER_NUMBER, db=self, JournalingDatum=JournalingDatum)
 
-	# 	self.assertEqual(result, target_number_of_days)
+		self.assertEqual(result, target_number_of_days)
 
-	# 	# Drop all values from the JournalingDatum.
-	# 	JournalingDatum.metadata.drop_all(self.engine)
+		# Drop all values from the JournalingDatum.
+		JournalingDatum.metadata.drop_all(self.engine)
 
 	_EXPECTED_URL = "https://storage.googleapis.com/bobby-chat-journaling/day{day_no}.png"
 
@@ -100,17 +100,17 @@ class TestJournaling(unittest.TestCase):
 	# TODO(do a test where the history length is 8.)
 	def test_ask_follow_questions_loop(self):
 
-	# 	test_request = Mock()
-	# 	test_request.json = {
-	# 	"prompt": "How was your day?",
-	# 	"user_event": "Fine",
-	# 	"follow_up_questions": "What did you do?\nWho were you with?",
-	# 	"history": [],
-	# 	"last_user_response": None
-	# 	}
+		test_request = Mock()
+		test_request.json = {
+		"prompt": "How was your day?",
+		"user_event": "Fine",
+		"follow_up_questions": "What did you do?\nWho were you with?",
+		"history": [],
+		"last_user_response": None
+		}
 
-	# 	with app.app_context():
-	# 		response = journaling.ask_follow_up_questions_loop(test_request)
+		with app.app_context():
+			response = journaling.ask_follow_up_questions_loop(test_request)
 
 
 if __name__ == '__main__':
