@@ -40,6 +40,7 @@ from features import recommender
 from features import welcome
 from features import burnout_survey
 from features import custom_reminder
+from features import journaling as journaling_v2
 
 # Import journeys
 from journeys import boundaries
@@ -1295,6 +1296,14 @@ def ask_follow_up_questions_loop():
 # @validate_twilio_request
 def save_journaling_data():
 	return journaling.save_data(request=request, db=db, JournalingDatum=JournalingDatum)
+
+########## Journaling Feature ###########
+# The journaling Journey will be replaced by the feature.
+@app.post('/journaling/get_journal_prompt')
+@validate_twilio_request
+def get_journal_prompt_v2():
+	return journaling_v2.get_journal_prompt(request=request, db=db, JournalingDatum=JournalingDatum)
+
 
 
 if __name__ == "__main__":

@@ -99,7 +99,6 @@ def get_number_of_days_journaled(user_number, db, JournalingDatum):
 	user_sessions = db.session.query(JournalingDatum).filter(JournalingDatum.user_id == user_id).all()
 
 	# The total number of days journaled.
-	print(user_sessions)
 	number_of_days_journaled = len(user_sessions)
 
 	return number_of_days_journaled
