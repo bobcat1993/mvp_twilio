@@ -61,7 +61,7 @@ _JOURNAL_PROMPTS = [
 	"""What is one thing you do really well, and when is this thing most valuable to you?""",
 	"""Write down one thing you achieved this week?""",
 	"""If you had all the time and resources you needed, what activities or hobbies would you pursue?""",
-	"""You are doing a great job! How does it feel to read this?""",
+	"""What are you going to do for yourself this weekend?""",
 	"""Write a short letter of thanks you’ve always wanted to send, but haven’t got round to doing.  This letter could be to someone else, but it could also be to yourself!"""
 ]
 
@@ -76,8 +76,8 @@ How do you feel about your achievement?""",
 """Is there a way that you could try or learn this thing now?
   What’s stopping you or holding you back?
   How can you prioritise spending more time doing fun activities?""",
-"""Do you believe that you are doing a good job?
-When was the last time you said this or heard this?""",
+"""How will you make time for yourself?
+How does looking after yourself help others?""",
 """What are you thankful for and why?"""
 ]
 
