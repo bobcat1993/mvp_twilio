@@ -1304,6 +1304,16 @@ def save_journaling_data():
 def get_journal_prompt_v2():
 	return journaling_v2.get_journal_prompt(request=request, db=db, JournalingDatum=JournalingDatum)
 
+@app.post('/journaling/ask_follow_up_questions_loop')
+@validate_twilio_request
+def ask_follow_up_questions_loop_v2():
+	return journaling_v2.ask_follow_up_questions_loop(request=request)
+
+@app.post('/journaling/save_data')
+@validate_twilio_request
+def save_journaling_data_v2():
+	return journaling_v2.save_data(request=request, db=db, JournalingDatum=JournalingDatum)
+
 
 
 if __name__ == "__main__":
