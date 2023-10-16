@@ -98,6 +98,15 @@ _JOURNALING_TOPICS = {
 		["Let's think about time-management tool. Write about the tools and techniques you use to manage your time, such as calendars, to-do lists, or time management apps.","Are there new tools or strategies you're considering implementing to enhance your time management?"],
 		["Let's explore your approach to setting deadlines for projects and tasks. Are you realistic in your expectations, or do you often overcommit and feel overwhelmed?", "How can you become better at estimating time requirements?", "Do you feel comfortable saying no to things?"],
 		["Write down your time management goals for the upcoming week.", "What specific steps can you take to improve your time management in the areas where you struggle the most?"]
+	],
+	"Work-Life Balance" : [
+		["Let's Begin by assessing your current work-life balance. How do you feel about the balance between your work life and personal life?", "Are there areas where you feel you're doing well?" "Where do you struggle?"],
+		["Let's explore your priorities. Write about your top priorities in life, both in your career and personal life.", "Are your current commitments and actions aligned with these priorities, or do you need to make adjustments?"],
+		["Let's explore your routine, Describe your typical daily and weekly routines.", "How do you allocate your time between work, family, friends, hobbies, and self-care?", "Are there changes you'd like to make to achieve a more balanced routine?"],
+		["Let's reflect on your ability to set boundaries and say \"no\" when necessary. Do you often overcommit or find it challenging to decline additional work or personal obligations?", "Where would you like to set more boundaries?", "Who do you need to talk to make your boundaries more clear?"],
+		["Let's talk about your self-care practices and relaxation techniques. What activities help you unwind, recharge, and reduce stress?", "Are there ways to incorporate more self-care into your daily or weekly routine?"],
+		["Let's consider the idea of work-life integration. Are there examples where boundaries between work and personal life are more fluid?", "How do you feel about this boundary?", "Is there anything you would like to change about this boundary?"],
+		["Set weekly balance goals for yourself. What specific actions or changes can you implement in the upcoming week to achieve a better work-life balance?", "How are you going to implement these actions or changes?"]
 	]
 }
 
