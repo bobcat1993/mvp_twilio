@@ -89,6 +89,18 @@ _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT = """The assistant is helping the user journa
 
 Only ask one question at a time."""
 
+_JOURNALING_TOPICS = {
+	"Time Management" : [
+		["Let's do a daily time audit. Describe how you spent your time today.", "What activities were the most time-consuming, and were they productive or time-wasting?", "How could you have used your time more efficiently?"],
+		["Let's consider prioritisation. Write about your current methods for setting priorities and organizing tasks.", "Are there specific strategies you use to determine what's most important?", "How effective are these strategies?"],
+		["Let's take a look consider time-wasting. What habits or behaviours consistently waste your time?", "What steps can you take to minimize or eliminate them from your daily routine?"],
+		["Imagine you have a completely free day to plan and organize as you see fit. Describe your ideal daily schedule, including work, personal time, and self-care.", "What changes can you make to your current schedule to align it more closely with this ideal?"],
+		["Let's think about time-management tool. Write about the tools and techniques you use to manage your time, such as calendars, to-do lists, or time management apps.","Are there new tools or strategies you're considering implementing to enhance your time management?"],
+		["Let's explore your approach to setting deadlines for projects and tasks. Are you realistic in your expectations, or do you often overcommit and feel overwhelmed?", "How can you become better at estimating time requirements?", "Do you feel comfortable saying no to things?"],
+		["Write down your time management goals for the upcoming week.", "What specific steps can you take to improve your time management in the areas where you struggle the most?"]
+	]
+}
+
 def get_number_of_days_journaled(user_number, db, JournalingDatum):
 	"""Get the number of journal entries for the user."""
 
@@ -102,7 +114,6 @@ def get_number_of_days_journaled(user_number, db, JournalingDatum):
 	number_of_days_journaled = len(user_sessions)
 
 	return number_of_days_journaled
-
 
 def get_journal_prompt(request, db, JournalingDatum):
 	"""Give the journaling prompt of the day"""
