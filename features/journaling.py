@@ -107,7 +107,59 @@ _JOURNALING_TOPICS = {
 		["Let's talk about your self-care practices and relaxation techniques. What activities help you unwind, recharge, and reduce stress?", "Are there ways to incorporate more self-care into your daily or weekly routine?"],
 		["Let's consider the idea of work-life integration. Are there examples where boundaries between work and personal life are more fluid?", "How do you feel about this boundary?", "Is there anything you would like to change about this boundary?"],
 		["Set weekly balance goals for yourself. What specific actions or changes can you implement in the upcoming week to achieve a better work-life balance?", "How are you going to implement these actions or changes?"]
+	],
+	"Communication Skills": [
+		["Let's begin by assessing your current communication skills. What do you think are your strengths and weaknesses in communication?", "Please give examples of situations where your strengths in communication were evident?", "Are there specific areas or situations where you feel your communication needs improvement?"],
+		["Let's consider at your listening skills. Do you find it easy to listen to other people?", "Can you think of a recent conversation where better listening (by yourself or someone you were talking to) could have improved the outcome?", "What habits or practices can you adopt to actively engage in conversations?"],
+		["Describe a recent conflict and how you handled it.","Is there something that you wish you had done differently?", "How do you think this would have affected the outcome?", "What specific steps can you take to handle similar conflicts more effectively in the future?"],
+		["Do you ever struggle with expressing your needs or respecting others' boundaries?", "Can you recall a situation where you had difficulty expressing your needs or setting boundaries?", "Try constructing a sentence of the form: 'I feel [emotion] when [event] because [reason]. I would like [change].' For example, I feel upset when you talk over me because I find it disrespectful. I would like you to wait for me to finish speaking.?"],
+		["Let's consider your tone of voice. What tone of voice did you last communicate with?", "Do you think this tone was appropriate or would you have changed it?", "Do you think this tone of voice helped or hindered the conversation?"],
+		["Let's talk about empathy. Can you think of a recent situation where understanding someone else's perspective was challenging?", "What made their perspective difficult to understand?", "Have you experienced a similar situation to them before?"],
+		["Thinking about the next few days ahead of you, what specific communication areas would you like to work on, and what steps can you take to improve?", "What are your short-term and long-term goals for improving your communication skills?", "What small improvement will you start with today?"]
+	],
+	"Setting Realistic Goals": [
+		["Let's identify your goals. What are your current goals or aspirations?", "Why are these goals important to you?"],
+		["Write down one of your goals.", "Is your goal a S.M.A.R.T. (Specific, Measurable, Achievable, Relevant, Time-bound) goal?", "How can you make your goal more specific, measurable, achievable, relevant, or time-bound?"],
+		["Let's talk about prioritization. Rank your goals in order of importance to you.",  "How can you allocate your time and resources effectively to work toward your top priorities?"],
+		["Write down one of your goals (it can be one from a previous session or a new one). What obstacles or challenges do you foresee in achieving your goals?", "How can you address or overcome these obstacles?", "Is there anyone that can help you?"],
+		["Let's look at breaking  down one of your larger goals into smaller, actionable steps. Which of your goals currently seems too large to manage in one go?", "What are some intermediate steps you can take to achieving this goal? I'm here to help you break it down if needed.", "Do you feel that this breakdown is more manageable and achievable?"],
+		["Write down one of your goals (it can be one from a previous session or a new one). How do you plan to track your progress toward this goal?", "What metrics or markers will you use to measure your success along the way?"],
+		["Write down one of your goals (it can be one from a previous session or a new one). What motivates you to work toward this goal?", "How can you stay motivated when faced with setbacks or difficulties on your path to achievement?", "Is there anyone or anything that depends on you achieving this goal?"]
+	],
+
+	"Workplace Challenges" : [
+		["What is the most significant challenge you're currently facing in your work at the moment?", "Why do you feel that this challenge is important to address, and how does it impact your overall well-being?", "Have you discussed this challenge with anyone else?"],
+		["Please recall a significant challenge you are facing at work (it can be one from a previous session). What potential solutions or strategies can you think of to overcome this challenge?", "Are there resources or support systems that can help you address this challenge effectively?", "Which solution or strategy do you believe is the most promising?", "How can you break down your chosen solution into actionable steps?"],
+		["Please recall a significant challenge you are facing at work (it can be one from a previous session). What obstacles or barriers do you anticipate as you work to resolve this challenge?", "Have you faced similar obstacles in the past? How did you handle them?", "Who can you reach out to for guidance or support in tackling these obstacles?"],
+		["Please recall a significant challenge you are facing at work (it can be one from a previous session). What lessons or insights have you gained from this challenge so far?", "How can you use this experience to foster personal or professional growth?", "What skills or knowledge can you acquire through addressing this challenge?", "In what ways can you apply the lessons learned to future situations?"],
+		["Please recall a significant challenge you are facing at work (it can be one from a previous session). Are there milestones you can set to measure your progress?", "How often will you review you progress?"],
+		["Please recall a significant challenge you are facing at work (it can be one from a previous session). You don't have to face all challenges alone. Who can you turn to for support or guidance as you work through this challenge?", "How can you effectively communicate your needs to those who can assist you?", "What types of support are you most in need of right now?", "How can you express your gratitude to those who offer help or guidance?"],
+		["Please recall a significant challenge you are facing at work (it can be one from a previous session). How have you been coping with the stress or pressure caused by this challenge?", "What self-care practices help you recharge during challenging times? It could be as simple as having a coffee with a friend.", "What motivates you to overcome this challenge?"]
+	],
+
+	"Imposter Syndrome" : [
+		["Let's begin with recognizing imposter feelings. Tell me about a recent situation where you felt like an imposter.", "What triggered these feelings, and how did they manifest?", "Are there recurring patterns or triggers for your imposter feelings?", "What emotions or thoughts accompany these feelings?"],
+		["It's really important acknowledge your achievements! List your any accomplishments, qualifications, and experiences. How have these achievements contributed to your expertise or competence?", "Are you downplaying or discounting any of your achievements?", "Is there anything that can use to remind yourself of your capabilities and accomplishments?"],
+		["Have you received any external validation of your skills? Did someone say 'good job' or have you completed a qualification?", "Do you tend to undervalue external validation or view it as temporary?", "How might you use external validation as a source of motivation and reassurance?"],
+		["Let's challenge any negative self-talk. Write down one negative self-talk or self-criticism you have of yourself.", "What evidence contradicts the negative self-talk?"],
+		["Let's think about defining some realistic expectations for yourself. Can you differentiate between striving for excellence and seeking perfection?", "Are your expectations aligned with your current goals and abilities?", "How can you reframe your expectations to reduce imposter feelings?"],
+		["Let's think about your support network. Did you know that many of the people you many consider mentor or role models are likely to also have experienced imposter syndrome. Who might you turn to for support, mentorship, or advice?", "What specific questions or concerns can you bring to your support network?"],
+		["Document your progress and self-reflection on your journey to overcome imposter syndrome. How have your efforts to combat imposter feelings evolved over time?", "Have you celebrated small wins and moments of self-assurance?", "What strategies or practices have been most effective in diminishing imposter syndrome?"]
+	],
+
+	# Easy one (gets harder towards the end).
+	"Prioritizing Self-Care":  [
+		["I want to understand, what does self-care mean to you, and why do you think it's important?", "What aspects of self-care are most challenging for you?", "How might practising self-care positively impact your life?"],
+		["Describe a self-care activity you engaged in today, no matter how small. How did it make you feel, and why did you choose this activity?", "What time of day did you do this activity?", "Could you imagine making this a regular part of your self-care routine?"],
+		["Finding time for self-care can be a challenge. What tends to get in the way of your self-care?", "Are there patterns or recurring barriers you notice in your self-care efforts?", "Is there a way for you to address or overcome these obstacles?"],
+		["Let's make a Self-Care Wish List! Create a list of self-care activities you'd like to explore or prioritize in the future.", "What's stopping you from trying these self-care activities?", "Can you set a goal to try one of the activities on your list?"],
+		["How does it feel after engaging in self-care. Do you notice any changes in your mood, stress levels, or overall well-being?", "How can you become more aware of your emotional responses to self-care?", "How can these positive emotions motivate you to continue prioritizing self-care?"],
+		["Let's talk about boundaries! Are you comfortable saying \"no\" to additional commitments when you need self-care time?", "Recall the last time you wanted to say no to additional commitments, how did it go?", "Try constructing a sentence of the form: 'I feel [emotion] when [event] because [reason]. I would like [change].' I'm here to help if you need it."
+		],
+		["Time to write a Self-Care Commitment outlining your intention to prioritize self-care. What will you do to make self-care a regular part of your life?", "How will you hold yourself accountable to this commitment?", "Can you create a self-care routine or schedule to help you stay on track?"
+		]
 	]
+
 }
 
 def get_number_of_days_journaled(user_number, db, JournalingDatum):
