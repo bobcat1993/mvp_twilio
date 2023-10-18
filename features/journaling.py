@@ -227,7 +227,7 @@ def ask_follow_up_questions_loop(request):
 
 	# Generate a question to ask the user for their thoughts about an event.
 	messages= [
-		{"role": "system", "content": _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT.format(example_questions=follow_up_questions)},
+		{"role": "system", "content": _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT},
 		{"role": "assistant", "content": prompt},
 		{"role": "user", "content": user_event},
 		*history
