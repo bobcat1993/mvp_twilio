@@ -85,13 +85,26 @@ _JOURNAL_PROMPTS = [
 "Tell me about your day so far. Is there anything you would have liked to do differently?"
 ]
 
-_FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT = """The assistant is helping the user journal. The assistant has given a prompt and will ask follow up question to help the user explore their thoughts. Questions should be short, friendly and thoughtful.
+_FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT = """The friendly assistant is helping the user journal. The assistant has given a prompt and will ask follow up question to help the user explore their thoughts. Questions should be short, friendly and thoughtful.
 
-Only ask one question at a time."""
+If the user asks for help, help them by simplifying the question or posing it in a different way.
+
+The assistant always asks one question at a time."""
 
 _JOURNALING_TOPICS = {
+
+	# These prompts are intended to be easy.
+	"Daily Prompts": [
+		[],
+		[],
+		[],
+		[],
+		[],
+		[],
+		[]
+	],
 	"Time Management" : [
-		["Let's do a daily time audit. Describe how you spent your time today.", "What activities were the most time-consuming, and were they productive or time-wasting?", "How could you have used your time more efficiently?"],
+		["Let's do a daily time audit. Describe how you spent your time today. What activities were the most time-consuming, and were they productive or time-wasting?", "How could you have used your time more efficiently?"],
 		["Let's consider prioritisation. Write about your current methods for setting priorities and organizing tasks.", "Are there specific strategies you use to determine what's most important?", "How effective are these strategies?"],
 		["Let's take a look consider time-wasting. What habits or behaviours consistently waste your time?", "What steps can you take to minimize or eliminate them from your daily routine?"],
 		["Imagine you have a completely free day to plan and organize as you see fit. Describe your ideal daily schedule, including work, personal time, and self-care.", "What changes can you make to your current schedule to align it more closely with this ideal?"],
@@ -228,7 +241,7 @@ def ask_follow_up_questions_loop(request):
 	# Generate a question to ask the user for their thoughts about an event.
 	messages= [
 		{"role": "system", "content": _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT},
-		{"role": "assistant", "content": prompt},
+		{"role": "assistant", "content": f'{prompt}\nLet me know if you are not sure.'},
 		{"role": "user", "content": user_event},
 		*history
 	]
@@ -248,6 +261,7 @@ def ask_follow_up_questions_loop(request):
 			messages=messages,
 			max_tokens=1024,
 			temperature=1.0,
+			top_p=1,
 			)
 
 		question = model_output['choices'][0]['message']['content']
