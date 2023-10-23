@@ -91,6 +91,7 @@ class TestJournaling(unittest.TestCase):
 		with app.app_context():
 			result = journaling.get_most_recent_topic_and_topic_idx(user_number=_USER_NUMBER, db=self, JournalingDatum=JournalingDatum)
 
+		# Assert that the topic and topic idx are as expected.
 		self.assertEqual(result['topic'], target_topic)
 		self.assertEqual(result['topic_idx'], target_topic_idx)
 
@@ -116,7 +117,7 @@ class TestJournaling(unittest.TestCase):
 		with app.app_context():
 			response = journaling.get_journal_prompt(test_request, db=self, JournalingDatum=JournalingDatum)
 
-		# Asser the day and URL are correct.
+		# Assert the day and URL are correct.
 		response = response.json
 		self.assertEqual(response['day'], str(day_number))
 		self.assertEqual(response['idx'], day_number - 1)

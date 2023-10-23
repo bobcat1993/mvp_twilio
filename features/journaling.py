@@ -260,7 +260,7 @@ _CURRENT_OPTIONS = [
 	'Self-Care', 'Self-Reflection', 'Having a Bad Day', 'Growth Mindset', 'Friendships', 'Choosing a Job', 'Social Media', 'Prioritizing Self-Care', 'Imposter Syndrome', 'Workplace Challenges', 'Setting Realistic Goals', 'Communication Skills', 'Work-Life Balance', 'Time Management'
 	]
 
-# def ask_user_for_journaling_topic(request)
+# def ask_user_for_journaling_topic(request):
 # 	"""Helps the user choose a topic to journal about."""
 
 # 	# Retrieve data from the request sent by Twilio
@@ -329,16 +329,11 @@ def get_most_recent_topic_and_topic_idx(user_number, db, JournalingDatum):
 	user_session = db.session.query(JournalingDatum).filter(JournalingDatum.user_id == user_id).all()
 
 	if user_session:
-		# Return the most recent topic and index.
 		user_session = user_session[-1]
-		return dict(
-			topic=user_session.topic,
-			topic_idx=user_session.topic_idx)
+		return dict(topic_idx=user_session.topic_idx, topic=user_session.topic)
 	else:
-		# Return None if the user has no saved topic/index. 
-		return dict(
-			topic=None,
-			topic_idx=None)
+		return dict(topic_idx=None, topic=None)
+
 
 def get_number_of_days_journaled(user_number, db, JournalingDatum):
 	"""Get the number of journal entries for the user."""
