@@ -93,16 +93,6 @@ The assistant always asks one question at a time."""
 
 _JOURNALING_TOPICS = {
 
-	# These prompts are intended to be easy.
-	"Daily Prompts": [
-		[],
-		[],
-		[],
-		[],
-		[],
-		[],
-		[]
-	],
 	"Time Management" : [
 		["Let's do a daily time audit. Describe how you spent your time today. What activities were the most time-consuming, and were they productive or time-wasting?", "How could you have used your time more efficiently?"],
 		["Let's consider prioritisation. Write about your current methods for setting priorities and organizing tasks.", "Are there specific strategies you use to determine what's most important?", "How effective are these strategies?"],
@@ -171,9 +161,102 @@ _JOURNALING_TOPICS = {
 		],
 		["Time to write a Self-Care Commitment outlining your intention to prioritize self-care. What will you do to make self-care a regular part of your life?", "How will you hold yourself accountable to this commitment?", "Can you create a self-care routine or schedule to help you stay on track?"
 		]
+	],
+
+	# Student
+	"Social Media": [
+		["Are you the same person on social media as you are in real life?", "What are the main differences?"],
+		["What would you teach the world in an online video?", "Who would your audience be?"],
+		["How do you archive your life?", "Why do you choose this method to archive your life?"],
+		["Have you ever posted, emailed or texted something you wish you could take back?", "Why did you wish you could take it back?", "What would you like to have done differently?"],
+		["How would you feel if an employer were to look at your posts?", "Is there anything you would rather an employer not see?"],
+		["Do you worry we are filming too much?", "How does filming affect your enjoyment of life events?"],
+		["What is something positive you have seen on social media?", "How did it make you feel?", "Did it inspire you with any ideas of your own?"]
+	],
+
+	# Student
+	"Choosing a Job": [
+		["What careers are you most curious about?", "Why do these careers interest you?"],
+		["What are your long time interests or passions?", "What is it that you enjoy most about you passion/interest?", "Could you imagine turning your passion/interest into a career?"],
+		["Do you think that you will have a career that you love?", "What would make you love your career?"],
+		["What investments are you willing to make to get your dream career", "What steps have you already taken?", "Which of these investments might be challenging?"],
+		["What would you choose to you if you had unlimited free time and no restrictions?", "Do these things relate to your career goals?", "Are you able to make time for some of these things?"],
+		["Where do you want to see yourself in 10 years?", "What choices that you make today will affect you 10 years from now?", "How do other people's expectations, influence your answer?"],
+		["What is important to you now that will still be important to you in 5 years time?", "Why is it important to you?"]
+	],
+
+	# Student
+	"Parental Expectations": [
+		["How are you similar or dissimilar to your parents?", "What do you think of these differences?", "Do you respect each other's differences?"],
+		["Will you follow in your parents footsteps or carve your own path?", "Who will set your path?", "Do you feel any pressures?"],
+		["How much freedom have your parents given you?", "How has that affected your life choices up to this point?", "How will it affect future decisions?"],
+		["What is your role within your family?", "Why do you play that role?", "What do you like most about that role?"],
+		["What does family mean to you?", "How has it's meaning changed since you were young?"],
+		["What is your favourite family memory?", "What about that memory is special?", "When was the last time you made a family memory like this?"],
+		["Did you pick up any hobbies from your family?", "When was the list time you did that?", "Why do you enjoy it?"]
+	],
+
+	# Slightly studenty.
+	"Friendships": [
+		["Do you feel like you spend enough time with other people?", "Is there someone you would like to spend more/less time with?", "Do you have enough time?"],
+		["How often do you spend one-on-one time with your closest friends?", "What do you enjoy most about that time?"],
+		["Do you prefer to make new friends online or in person?", "Where do you typically make new friends?"],
+		["How have you helped a friend in a time of need?", "How did this affect your relationship?"],
+		["How do you feel about introducing friends from different parts of your life?", "Have you tried?", "How do you think it would go?"],
+		["Have you had a friendship come to an end?", "How did you handle it?", "Did you learn anything about yourself?"],
+		["What makes you feel left out?", "Do you think people do this intensionally?", "How might you ask to be included?"]
+	],
+
+	# This one is somewhat accessible.
+	"Growth Mindset":
+	[
+		["Do you have any limiting self-beliefs? For example, do you ever say 'I can't'?", "What is your strongest limiting self-belief?", "Can you think of any evidence that is counter to this belief?"],
+		["What does your inner voice say to you?", "Is it mostly positive or negative?", "How do you react to your inner voice?"],
+		["Are you living your life in the past, the present moment, or in the future?", "What stories do you tell yourself about your past?", "What can you take away from it?", "What can you learn from your past to serve your today in the moment?"],
+		["What are your beliefs and how do they help you get through life's challenges?", "Do your beliefs and values align or contradict?"],
+		["Are you afraid of change, being challenged, or failing?", "What's the worst that can happen?", "What opportunities might you miss out on if you give into fear?"],
+		["What are some goals today, long-term goals, or life goals you need to get to where you want to be?", "What steps are you already taking towards these goals?", "What does the path to your goal look like?"],
+		["Has something previously got in the way of your dreams? How did you grow to overcome it?", "What did you learn?", "How can that experience inspire you to work through challenges?"]
+	],
+
+	# This one is reasonable accessible.
+	"Having a Bad Day": [
+		["What happened today and what is bothering you?", "What are you thinking and feeling?"],
+		["What is something helpful you might tell someone whose having a similarly bad day?"],
+		["What negative thoughts can up for you today?", "Are these thoughts helpful?", "What might be a more helpful re-framing of this thought."],
+		["What did you feel like you had not control over today?", "Was there anything that you did feel you had control over?", "Can you begin to accept what was outside of your control?"],
+		["Remember the last time you had a bad day. When helped you get through it?", "Why did that work?"],
+		["What happened today and what can you learn from this experience?", "How do these experiences make you stronger?"],
+		["Is there something kind you can do for yourself when you are feeling down? Write them down.", "Would you do any of them with a friend?"],
+	],
+
+	# This one is good and reasonable accessible.
+	"Self-Reflection":[
+		["What opportunities might you have soon that put you outside of your comfort zone?", "How do they make you feel?", "What might you do to encourage your self to try them?"],
+		["If you could, what would you tell your teenage self that would help you now?", "How would that help you?"],
+		["What would a close friend say you need to work on?", "What steps do you need to take to begin working on this?"],
+		["If you were having a perfect day what would you be feeling and thinking", "How do your thoughts and feeling influence your day?"],
+		["Are there any boundaries you feel you need to set between yourself and others?", "What is the first step to setting these boundaries?", "How comfortable are you asserting your boundaries?"],
+		["What would you like to say 'no' to? Make a list.", "Can you say 'no' to any of these things?", "Can you gain some control by deciding when you do some of these things?"],
+		["If you were guaranteed that today was the perfect time to do something, what would you do?", "How would doing that make you feel?", "Would you see yourself differently?"]
+	],
+
+	# This one is good and reasonable accessible.
+	"Self-Care": [
+		["What are a few small things you can do for yourself", "How can you make time for them?"],
+		["Think of the last kind thing you did for yourself. What were the benefits?", "How long ago was this?", "Is there a way to more regularly include this in your schedule?"],
+		["What would a perfect evening look like to you?", "What small change might you make to your evenings to make them more similar to your perfect evening?"],
+		["When you are swamped, how can you find 10 mins for yourself?", "What can you do in those 10 mins?"],
+		["What small thing can you do to prioritize your physical health?", "How can you implement this?"],
+		["If you were to make a self-care box, what would you put in it?", "How would you use it?"],
+		["How do you advocate for yourself?", "Who would you advocate to?", "What would you say?"]
 	]
 
 }
+
+_CURRENT_OPTIONS = [
+	'Self-Care', 'Self-Reflection', 'Having a Bad Day', 'Growth Mindset', 'Friendships', 'Choosing a Job', 'Social Media', 'Prioritizing Self-Care', 'Imposter Syndrome', 'Workplace Challenges', 'Setting Realistic Goals', 'Communication Skills', 'Work-Life Balance', 'Time Management'
+	]
 
 def get_number_of_days_journaled(user_number, db, JournalingDatum):
 	"""Get the number of journal entries for the user."""
