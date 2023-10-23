@@ -73,13 +73,13 @@ class TestJournaling(unittest.TestCase):
 	def test_get_most_recent_topic_and_topic_idx(self):
 		# Create some dummy data samples for UserDatum.
 		data = [
+			{'user_id': _USER_ID, 'topic': 'Time Management', 'topic_idx': 5},
 			{'user_id': _USER_ID, 'topic': 'Time Management', 'topic_idx': 6},
-			{'user_id': _USER_ID, 'topic': 'Time Management', 'topic_idx': 7},
-			{'user_id': _USER_ID,'topic': 'Social Media', 'topic_idx': 1}
+			{'user_id': _USER_ID,'topic': 'Social Media', 'topic_idx': 0}
 		]
 
 		target_topic = 'Social Media'
-		target_topic_idx = 1
+		target_topic_idx = 0
 
 		# Add the dummy UserDatum to the table.
 		for d in data:

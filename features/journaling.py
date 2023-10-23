@@ -326,11 +326,19 @@ def get_most_recent_topic_and_topic_idx(user_number, db, JournalingDatum):
 	user_id = string_hash(user_number)
 
 	# Getting the sessions where the user has journaled and written something down. If the user gets a prompt and does not write something it will not count as a day.
-	user_session = db.session.query(JournalingDatum).filter(JournalingDatum.user_id == user_id).all()[-1]
+	user_session = db.session.query(JournalingDatum).filter(JournalingDatum.user_id == user_id).all()
 
-	return dict(
-		topic=user_session.topic,
-		topic_idx=user_session.topic_idx)
+	if user_session:
+		# Return the most recent topic and index.
+		user_session = user_session[-1]
+		return dict(
+			topic=user_session.topic,
+			topic_idx=user_session.topic_idx)
+	else:
+		# Return None if the user has no saved topic/index. 
+		return dict(
+			topic=None,
+			topic_idx=None)
 
 def get_number_of_days_journaled(user_number, db, JournalingDatum):
 	"""Get the number of journal entries for the user."""
