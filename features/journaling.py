@@ -407,7 +407,7 @@ def ask_user_for_journaling_topic_loop(request):
 		prompt_list = _JOURNALING_TOPICS[topic][0]
 		prompt = prompt_list[0]
 		follow_up_questions = '\n'.join(prompt_list[1:])
-		topic_idx = 1  # Already progress by one.
+		topic_idx = 0  # Start from zero.
 
 
 	# Note that the last output from this loop is a question from the 

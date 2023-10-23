@@ -149,7 +149,7 @@ class TestJournaling(unittest.TestCase):
 			'last_user_response': None}
 
 		expected_topic = 'Time Management'
-		expected_topic_id = 0
+		expected_topic_id = 1
 
 		with app.app_context():
 			response = journaling.ask_user_for_journaling_topic_loop(test_request)
