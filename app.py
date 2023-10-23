@@ -1093,7 +1093,7 @@ def new_user():
 	if 'tag' in message_body:
 		tag = message_body['tag']
 	else:
-		tag = None
+		tag = 'None'
 
 	# Post-process the user number.
 	if user_number:
@@ -1143,6 +1143,7 @@ def new_user():
 			'{"api_key":'
 			f'"{api_key}",'
 			f'"email_address": "{user_email}",'
+			f'"tags": ["{tag}"],'
 			'"status":"SUBSCRIBED"}'
 			)
 
