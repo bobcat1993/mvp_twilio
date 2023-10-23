@@ -260,65 +260,6 @@ _CURRENT_OPTIONS = [
 	'Self-Care', 'Self-Reflection', 'Having a Bad Day', 'Growth Mindset', 'Friendships', 'Choosing a Job', 'Social Media', 'Prioritizing Self-Care', 'Imposter Syndrome', 'Workplace Challenges', 'Setting Realistic Goals', 'Communication Skills', 'Work-Life Balance', 'Time Management'
 	]
 
-# def ask_user_for_journaling_topic(request):
-# 	"""Helps the user choose a topic to journal about."""
-
-# 	# Retrieve data from the request sent by Twilio
-# 	message_body = request.json
-# 	user_event = message_body['user_event']
-# 	prompt = message_body['prompt']
-# 	follow_up_questions = message_body['follow_up_questions']
-# 	history = message_body['history']
-# 	last_user_response = message_body['last_user_response']
-
-# 	if last_user_response:
-# 		history.append({"role": "user", "content": last_user_response})
-
-# 	# Generate a question to ask the user for their thoughts about an event.
-# 	messages= [
-# 		{"role": "system", "content": _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT},
-# 		{"role": "assistant", "content": f'{prompt}\nLet me know if you are not sure.'},
-# 		{"role": "user", "content": user_event},
-# 		*history
-# 	]
-
-# 	# Always an odd number of messages hence looking at == 1, rather than 0.
-# 	logging.info('Number of message: %s', len(messages))
-# 	logging.info('Eval: %s', (len(messages) > _ASK_TO_CONTINUE_EVERY_N) and (len(messages) % _ASK_TO_CONTINUE_EVERY_N == 1))
-
-# 	if (len(messages) > _ASK_TO_CONTINUE_EVERY_N) and (len(messages) % _ASK_TO_CONTINUE_EVERY_N == 1):
-# 		# Ask the user (in a nice way) if they are done with journaling.
-# 		question = np.random.choice(_DO_YOU_WANT_TO_CONTINUE)
-# 	else:
-# 		# Otherwise continue asking questions.
-
-# 		model_output = utils.chat_completion(
-# 			model="gpt-3.5-turbo-0613",
-# 			messages=messages,
-# 			max_tokens=1024,
-# 			temperature=1.0,
-# 			top_p=1,
-# 			)
-
-# 		question = model_output['choices'][0]['message']['content']
-	
-# 	history.append({"role": "assistant", "content": question})
-
-# 	# If the model does not ask a question, end the session.
-# 	if '?' in question:
-# 		is_done = False
-# 	else:
-# 		is_done = True
-
-# 	# Note that the last output from this loop is a question from the 
-# 	# model, not a user response.
-# 	return jsonify(
-# 		question=question,
-# 		messages=messages,
-# 		history=json.dumps(history),
-# 		is_done=is_done,
-# 		time=datetime.now())
-
 def get_most_recent_topic_and_topic_idx(user_number, db, JournalingDatum):
 	"""Get the topic and the topic_idx"""
 
@@ -350,25 +291,137 @@ def get_number_of_days_journaled(user_number, db, JournalingDatum):
 	return number_of_days_journaled
 
 def get_journal_prompt(request, db, JournalingDatum):
-	"""Give the journaling prompt of the day"""
+	"""Give the journaling prompt if there is one."""
 
 	message_body = request.json
 	user_number = message_body['user_number']
 
 	# Get the day number/ index.
-	day_index = get_number_of_days_journaled(user_number, db, JournalingDatum) - 1
+	topic_info = get_most_recent_topic_and_topic_idx(user_number, db, JournalingDatum)
 
-	# Get the prompt and follow up questions based on the day.
-	# Default to day one if the challenge has not started.
-	idx = day_index % len(_JOURNAL_PROMPTS)
-	prompt = _JOURNAL_PROMPTS[idx]
+	topic = topic_info['topic']
+	topic_idx = topic_info['topic_idx']
+
+	if not topic_idx:
+		# The user has not topic selected.
+		message = 'Hi, I\'m excited that you have chosen to start journaling with me.'
+		return jsonify(
+			topic=None,
+			topic_idx=None,
+			prompt=None,
+			follow_up_questions=None,
+			time=datetime.now(),
+			message=message,
+			select_new_topic=True)
+
+	# Get all prompts in that topic.
+	prompt_list = _JOURNALING_TOPICS[topic]
+	# If the topic_idx is within the range, get the prompt.
+	if len(prompts) > topic_idx + 1:
+		prompt = prompt_list[topic_idx + 1]
+		message = f'Hi, great to see you again! You have made your way to session {topic_idx + 2} out of {len(prompts)} in the {topic} prompt series.'
+		return jsonify(
+			topic=topic,
+			topic_idx=topic_idx + 1, # Progress the topic_idx by one.
+			prompt=prompt[0],
+			follow_up_questions='\n'.join(prompt[1:]),
+			message=message,
+			time=datetime.now(),
+			select_new_topic=False)
+	else:
+		# The topic_idx must be out of range.
+		message = f'Hi, glad you\'re back for more! In the last session you reached the end of the {topic} prompt series. Time to select a new series.'
+		return jsonify(
+			topic=None,
+			topic_idx=None,
+			prompt=None,
+			follow_up_questions=None,
+			time=datetime.now(),
+			message=message,
+			select_new_topic=True)
+
+# TODO(toni): Use f-string of _CURRENT_OPTIONS for the options.
+_ASK_USER_FOR_TOPIC_SYSTEM_PROMPT = """
+You are Bobby, a well-being assistant, helping the user journal.
+
+You can help the user journal on the following topics:
+
+'Self-Care', 'Self-Reflection', 'Having a Bad Day', 'Growth Mindset', 'Friendships', 'Choosing a Job', 'Social Media', 'Prioritising Self-Care', 'Imposter Syndrome', 'Workplace Challenges', 'Setting Realistic Goals', 'Communication Skills', 'Work-Life Balance', 'Time Management'.
+
+Ask the user one question at a time to pick a topic most relevant for them.
+
+Once they pick a topic respond with "USER CHOSEN" followed by the chosen topic."""
+
+_BOT_ASKS_FOR_TOPIC = """Think about your day or week so far. Is there a particular experience or feeling that has been on your mind, something you'd like to explore and understand better through journaling?"""
+
+def ask_user_for_journaling_topic_loop(request):
+	"""Helps the user choose a topic to journal about."""
+
+	# Retrieve data from the request sent by Twilio
+	message_body = request.json
+	user_topic_intro = message_body['user_topic_intro']
+	history = message_body['history']
+	last_user_response = message_body['last_user_response']
+
+	prompt = None
+	follow_up_questions = None
+	topic = None
+	topic_idx = None
+
+	if last_user_response:
+		history.append({"role": "user", "content": last_user_response})
+
+	# Generate a question to ask the user for their thoughts about an event.
+	messages= [
+		{"role": "system", "content": _ASK_USER_FOR_TOPIC_SYSTEM_PROMPT},
+		{"role": "assistant", "content": _BOT_ASKS_FOR_TOPIC},
+		{"role": "user", "content": user_topic_intro},
+		*history
+	]
+
+	model_output = utils.chat_completion(
+		model="gpt-3.5-turbo-0613",
+		messages=messages,
+		max_tokens=1024,
+		temperature=1.0,
+		top_p=1,
+		)
+
+	question = model_output['choices'][0]['message']['content']
 	
+	history.append({"role": "assistant", "content": question})
+
+	if 'USER CHOSEN' in question:
+		is_done = True
+		for opt in _CURRENT_OPTIONS:
+			if opt.lower() in question.lower():
+				topic = opt
+	else:
+		is_done = False
+
+	if is_done:
+		if not topic:
+			# Use the Self-Reflection topic as default.
+			topic = 'Self-Reflection'
+		
+		prompt_list = _JOURNALING_TOPICS[topic][0]
+		prompt = prompt_list[0]
+		follow_up_questions = '\n'.join(prompt_list[1:])
+		topic_idx = 1  # Already progress by one.
+
+
+	# Note that the last output from this loop is a question from the 
+	# model, not a user response.
 	return jsonify(
-		day=str(day_index + 1),
-		idx=idx,
+		question=question,
+		messages=messages,
+		history=json.dumps(history),
+		is_done=is_done,
+		topic=topic,
+		topic_idx=topic_idx,
 		prompt=prompt,
-		time=datetime.now()
-	)
+		follow_up_questions=follow_up_questions,
+		time=datetime.now())
 
 _DO_YOU_WANT_TO_CONTINUE = [
 	'Do you want to continue?',

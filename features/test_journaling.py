@@ -140,6 +140,26 @@ class TestJournaling(unittest.TestCase):
 		with app.app_context():
 			response = journaling.ask_follow_up_questions_loop(test_request)
 
+	def test_ask_user_for_journaling_topic_loop(self):
+
+		test_request = Mock()
+		test_request.json = {
+			'user_topic_intro': 'I want to manage my time better.',
+			'history': [],
+			'last_user_response': None}
+
+		expected_topic = 'Time Management'
+		expected_topic_id = 0
+
+		with app.app_context():
+			response = journaling.ask_user_for_journaling_topic_loop(test_request)
+
+		# It's possible that the bot tries to confirm the choice and hence this is not the last response.
+		response = response.json
+		if response['is_done'] == True:
+			self.assertEqual(response['topic'], expected_topic)
+			self.assertEqual(response['topic_idx'], 1)
+
 
 if __name__ == '__main__':
 	unittest.main()
