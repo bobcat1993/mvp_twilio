@@ -1138,7 +1138,6 @@ def new_user():
 			'Content-Type': 'application/json',
 		}
 
-		# TODO(toni) Add a tag!
 		data = (
 			'{"api_key":'
 			f'"{api_key}",'
