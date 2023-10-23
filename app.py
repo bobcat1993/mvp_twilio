@@ -44,7 +44,7 @@ from features import journaling as journaling_v2
 
 # Import journeys
 from journeys import boundaries
-from journeys import journaling
+from features import journaling
 
 
 from absl import flags
@@ -178,12 +178,11 @@ BoundariesStageTwoDatum = boundaries.get_BoundariesStageTwoDatum(db)
 BoundariesStageThreeDatum = boundaries.get_BoundariesStageThreeDatum(db)
 BoundariesStageFourDatum = boundaries.get_BoundariesStageFourDatum(db)
 BoundariesStageFiveDatum = boundaries.get_BoundariesStageFiveDatum(db)
-# Journaling Journey.
-JournalingDatum = journaling.get_JournalingDatum(db)
 
 # Datum for other features.
 BurnoutSurveyDatum = burnout_survey.get_BurnoutSurveyDatum(db)
 CustomReminderDatum = custom_reminder.get_CustomReminderDatum(db)
+JournalingDatum = journaling_v2.get_JournalingDatum(db)
 
 @app.before_first_request
 def init_app():
