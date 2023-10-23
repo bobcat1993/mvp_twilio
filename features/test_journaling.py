@@ -70,6 +70,33 @@ class TestJournaling(unittest.TestCase):
 		# Drop all values from the JournalingDatum.
 		JournalingDatum.metadata.drop_all(self.engine)
 
+	def test_get_most_recent_topic_and_topic_idx(self):
+		# Create some dummy data samples for UserDatum.
+		data = [
+			{'user_id': _USER_ID, 'topic': 'Time Management', 'topic_idx': 6},
+			{'user_id': _USER_ID, 'topic': 'Time Management', 'topic_idx': 7},
+			{'user_id': _USER_ID,'topic': 'Social Media', 'topic_idx': 1}
+		]
+
+		target_topic = 'Social Media'
+		target_topic_idx = 1
+
+		# Add the dummy UserDatum to the table.
+		for d in data:
+			datum = JournalingDatum(**d)
+			self.session.add(datum)
+		self.session.commit()
+
+		# Make sure we retrieve data for the correct user.
+		with app.app_context():
+			result = journaling.get_most_recent_topic_and_topic_idx(user_number=_USER_NUMBER, db=self, JournalingDatum=JournalingDatum)
+
+		self.assertEqual(result['topic'], target_topic)
+		self.assertEqual(result['topic_idx'], target_topic_idx)
+
+		# Drop all values from the JournalingDatum.
+		JournalingDatum.metadata.drop_all(self.engine)
+
 	_EXPECTED_URL = "https://storage.googleapis.com/bobby-chat-journaling/day{day_no}.png"
 
 	def test_get_journal_prompt(self, day_number=4):

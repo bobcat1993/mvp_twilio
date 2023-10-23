@@ -260,64 +260,77 @@ _CURRENT_OPTIONS = [
 	'Self-Care', 'Self-Reflection', 'Having a Bad Day', 'Growth Mindset', 'Friendships', 'Choosing a Job', 'Social Media', 'Prioritizing Self-Care', 'Imposter Syndrome', 'Workplace Challenges', 'Setting Realistic Goals', 'Communication Skills', 'Work-Life Balance', 'Time Management'
 	]
 
-def ask_user_for_journaling_topic(request)
-	"""Helps the user choose a topic to journal about."""
+# def ask_user_for_journaling_topic(request)
+# 	"""Helps the user choose a topic to journal about."""
 
-	# Retrieve data from the request sent by Twilio
-	message_body = request.json
-	user_event = message_body['user_event']
-	prompt = message_body['prompt']
-	follow_up_questions = message_body['follow_up_questions']
-	history = message_body['history']
-	last_user_response = message_body['last_user_response']
+# 	# Retrieve data from the request sent by Twilio
+# 	message_body = request.json
+# 	user_event = message_body['user_event']
+# 	prompt = message_body['prompt']
+# 	follow_up_questions = message_body['follow_up_questions']
+# 	history = message_body['history']
+# 	last_user_response = message_body['last_user_response']
 
-	if last_user_response:
-		history.append({"role": "user", "content": last_user_response})
+# 	if last_user_response:
+# 		history.append({"role": "user", "content": last_user_response})
 
-	# Generate a question to ask the user for their thoughts about an event.
-	messages= [
-		{"role": "system", "content": _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT},
-		{"role": "assistant", "content": f'{prompt}\nLet me know if you are not sure.'},
-		{"role": "user", "content": user_event},
-		*history
-	]
+# 	# Generate a question to ask the user for their thoughts about an event.
+# 	messages= [
+# 		{"role": "system", "content": _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT},
+# 		{"role": "assistant", "content": f'{prompt}\nLet me know if you are not sure.'},
+# 		{"role": "user", "content": user_event},
+# 		*history
+# 	]
 
-	# Always an odd number of messages hence looking at == 1, rather than 0.
-	logging.info('Number of message: %s', len(messages))
-	logging.info('Eval: %s', (len(messages) > _ASK_TO_CONTINUE_EVERY_N) and (len(messages) % _ASK_TO_CONTINUE_EVERY_N == 1))
+# 	# Always an odd number of messages hence looking at == 1, rather than 0.
+# 	logging.info('Number of message: %s', len(messages))
+# 	logging.info('Eval: %s', (len(messages) > _ASK_TO_CONTINUE_EVERY_N) and (len(messages) % _ASK_TO_CONTINUE_EVERY_N == 1))
 
-	if (len(messages) > _ASK_TO_CONTINUE_EVERY_N) and (len(messages) % _ASK_TO_CONTINUE_EVERY_N == 1):
-		# Ask the user (in a nice way) if they are done with journaling.
-		question = np.random.choice(_DO_YOU_WANT_TO_CONTINUE)
-	else:
-		# Otherwise continue asking questions.
+# 	if (len(messages) > _ASK_TO_CONTINUE_EVERY_N) and (len(messages) % _ASK_TO_CONTINUE_EVERY_N == 1):
+# 		# Ask the user (in a nice way) if they are done with journaling.
+# 		question = np.random.choice(_DO_YOU_WANT_TO_CONTINUE)
+# 	else:
+# 		# Otherwise continue asking questions.
 
-		model_output = utils.chat_completion(
-			model="gpt-3.5-turbo-0613",
-			messages=messages,
-			max_tokens=1024,
-			temperature=1.0,
-			top_p=1,
-			)
+# 		model_output = utils.chat_completion(
+# 			model="gpt-3.5-turbo-0613",
+# 			messages=messages,
+# 			max_tokens=1024,
+# 			temperature=1.0,
+# 			top_p=1,
+# 			)
 
-		question = model_output['choices'][0]['message']['content']
+# 		question = model_output['choices'][0]['message']['content']
 	
-	history.append({"role": "assistant", "content": question})
+# 	history.append({"role": "assistant", "content": question})
 
-	# If the model does not ask a question, end the session.
-	if '?' in question:
-		is_done = False
-	else:
-		is_done = True
+# 	# If the model does not ask a question, end the session.
+# 	if '?' in question:
+# 		is_done = False
+# 	else:
+# 		is_done = True
 
-	# Note that the last output from this loop is a question from the 
-	# model, not a user response.
-	return jsonify(
-		question=question,
-		messages=messages,
-		history=json.dumps(history),
-		is_done=is_done,
-		time=datetime.now())
+# 	# Note that the last output from this loop is a question from the 
+# 	# model, not a user response.
+# 	return jsonify(
+# 		question=question,
+# 		messages=messages,
+# 		history=json.dumps(history),
+# 		is_done=is_done,
+# 		time=datetime.now())
+
+def get_most_recent_topic_and_topic_idx(user_number, db, JournalingDatum):
+	"""Get the topic and the topic_idx"""
+
+	# Hash the user number to match it in the data frame.
+	user_id = string_hash(user_number)
+
+	# Getting the sessions where the user has journaled and written something down. If the user gets a prompt and does not write something it will not count as a day.
+	user_session = db.session.query(JournalingDatum).filter(JournalingDatum.user_id == user_id).all()[-1]
+
+	return dict(
+		topic=user_session.topic,
+		topic_idx=user_session.topic_idx)
 
 def get_number_of_days_journaled(user_number, db, JournalingDatum):
 	"""Get the number of journal entries for the user."""
