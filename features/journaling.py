@@ -38,55 +38,6 @@ def get_JournalingDatum(db):
 
 	return JournalingDatum
 
-
-_JOURNAL_PROMPTS = [
-"What's one thing that made you smile today?",
-"Tell me about the weather outside and how it's affecting your mood.",
-"Tell me about something you're looking forward to today.",
-"What's your favourite meal or snack from today, and why?:",
-"Document one small act of kindness you performed or witnessed today.",
-"Reflect on a recent conversation you had and how it made you feel.",
-"Share a short gratitude list for the people you interacted with today in person or virtually.",
-"What's one thing you achieved or completed today, no matter how small?",
-"Tell me about something you'd like to do for yourself this evening.",
-"What's one thing you learned today that you didn't know yesterday?",
-"Tell me about a challenge you faced today and how you managed it.",
-"Tell me about the most interesting or inspiring thing you saw today.",
-"Tell me about a small goal or intention for tomorrow.",
-"What was the most delicious thing you tasted today? Describe it to me.",
-"Where did you spend most of your time today? Describe it to me.",
-"Reflect on something that you read today. What did you take away from it?",
-"Write about a moment of joy or excitement from your day.",
-"Tell me about someone you interacted with today (it can be virtually) and how they made you feel.",
-"Tell me about an aspiration that crossed your mind today.",
-"Share a moment when you felt proud of yourself today.",
-"What's one simple thing you can do to improve your day right now?",
-"Sum up your day in one word. Why did you choose that word?",
-"Share one thing on your to do list?",
-"What thought is top of mind today?",
-"What challenge did you face today and how did you deal with it?",
-"Tell me about a conversation you had today that left an impression on you.",
-"What was the most unexpected thing that happened to you today?  Tell me about it.",
-"Reflect on your current goals. Have they changed or evolved recently?",
-"What's been on your mind a lot lately?",
-"Tell me about your current daily routine and one adjustment you would like to make.",
-"Tell me about a recent dream you had and any symbolism it may hold.",
-"When you think about current relationships, both with friends and family, what comes to mind?",
-"Please share with me a habit you'd like to cultivate or a bad habit you'd like to break.",
-"Describe someone who's supported or influenced you today, directly or indirectly.",
-"Tell me about something you did today that took you out of your comfort zone.",
-"Tell me about a goal or project you're working on and your progress so far.",
-"Share your thoughts on a news story or event that caught your attention today.",
-"Tell me about your plans for the next few days and how they make you feel.",
-"What is your favourite season? How does it affect your mood and outlook?",
-"What did you accomplish today? It can be anything small or large.",
-"Tell me about a challenge you'd like to tackle in the next few days.",
-"Tell me about a personal ritual or routine that brings you comfort. It could be as simple as making a morning coffee.",
-"Tell me about one thing that you're proud of in your life right now. Don’t be afraid to recognise your achievements.",
-"Please share with me any feeling or emotion that you're experiencing at this moment.",
-"Tell me about your day so far. Is there anything you would have liked to do differently?"
-]
-
 _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT = """The friendly assistant is helping the user journal. The assistant has given a prompt and will ask follow up question to help the user explore their thoughts. Questions should be short, friendly and thoughtful.
 
 If the user asks for help, help them by simplifying the question or posing it in a different way.
@@ -245,7 +196,7 @@ _JOURNALING_TOPICS = {
 
 	# This one is good and reasonable accessible.
 	"Self-Care": [
-		["What are a few small things you can do for yourself", "How can you make time for them?"],
+		["What are a few small things you can do for yourself today?", "How can you make time for them?"],
 		["Think of the last kind thing you did for yourself. What were the benefits?", "How long ago was this?", "Is there a way to more regularly include this in your schedule?"],
 		["What would a perfect evening look like to you?", "What small change might you make to your evenings to make them more similar to your perfect evening?"],
 		["When you are swamped, how can you find 10 mins for yourself?", "What can you do in those 10 mins?"],
