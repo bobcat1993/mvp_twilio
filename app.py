@@ -1303,6 +1303,12 @@ def save_journaling_data():
 def get_journal_prompt_v2():
 	return journaling_v2.get_journal_prompt(request=request, db=db, JournalingDatum=JournalingDatum)
 
+@app.post('/journaling/ask_user_for_journaling_topic_loop')
+@validate_twilio_request
+def ask_user_for_journaling_topic_loop():
+	return journaling_v2.ask_user_for_journaling_topic_loop(request=request)
+
+
 @app.post('/journaling/ask_follow_up_questions_loop')
 @validate_twilio_request
 def ask_follow_up_questions_loop_v2():
