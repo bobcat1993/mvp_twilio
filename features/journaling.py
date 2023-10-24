@@ -44,24 +44,24 @@ If the user asks for help, help them by simplifying the question or posing it in
 
 The assistant always asks one short question at a time.
 
-As the user the following follow up questions if appropriate:
+Ask the user the following follow up questions if appropriate:
 {follow_up_questions}"""
 
 _JOURNALING_TOPICS = {
 
 	"Time Management" : [
-		["Let's do a daily time audit. Describe how you spent your time today. What activities were the most time-consuming, and were they productive or time-wasting?", "How could you have used your time more efficiently?"],
+		["Let's do a daily time audit. How you spent your time today?", "What activities were the most time-consuming, and were they productive or time-wasting?", "How could you have used your time more efficiently?"],
 		["Let's consider prioritisation. Write about your current methods for setting priorities and organizing tasks.", "Are there specific strategies you use to determine what's most important?", "How effective are these strategies?"],
 		["Let's take a look consider time-wasting. What habits or behaviours consistently waste your time?", "What steps can you take to minimize or eliminate them from your daily routine?"],
-		["Imagine you have a completely free day to plan and organize as you see fit. Describe your ideal daily schedule, including work, personal time, and self-care.", "What changes can you make to your current schedule to align it more closely with this ideal?"],
-		["Let's think about time-management tool. Write about the tools and techniques you use to manage your time, such as calendars, to-do lists, or time management apps.","Are there new tools or strategies you're considering implementing to enhance your time management?"],
+		["Imagine you have a completely free day to plan and organize as you see fit. What does your ideal daily schedule -- including work, personal time, and self-care -- look like?.", "What changes can you make to your current schedule to align it more closely with this ideal?"],
+		["Let's think about time-management tools. What tools and techniques do you use to manage your time, such as calendars, to-do lists, or time management apps?","How well do these tools work for you?", "Are there new tools or strategies you're considering implementing to enhance your time management?"],
 		["Let's explore your approach to setting deadlines for projects and tasks. Are you realistic in your expectations, or do you often overcommit and feel overwhelmed?", "How can you become better at estimating time requirements?", "Do you feel comfortable saying no to things?"],
-		["Write down your time management goals for the upcoming week.", "What specific steps can you take to improve your time management in the areas where you struggle the most?"]
+		["What are your time management goals for the upcoming week?", "What specific steps can you take to improve your time management in the areas where you struggle the most?"]
 	],
 	"Work-Life Balance" : [
 		["Let's Begin by assessing your current work-life balance. How do you feel about the balance between your work life and personal life?", "Are there areas where you feel you're doing well?" "Where do you struggle?"],
-		["Let's explore your priorities. Write about your top priorities in life, both in your career and personal life.", "Are your current commitments and actions aligned with these priorities, or do you need to make adjustments?"],
-		["Let's explore your routine, Describe your typical daily and weekly routines.", "How do you allocate your time between work, family, friends, hobbies, and self-care?", "Are there changes you'd like to make to achieve a more balanced routine?"],
+		["Let's explore your priorities. What are your top priorities in life, both in your career and personal life?", "Are your current commitments and actions aligned with these priorities, or do you need to make adjustments?"],
+		["Let's explore your routine. Describe your typical daily and weekly routines.", "How do you allocate your time between work, family, friends, hobbies, and self-care?", "Are there changes you'd like to make to achieve a more balanced routine?"],
 		["Let's reflect on your ability to set boundaries and say \"no\" when necessary. Do you often overcommit or find it challenging to decline additional work or personal obligations?", "Where would you like to set more boundaries?", "Who do you need to talk to make your boundaries more clear?"],
 		["Let's talk about your self-care practices and relaxation techniques. What activities help you unwind, recharge, and reduce stress?", "Are there ways to incorporate more self-care into your daily or weekly routine?"],
 		["Let's consider the idea of work-life integration. Are there examples where boundaries between work and personal life are more fluid?", "How do you feel about this boundary?", "Is there anything you would like to change about this boundary?"],
