@@ -224,7 +224,7 @@ _JOURNALING_TOPICS = {
 	# This one is reasonable accessible.
 	"Having a Bad Day": [
 		["What happened today and what is bothering you?", "What are you thinking and feeling?"],
-		["What is something helpful you might tell someone whose having a similarly bad day?"],
+		["What is something helpful you might tell someone whose having a similarly bad day?", "How does it feel to say those things to yourself?"],
 		["What negative thoughts can up for you today?", "Are these thoughts helpful?", "What might be a more helpful re-framing of this thought."],
 		["What did you feel like you had not control over today?", "Was there anything that you did feel you had control over?", "Can you begin to accept what was outside of your control?"],
 		["Remember the last time you had a bad day. When helped you get through it?", "Why did that work?"],
@@ -317,9 +317,9 @@ def get_journal_prompt(request, db, JournalingDatum):
 	# Get all prompts in that topic.
 	prompt_list = _JOURNALING_TOPICS[topic]
 	# If the topic_idx is within the range, get the prompt.
-	if len(prompts) > topic_idx + 1:
+	if len(prompt_list) > topic_idx + 1:
 		prompt = prompt_list[topic_idx + 1]
-		message = f'Hi, great to see you again! You have made your way to session {topic_idx + 2} out of {len(prompts)} in the {topic} prompt series.'
+		message = f'Hi, great to see you again! You have made your way to session {topic_idx + 2} out of {len(prompt_list)} in the {topic} prompt series.'
 		return jsonify(
 			topic=topic,
 			topic_idx=topic_idx + 1, # Progress the topic_idx by one.
