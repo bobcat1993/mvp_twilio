@@ -38,11 +38,14 @@ def get_JournalingDatum(db):
 
 	return JournalingDatum
 
-_FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT = """The friendly assistant is helping the user journal. The assistant has given a prompt and will ask follow up questions to help the user explore their thoughts. Questions should be short, friendly and thoughtful.
+_FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT = """The friendly assistant is helping the user journal. The assistant has given a prompt and will ask short follow up questions to help the user explore their thoughts. Questions should be short, friendly and thoughtful.
 
 If the user asks for help, help them by simplifying the question or posing it in a different way.
 
-The assistant always asks one question at a time."""
+The assistant always asks one short question at a time.
+
+As the user the following follow up questions if appropriate:
+{follow_up_questions}"""
 
 _JOURNALING_TOPICS = {
 
@@ -84,13 +87,13 @@ _JOURNALING_TOPICS = {
 	],
 
 	"Workplace Challenges" : [
-		["What is the most significant challenge you're currently facing in your work at the moment?", "Why do you feel that this challenge is important to address, and how does it impact your overall well-being?", "Have you discussed this challenge with anyone else?"],
-		["Please recall a significant challenge you are facing at work (it can be one from a previous session). What potential solutions or strategies can you think of to overcome this challenge?", "Are there resources or support systems that can help you address this challenge effectively?", "Which solution or strategy do you believe is the most promising?", "How can you break down your chosen solution into actionable steps?"],
-		["Please recall a significant challenge you are facing at work (it can be one from a previous session). What obstacles or barriers do you anticipate as you work to resolve this challenge?", "Have you faced similar obstacles in the past? How did you handle them?", "Who can you reach out to for guidance or support in tackling these obstacles?"],
-		["Please recall a significant challenge you are facing at work (it can be one from a previous session). What lessons or insights have you gained from this challenge so far?", "How can you use this experience to foster personal or professional growth?", "What skills or knowledge can you acquire through addressing this challenge?", "In what ways can you apply the lessons learned to future situations?"],
-		["Please recall a significant challenge you are facing at work (it can be one from a previous session). Are there milestones you can set to measure your progress?", "How often will you review you progress?"],
-		["Please recall a significant challenge you are facing at work (it can be one from a previous session). You don't have to face all challenges alone. Who can you turn to for support or guidance as you work through this challenge?", "How can you effectively communicate your needs to those who can assist you?", "What types of support are you most in need of right now?", "How can you express your gratitude to those who offer help or guidance?"],
-		["Please recall a significant challenge you are facing at work (it can be one from a previous session). How have you been coping with the stress or pressure caused by this challenge?", "What self-care practices help you recharge during challenging times? It could be as simple as having a coffee with a friend.", "What motivates you to overcome this challenge?"]
+		["What is the most significant challenge you're currently facing in your work at the moment?", "Why do you feel that this challenge is important to address and how does it impact your overall well-being?", "Have you discussed this challenge with anyone else?"],
+		["Let's think about a challenge you are facing at work. What potential solutions or strategies can you think of to overcome this challenge?", "Are there resources or support systems that can help you address this challenge effectively?", "Which solution or strategy do you believe is the most promising?", "How can you break down your chosen solution into actionable steps?"],
+		["Challenge often require navigating an assault course of obstacles and barriers. What obstacles or barriers do you anticipate as you work to resolve your current challenges?", "Have you faced similar obstacles in the past? How did you handle them?", "Who can you reach out to for guidance or support in tackling these obstacles?"],
+		["Challenges by definition can be challenging, but they can also be opportunities to learn and grow. What lessons or insights have you gained so far from an ongoing (or recent) challenge?", "How can you use this experience to foster personal or professional growth?", "What skills or knowledge can you acquire through addressing this challenge?", "In what ways can you apply the lessons learned to future situations?"],
+		["When working through a challenge it's helpful to set milestones. Thinking about a current challenge you are facing, are there milestones you can set to measure your progress?", "How often will you review you progress?"],
+		["When facing challenge at work, you don't always have to face them alone. Who can you turn to for support or guidance as you work through this challenge?", "How can you effectively communicate your needs to those who can assist you?", "What types of support are you most in need of right now?", "How can you express your gratitude to those who offer help or guidance?"],
+		["We can put a lot of pressure on our selves when facing challenging times. Think about a challenges are working with at the moment. How have you been coping with the stress or pressure caused by this challenge?", "What self-care practices help you recharge during challenging times? It could be as simple as having a coffee with a friend.", "What motivates you to overcome this challenge?"]
 	],
 
 	"Imposter Syndrome" : [
@@ -408,7 +411,7 @@ def ask_follow_up_questions_loop(request):
 
 	# Generate a question to ask the user for their thoughts about an event.
 	messages= [
-		{"role": "system", "content": _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT},
+		{"role": "system", "content": _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT.format(follow_up_questions=follow_up_questions)},
 		{"role": "assistant", "content": f'{prompt}\nLet me know if you are not sure.'},
 		{"role": "user", "content": user_event},
 		*history
