@@ -100,13 +100,15 @@ class TestJournaling(unittest.TestCase):
 
 	_EXPECTED_URL = "https://storage.googleapis.com/bobby-chat-journaling/day{day_no}.png"
 
-	def test_get_journal_prompt(self, day_number=4):
+	# TODO(toni) Make parametrised!
+	# Test that topic and topic_idx go to None when the topic_idx is 6 (at the end of the list).
+	def test_get_journal_prompt(self):
 
 		test_request = Mock()
 		test_request.json = {'user_number': _USER_NUMBER}
 
 		# Add day_number entries.
-		data = [{'user_id': _USER_ID}] * day_number
+		data = [{'user_id': _USER_ID, 'topic': 'Friendships', 'topic_idx': 5}]
 
 		# Add the dummy UserDatum to the table.
 		for d in data:
@@ -119,8 +121,8 @@ class TestJournaling(unittest.TestCase):
 
 		# Assert the day and URL are correct.
 		response = response.json
-		self.assertEqual(response['day'], str(day_number))
-		self.assertEqual(response['idx'], day_number - 1)
+		self.assertEqual(response['topic'], 'Friendships')
+		self.assertEqual(response['topic_idx'], 6)
 
 		# Remove any values from the journaling data.
 		JournalingDatum.metadata.drop_all(self.engine)
@@ -149,7 +151,7 @@ class TestJournaling(unittest.TestCase):
 			'last_user_response': None}
 
 		expected_topic = 'Time Management'
-		expected_topic_id = 1
+		expected_topic_idx = 0
 
 		with app.app_context():
 			response = journaling.ask_user_for_journaling_topic_loop(test_request)
@@ -158,7 +160,7 @@ class TestJournaling(unittest.TestCase):
 		response = response.json
 		if response['is_done'] == True:
 			self.assertEqual(response['topic'], expected_topic)
-			self.assertEqual(response['topic_idx'], 1)
+			self.assertEqual(response['topic_idx'], expected_topic_idx)
 
 
 if __name__ == '__main__':
