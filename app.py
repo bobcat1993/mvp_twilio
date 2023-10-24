@@ -40,11 +40,10 @@ from features import recommender
 from features import welcome
 from features import burnout_survey
 from features import custom_reminder
-from features import journaling as journaling_v2
+from features import journaling as journaling
 
 # Import journeys
 from journeys import boundaries
-from features import journaling
 
 
 from absl import flags
@@ -182,7 +181,7 @@ BoundariesStageFiveDatum = boundaries.get_BoundariesStageFiveDatum(db)
 # Datum for other features.
 BurnoutSurveyDatum = burnout_survey.get_BurnoutSurveyDatum(db)
 CustomReminderDatum = custom_reminder.get_CustomReminderDatum(db)
-JournalingDatum = journaling_v2.get_JournalingDatum(db)
+JournalingDatum = journaling.get_JournalingDatum(db)
 
 @app.before_first_request
 def init_app():
@@ -1283,24 +1282,23 @@ def save_custom_reminder_date():
 # The journaling Journey will be replaced by the feature.
 @app.post('/journaling/get_journal_prompt')
 @validate_twilio_request
-def get_journal_prompt_v2():
-	return journaling_v2.get_journal_prompt(request=request, db=db, JournalingDatum=JournalingDatum)
+def get_journal_prompt():
+	return journaling.get_journal_prompt(request=request, db=db, JournalingDatum=JournalingDatum)
 
 @app.post('/journaling/ask_user_for_journaling_topic_loop')
 @validate_twilio_request
 def ask_user_for_journaling_topic_loop():
-	return journaling_v2.ask_user_for_journaling_topic_loop(request=request)
-
+	return journaling.ask_user_for_journaling_topic_loop(request=request)
 
 @app.post('/journaling/ask_follow_up_questions_loop')
 @validate_twilio_request
-def ask_follow_up_questions_loop_v2():
-	return journaling_v2.ask_follow_up_questions_loop(request=request)
+def ask_follow_up_questions_loop():
+	return journaling.ask_follow_up_questions_loop(request=request)
 
 @app.post('/journaling/save_data')
 @validate_twilio_request
-def save_journaling_data_v2():
-	return journaling_v2.save_data(request=request, db=db, JournalingDatum=JournalingDatum)
+def save_journaling_data():
+	return journaling.save_data(request=request, db=db, JournalingDatum=JournalingDatum)
 
 
 
