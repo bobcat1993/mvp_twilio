@@ -42,10 +42,7 @@ _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT = """The friendly assistant is helping the us
 
 If the user asks for help, help them by simplifying the question or posing it in a different way.
 
-The assistant always asks one question at a time.
-
-Some example questions include:
-{follow_up_questions}"""
+The assistant always asks one question at a time."""
 
 _JOURNALING_TOPICS = {
 
@@ -411,7 +408,7 @@ def ask_follow_up_questions_loop(request):
 
 	# Generate a question to ask the user for their thoughts about an event.
 	messages= [
-		{"role": "system", "content": _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT.format(follow_up_questions=follow_up_questions)},
+		{"role": "system", "content": _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT},
 		{"role": "assistant", "content": f'{prompt}\nLet me know if you are not sure.'},
 		{"role": "user", "content": user_event},
 		*history
