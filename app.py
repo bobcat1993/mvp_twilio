@@ -1279,23 +1279,6 @@ def set_custom_reminder():
 def save_custom_reminder_date():
 	return custom_reminder.save_data(request=request, db=db, CustomReminderDatum=CustomReminderDatum)
 
-
-########## Journaling Journey ###########
-@app.post('/journaling_journey/get_journal_prompt')
-# @validate_twilio_request
-def get_journal_prompt():
-	return journaling.get_journal_prompt(request=request)
-
-@app.post('/journaling_journey/ask_follow_up_questions_loop')
-# @validate_twilio_request
-def ask_follow_up_questions_loop():
-	return journaling.ask_follow_up_questions_loop(request=request)
-
-@app.post('/journaling_journey/save_data')
-# @validate_twilio_request
-def save_journaling_data():
-	return journaling.save_data(request=request, db=db, JournalingDatum=JournalingDatum)
-
 ########## Journaling Feature ###########
 # The journaling Journey will be replaced by the feature.
 @app.post('/journaling/get_journal_prompt')
