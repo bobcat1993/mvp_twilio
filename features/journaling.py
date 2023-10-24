@@ -251,7 +251,7 @@ def get_journal_prompt(request, db, JournalingDatum):
 	topic_info = get_most_recent_topic_and_topic_idx(user_number, db, JournalingDatum)
 
 	topic = topic_info['topic']
-	topic_idx = topic_info['topic_idx']
+	topic_idx = int(topic_info['topic_idx'])
 
 	print('topic:', topic)
 	print('topic_idx:', topic_idx)
