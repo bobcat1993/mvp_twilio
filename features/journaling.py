@@ -38,11 +38,14 @@ def get_JournalingDatum(db):
 
 	return JournalingDatum
 
-_FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT = """The friendly assistant is helping the user journal. The assistant has given a prompt and will ask follow up question to help the user explore their thoughts. Questions should be short, friendly and thoughtful.
+_FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT = """The friendly assistant is helping the user journal. The assistant has given a prompt and will ask follow up questions to help the user explore their thoughts. Questions should be short, friendly and thoughtful.
 
 If the user asks for help, help them by simplifying the question or posing it in a different way.
 
-The assistant always asks one question at a time."""
+The assistant always asks one question at a time.
+
+Some example questions include:
+{follow_up_questions}"""
 
 _JOURNALING_TOPICS = {
 
@@ -253,7 +256,10 @@ def get_journal_prompt(request, db, JournalingDatum):
 	topic = topic_info['topic']
 	topic_idx = topic_info['topic_idx']
 
-	if not topic_idx:
+	print('topic:', topic)
+	print('topic_idx:', topic_idx)
+
+	if topic_idx is None:
 		# The user has not topic selected.
 		message = 'Hi, I\'m excited that you have chosen to start journaling with me.'
 		return jsonify(
@@ -267,6 +273,7 @@ def get_journal_prompt(request, db, JournalingDatum):
 
 	# Get all prompts in that topic.
 	prompt_list = _JOURNALING_TOPICS[topic]
+	print('len(prompt_list):', len(prompt_list))
 	# If the topic_idx is within the range, get the prompt.
 	if len(prompt_list) > topic_idx + 1:
 		prompt = prompt_list[topic_idx + 1]
@@ -404,7 +411,7 @@ def ask_follow_up_questions_loop(request):
 
 	# Generate a question to ask the user for their thoughts about an event.
 	messages= [
-		{"role": "system", "content": _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT},
+		{"role": "system", "content": _FOLLOW_UP_QUESTIONS_SYSTEM_PROMPT.format(follow_up_questions=follow_up_questions)},
 		{"role": "assistant", "content": f'{prompt}\nLet me know if you are not sure.'},
 		{"role": "user", "content": user_event},
 		*history
