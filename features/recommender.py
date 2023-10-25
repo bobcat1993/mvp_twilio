@@ -6,7 +6,7 @@ import sys
 sys.path.append('..')
 import utils
 
-_RECOMMENDER_SYSTEM_PROMPT = """In this coaching session you must recommend on of 5 tools based on how the user is feeling. The tools are described below.
+_RECOMMENDER_SYSTEM_PROMPT = """In this coaching session you must recommend one of three tools based on how the user is feeling. The tools are described below.
 
 Reflect:
 The reflection tool is helpful for users who have distortions in their thinking. This tool guides users through the ABC from CBT.
@@ -17,7 +17,7 @@ This is great for users who feel helpless or lack of control. This tool can help
 Journaling:
 This tool is great for almost anything. Users can choose for a wide variety of topics and if they get stuck they can ask Bobby for help along the way.
 
-The assistant responds with one or two suggestions and a simple explanation. The response should be one sentence long."""
+The assistant responds with one or two suggestions and a simple, friendly explanation that refers back to the user's feeling. The response should be one sentence long."""
 
 
 _ASK_USER_HOW_THEY_FEEL = """Please tell me how you are feeling or what you would like help with and I'll do my best to recommend a tool."""
