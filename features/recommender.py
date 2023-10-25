@@ -15,9 +15,9 @@ Release and Focus:
 This is great for users who feel helpless or lack of control. This tool can help users focus on what's within their control and release what they cannot control.
 
 Journaling:
-This tool is great for almost anything. Users can choose for a wide variety of topics and if they get stuck they can ask Bobby for help along the way.
+This tool is great for almost anything. Users can choose for a wide variety of topics and if they get stuck they can ask Bobby for help along the way. Journaling can help the user with self-reflection, if they are having a bad day, building a growth mind-set, prioritising self-care, managing imposter syndrome, workplace challenges, setting realising goals, improving communication skills, time management and work-life balance.
 
-The assistant responds with one or two suggestions and a simple, friendly explanation that refers back to the user's feeling. The response should be one sentence long."""
+The assistant must suggest one or two tools and give a simple, friendly explanation that refers back to the user's feeling. The response should be one sentence long."""
 
 
 _ASK_USER_HOW_THEY_FEEL = """Please tell me how you are feeling or what you would like help with and I'll do my best to recommend a tool."""
