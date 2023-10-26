@@ -454,8 +454,11 @@ def ask_follow_up_questions_loop(request):
 	# If the model does not ask a question, end the session.
 	if '?' in question:
 		is_done = False
-	else:
+	elif len(messages) > 5:
+		# If there is no '?' and more than 5 messages.
 		is_done = True
+	else:
+		is_done = False
 
 	# Note that the last output from this loop is a question from the 
 	# model, not a user response.
