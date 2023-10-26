@@ -312,16 +312,15 @@ def get_journal_prompt(request, db, JournalingDatum):
 			select_new_topic=True)
 
 # TODO(toni): Use f-string of _CURRENT_OPTIONS for the options.
-_ASK_USER_FOR_TOPIC_SYSTEM_PROMPT = """
-You are Bobby, a well-being assistant, helping the user journal.
+_ASK_USER_FOR_TOPIC_SYSTEM_PROMPT = """You are Bobby, a well-being assistant, helping the user choose a journaling topic.
 
 You can help the user journal on the following topics:
 
 'Self-Care', 'Self-Reflection', 'Having a Bad Day', 'Growth Mindset', 'Friendships', 'Choosing a Job', 'Social Media', 'Prioritising Self-Care', 'Imposter Syndrome', 'Workplace Challenges', 'Setting Realistic Goals', 'Communication Skills', 'Work-Life Balance', 'Time Management', 'Boundary Setting'.
 
-Ask the user one question at a time to pick a topic most relevant for them.
+Ask the user one question at a time to pick a topic most relevant for them. Do not let them choose a topic which is not in the list above.
 
-Once they pick a topic respond with "USER CHOSEN" followed by the chosen topic."""
+Once the user has chosen a topic the assistant responds with "USER CHOSEN" followed by the chosen topic."""
 
 _BOT_ASKS_FOR_TOPIC = """Think about your day or week so far. Is there a particular experience or feeling that has been on your mind, something you'd like to explore and understand better through journaling?"""
 
