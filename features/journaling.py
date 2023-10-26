@@ -206,12 +206,23 @@ _JOURNALING_TOPICS = {
 		["What small thing can you do to prioritize your physical health?", "How can you implement this?"],
 		["If you were to make a self-care box, what would you put in it?", "How would you use it?"],
 		["How do you advocate for yourself?", "Who would you advocate to?", "What would you say?"]
+	],
+
+	#
+	"Boundary Setting": [
+		["Reflect on a time when you felt guilty for setting a boundary. Can you describe the boundary and the reasons behind your guilt?", "What specific boundary did you set, and why did it make you feel guilty?", "Did your guilt stem from a particular belief or expectation you held about setting boundaries?", "How can you reframe your perspective on boundaries to reduce feelings of guilt in similar situations?"],
+		["Think about a current relationship or situation where you sense a need to establish boundaries but haven't yet. What's holding you back?", "What kind of boundaries do you believe are necessary in this situation or with this person?", "Are there underlying fears or concerns that are preventing you from setting these boundaries?", "What steps can you take to address these fears and move towards setting the boundaries you need?"],
+		["Describe a time when you felt like you compromised your own well-being because you didn't set a boundary. What impact did it have on you?", "What prevented you from setting the necessary boundary in that situation?", "How did not setting the boundary affect your physical and emotional well-being?", "What actions can you take to prevent similar compromises in the future?"],
+		["Think about your values and priorities in life. How do your boundaries align with these values, and are there areas where they don't align?", "Can you identify areas where your boundaries are inconsistent with your values or priorities?", "How might realigning your boundaries with your core values improve your sense of purpose and well-being?", "What steps can you take to bring your boundaries in line with your values?"],
+		["Reflect on a time when you set a boundary that positively impacted your life or well-being. What did you learn from that experience?", "What was the boundary you set, and how did it improve your life or well-being?", "Did you face any guilt or internal resistance when you first set that boundary?", "How can you apply the lessons learned from that experience to set and maintain boundaries without guilt in the future?"],
+		["Consider a situation where someone else's expectations or demands led you to feel guilty for asserting your own boundaries. What steps can you take to address this guilt?", "Describe the situation where someone else's expectations clashed with your boundaries and made you feel guilty.", "How can you assert your boundaries more assertively in such situations without succumbing to guilt?", "Are there communication strategies or tools you can use to express your boundaries more effectively?"],
+		["Think about a recent instance where you hesitated to set a boundary because of fear of conflict or upsetting someone. Can you describe the situation, and the emotions you experienced?", "What was the specific situation or relationship where you hesitated to set a boundary?", "What emotions, such as fear or anxiety, did you experience in relation to setting that boundary?", "How can you develop the skills and mindset needed to assert your boundaries confidently in situations like these while managing any guilt or discomfort that may arise?"]
 	]
 
 }
 
 _CURRENT_OPTIONS = [
-	'Self-Care', 'Self-Reflection', 'Having a Bad Day', 'Growth Mindset', 'Friendships', 'Choosing a Job', 'Social Media', 'Prioritizing Self-Care', 'Imposter Syndrome', 'Workplace Challenges', 'Setting Realistic Goals', 'Communication Skills', 'Work-Life Balance', 'Time Management'
+	'Self-Care', 'Self-Reflection', 'Having a Bad Day', 'Growth Mindset', 'Friendships', 'Choosing a Job', 'Social Media', 'Prioritizing Self-Care', 'Imposter Syndrome', 'Workplace Challenges', 'Setting Realistic Goals', 'Communication Skills', 'Work-Life Balance', 'Time Management', 'Boundary Setting'
 	]
 
 def get_most_recent_topic_and_topic_idx(user_number, db, JournalingDatum):
@@ -306,7 +317,7 @@ You are Bobby, a well-being assistant, helping the user journal.
 
 You can help the user journal on the following topics:
 
-'Self-Care', 'Self-Reflection', 'Having a Bad Day', 'Growth Mindset', 'Friendships', 'Choosing a Job', 'Social Media', 'Prioritising Self-Care', 'Imposter Syndrome', 'Workplace Challenges', 'Setting Realistic Goals', 'Communication Skills', 'Work-Life Balance', 'Time Management'.
+'Self-Care', 'Self-Reflection', 'Having a Bad Day', 'Growth Mindset', 'Friendships', 'Choosing a Job', 'Social Media', 'Prioritising Self-Care', 'Imposter Syndrome', 'Workplace Challenges', 'Setting Realistic Goals', 'Communication Skills', 'Work-Life Balance', 'Time Management', 'Boundary Setting'.
 
 Ask the user one question at a time to pick a topic most relevant for them.
 
