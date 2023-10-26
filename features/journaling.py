@@ -86,14 +86,24 @@ _JOURNALING_TOPICS = {
 		["Write down one of your goals (it can be one from a previous session or a new one). What motivates you to work toward this goal?", "How can you stay motivated when faced with setbacks or difficulties on your path to achievement?", "Is there anyone or anything that depends on you achieving this goal?"]
 	],
 
+	# "Workplace Challenges" : [
+	# 	["What is the most significant challenge you're currently facing in your work at the moment?", "Why do you feel that this challenge is important to address and how does it impact your overall well-being?", "Have you discussed this challenge with anyone else?"],
+	# 	["Let's think about a challenge you are facing at work. How are you currently trying to tackle this challenge?", "Are there resources or support systems that can help you address this challenge effectively?", "Which solution or strategy do you believe is the most promising?", "How can you break down your chosen solution into actionable steps?"],
+	# 	["Challenge often require navigating an assault course of obstacles and barriers. What obstacles or barriers do you anticipate as you work to resolve your current challenges?", "Have you faced similar obstacles in the past? How did you handle them?", "Who can you reach out to for guidance or support in tackling these obstacles?"],
+	# 	["Challenges by definition can be challenging, but they can also be opportunities to learn and grow. What lessons or insights have you gained so far from an ongoing (or recent) challenge?", "How can you use this experience to foster personal or professional growth?", "What skills or knowledge can you acquire through addressing this challenge?", "In what ways can you apply the lessons learned to future situations?"],
+	# 	["When working through a challenge it's helpful to set milestones. Thinking about a current challenge you are facing, are there milestones you can set to measure your progress?", "How often will you review you progress?"],
+	# 	["When facing challenge at work, you don't always have to face them alone. Who can you turn to for support or guidance as you work through this challenge?", "How can you effectively communicate your needs to those who can assist you?", "What types of support are you most in need of right now?", "How can you express your gratitude to those who offer help or guidance?"],
+	# 	["We can put a lot of pressure on our selves when facing challenging times. Thinking about a challenge you are working with at the moment, how have you been coping with the stress or pressure caused by this challenge?", "What self-care practices help you recharge during challenging times? It could be as simple as having a coffee with a friend.", "What motivates you to overcome this challenge?"]
+	# ],
+
 	"Workplace Challenges" : [
-		["What is the most significant challenge you're currently facing in your work at the moment?", "Why do you feel that this challenge is important to address and how does it impact your overall well-being?", "Have you discussed this challenge with anyone else?"],
-		["Let's think about a challenge you are facing at work. How are you currently trying to tackle this challenge?", "Are there resources or support systems that can help you address this challenge effectively?", "Which solution or strategy do you believe is the most promising?", "How can you break down your chosen solution into actionable steps?"],
-		["Challenge often require navigating an assault course of obstacles and barriers. What obstacles or barriers do you anticipate as you work to resolve your current challenges?", "Have you faced similar obstacles in the past? How did you handle them?", "Who can you reach out to for guidance or support in tackling these obstacles?"],
-		["Challenges by definition can be challenging, but they can also be opportunities to learn and grow. What lessons or insights have you gained so far from an ongoing (or recent) challenge?", "How can you use this experience to foster personal or professional growth?", "What skills or knowledge can you acquire through addressing this challenge?", "In what ways can you apply the lessons learned to future situations?"],
-		["When working through a challenge it's helpful to set milestones. Thinking about a current challenge you are facing, are there milestones you can set to measure your progress?", "How often will you review you progress?"],
-		["When facing challenge at work, you don't always have to face them alone. Who can you turn to for support or guidance as you work through this challenge?", "How can you effectively communicate your needs to those who can assist you?", "What types of support are you most in need of right now?", "How can you express your gratitude to those who offer help or guidance?"],
-		["We can put a lot of pressure on our selves when facing challenging times. Thinking about a challenge you are working with at the moment, how have you been coping with the stress or pressure caused by this challenge?", "What self-care practices help you recharge during challenging times? It could be as simple as having a coffee with a friend.", "What motivates you to overcome this challenge?"]
+		["Share a recent workplace challenge you encountered. What made it challenging, and how did you handle it?", "What specific workplace challenge did you face, and what made it particularly difficult?", "What strategies did you use to address this challenge, and were they effective?", "Did this experience lead to any insights or changes in your approach to handling workplace challenges?"],
+		["Describe a time when you had to set boundaries in your professional life. What prompted you to set these boundaries, and what was the outcome?", "What were the specific boundaries you needed to establish in your workplace, and why were they necessary?", "How did you communicate these boundaries to your colleagues or superiors, and what reactions did you receive?", "Did setting these boundaries positively impact your work-life balance and productivity?"],
+		["Think about a situation where you had to collaborate with a difficult colleague. How did you manage the challenges, and what did you learn from the experience?", "Can you describe the challenges you faced while collaborating with this difficult colleague?", "What strategies or communication techniques did you use to manage the challenges and maintain a productive working relationship?", "What valuable lessons did you take away from this experience to handle difficult colleagues in the future?"],
+		["Reflect on a time when you felt overwhelmed with your workload. How did you address this feeling, and what changes did you make?", "What factors contributed to your feeling overwhelmed with your workload?", "How did you cope with this situation, and did you set any boundaries or seek support to manage your workload?", "Have you established new work habits or strategies to prevent future instances of feeling overwhelmed?"],
+		["Tell me about a situation where you had to give critical feedback to a co-worker or subordinate. How did you approach this, and what were the outcomes?", "What was the feedback you needed to deliver, and what prompted this conversation?", "How did you communicate the feedback in a constructive and supportive manner?", "What changes or improvements resulted from this feedback, and did it affect your working relationship?"],
+		["Share an instance when you faced ethical or moral dilemmas in your workplace. How did you navigate these challenges?", "What were the ethical or moral dilemmas you encountered in your workplace?", "How did you approach and resolve these dilemmas while maintaining your integrity and professional standards?", "Are there strategies or ethical principles you rely on when facing similar dilemmas in the future?"],
+		["Describe a time when you had to manage a team or project with conflicting goals and interests. How did you balance these challenges?", "What were the conflicting goals and interests within your team or project, and how did they impact your work?", "What strategies or leadership approaches did you use to navigate these conflicts and move the project forward?", "What lessons or best practices did you learn from this experience that you can apply to future projects with similar challenges?"]
 	],
 
 	"Imposter Syndrome" : [
@@ -220,6 +230,13 @@ _JOURNALING_TOPICS = {
 	]
 
 }
+
+"""
+TOPIC TODOs:
+- Back to work / start of a new term.
+- Gratitude
+
+"""
 
 _CURRENT_OPTIONS = [
 	'Self-Care', 'Self-Reflection', 'Having a Bad Day', 'Growth Mindset', 'Friendships', 'Choosing a Job', 'Social Media', 'Prioritizing Self-Care', 'Imposter Syndrome', 'Workplace Challenges', 'Setting Realistic Goals', 'Communication Skills', 'Work-Life Balance', 'Time Management', 'Boundary Setting'
