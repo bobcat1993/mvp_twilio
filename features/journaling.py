@@ -525,6 +525,8 @@ def save_data(request, db, JournalingDatum):
 		# Dump the history (into dicts).
 		history = message_body['history']
 		message_body['history'] = json.dumps(history)
+		topic_history = message_body['topic_history']
+		message_body['topic_history'] = json.dumps(topic_history)
 
 		datum = JournalingDatum(**message_body)
 		db.session.add(datum)
