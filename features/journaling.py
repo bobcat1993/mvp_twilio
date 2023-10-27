@@ -227,6 +227,16 @@ _JOURNALING_TOPICS = {
 		["Reflect on a time when you set a boundary that positively impacted your life or well-being. What did you learn from that experience?", "What was the boundary you set, and how did it improve your life or well-being?", "Did you face any guilt or internal resistance when you first set that boundary?", "How can you apply the lessons learned from that experience to set and maintain boundaries without guilt in the future?"],
 		["Consider a situation where someone else's expectations or demands led you to feel guilty for asserting your own boundaries. What steps can you take to address this guilt?", "Describe the situation where someone else's expectations clashed with your boundaries and made you feel guilty.", "How can you assert your boundaries more assertively in such situations without succumbing to guilt?", "Are there communication strategies or tools you can use to express your boundaries more effectively?"],
 		["Think about a recent instance where you hesitated to set a boundary because of fear of conflict or upsetting someone. Can you describe the situation, and the emotions you experienced?", "What was the specific situation or relationship where you hesitated to set a boundary?", "What emotions, such as fear or anxiety, did you experience in relation to setting that boundary?", "How can you develop the skills and mindset needed to assert your boundaries confidently in situations like these while managing any guilt or discomfort that may arise?"]
+	],
+
+	"Gratitude": [
+		["Reflect on a recent experience where you felt truly grateful. What was the situation, and what about it filled you with gratitude?", "Can you describe the specific experience or situation that evoked feelings of gratitude?", "What aspects of that experience or situation made you feel grateful, and why were they significant to you?", "How can you cultivate more moments of gratitude in your daily life?"],
+		["Think about a person in your life whom you're grateful for. What qualities or actions of this person make you feel thankful?", "Who is the person you're grateful for, and what role do they play in your life?", "What specific qualities, actions, or support from this person have inspired your feelings of gratitude?", "Have you expressed your gratitude to them, and how has it impacted your relationship?"],
+		["Describe a challenge or hardship you've faced that, in hindsight, you're grateful for. How did this experience contribute to your personal growth?", "Can you share the challenging experience you faced and why it was difficult at the time?", "What positive aspects or personal growth resulted from this experience that you now appreciate?", "How can you use this perspective to find gratitude in future challenges?"],
+		["Reflect on a daily gratitude practice, such as keeping a gratitude journal or expressing gratitude to others. How has this practice affected your overall well-being?", "Do you have a daily gratitude practice, and if so, what is it?", "How has this practice influenced your mood, attitude, or general outlook on life?", "What can you do to further enhance or maintain this practice for long-term benefits?"],
+		["Think about a specific skill or opportunity you have that you're grateful for. How has this skill or opportunity positively impacted your life or career?", "What skill or opportunity are you grateful for, and why is it important to you?", "How has this skill or opportunity enhanced your life, career, or personal development?", "Are there ways you can pay it forward or leverage this skill/opportunity for the benefit of others?"],
+		["Share a moment when you felt grateful for the beauty of nature or a simple pleasure in life. What was that experience, and how did it make you feel?", "Describe the specific experience or moment in nature or life's simple pleasures that filled you with gratitude.", "What emotions and sensations did you experience during this moment of gratitude?", "How can you incorporate more appreciation for nature and simple pleasures into your daily routine?"],
+		["Consider a time when you expressed gratitude to someone, and it had a significant impact on them. What did you express gratitude for, and how did they react?", "Can you recall a specific instance when you expressed gratitude to someone, and for what reason?", "How did the person you expressed gratitude to react, and how did it affect your relationship or their well-being?", "Are there more opportunities to express gratitude in your personal and professional life?"]
 	]
 
 }
@@ -234,12 +244,11 @@ _JOURNALING_TOPICS = {
 """
 TOPIC TODOs:
 - Back to work / start of a new term.
-- Gratitude
 
 """
 
 _CURRENT_OPTIONS = [
-	'Self-Care', 'Self-Reflection', 'Having a Bad Day', 'Growth Mindset', 'Friendships', 'Choosing a Job', 'Social Media', 'Prioritizing Self-Care', 'Imposter Syndrome', 'Workplace Challenges', 'Setting Realistic Goals', 'Communication Skills', 'Work-Life Balance', 'Time Management', 'Boundary Setting'
+	'Self-Care', 'Self-Reflection', 'Having a Bad Day', 'Growth Mindset', 'Friendships', 'Choosing a Job', 'Social Media', 'Prioritizing Self-Care', 'Imposter Syndrome', 'Workplace Challenges', 'Setting Realistic Goals', 'Communication Skills', 'Work-Life Balance', 'Time Management', 'Boundary Setting', 'Gratitude'
 	]
 
 def get_most_recent_topic_and_topic_idx(user_number, db, JournalingDatum):
