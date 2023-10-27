@@ -20,6 +20,9 @@ def get_JournalingDatum(db):
 		"""Stores the data from the journaling journey flow."""
 
 		id = db.Column(db.Integer, primary_key=True)
+		# The prompt given to the user.
+		prompt = db.Column(db.String, nullable=True)
+
 		# Intro to topic selection: feeling | Free Style | IDK.
 		user_topic_intro = db.Column(db.String, nullable=True)
 		# User choosing the topic.
