@@ -20,7 +20,21 @@ def get_JournalingDatum(db):
 		"""Stores the data from the journaling journey flow."""
 
 		id = db.Column(db.Integer, primary_key=True)
+		# Intro to topic selection: feeling | Free Style | IDK.
+		user_topic_intro = db.Column(db.String, nullable=True)
+		# User choosing the topic.
+		topic_history = db.Column(db.String, nullable=True)
+		last_user_topic_response = db.Column(db.String, nullable=True)
+
+		# First answer from Free Style journaling.
+		free_style_user_event = db.Column(db.String, nullable=True)
+
+		# The first response (free type/ topic) to journaling.
+		user_event_var = db.Column(db.String, nullable=True)
+
+		# First answer from Topic Journaling.
 		user_event = db.Column(db.String, nullable=True)
+
 		start_time = db.Column(db.DateTime, nullable=True)
 		approx_end_time = db.Column(db.DateTime, nullable=True)
 		last_user_response = db.Column(db.String, nullable=True)
