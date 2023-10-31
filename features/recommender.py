@@ -24,27 +24,32 @@ _ASK_USER_HOW_THEY_FEEL = """Please tell me how you are feeling or what you woul
 
 def recommend_tool(request):
 
-	# Get the inputs.
-	message_body = request.json
-	user_feeling = message_body['user_feeling']
+	try:
 
-	# Reconstruct the conversation so far.
-	messages = [
-	{"role": "system", "content": _RECOMMENDER_SYSTEM_PROMPT},
-	{"role": "assistant", "content": _ASK_USER_HOW_THEY_FEEL},
-	{"role": "user", "content": user_feeling},
-	]
+		# Get the inputs.
+		message_body = request.json
+		user_feeling = message_body['user_feeling']
 
-	model_output = utils.chat_completion(
-		model="gpt-3.5-turbo-0613",
-		messages=messages,
-		max_tokens=1024,
-		temperature=1.0,
-		)
+		# Reconstruct the conversation so far.
+		messages = [
+		{"role": "system", "content": _RECOMMENDER_SYSTEM_PROMPT},
+		{"role": "assistant", "content": _ASK_USER_HOW_THEY_FEEL},
+		{"role": "user", "content": user_feeling},
+		]
 
-	response = model_output['choices'][0]['message']['content']
+		model_output = utils.chat_completion(
+			model="gpt-3.5-turbo-0613",
+			messages=messages,
+			max_tokens=1024,
+			temperature=1.0,
+			)
 
-	return jsonify(
-		response=response
-	)
+		response = model_output['choices'][0]['message']['content']
+
+		return jsonify(response=response)
+
+	except Exception as e:
+		logging.error('error: %s', str(e))
+		return jsonify({'error': str(e)}), 400
+
 

@@ -1300,6 +1300,12 @@ def ask_follow_up_questions_loop():
 def save_journaling_data():
 	return journaling.save_data(request=request, db=db, JournalingDatum=JournalingDatum)
 
+# TESTING OUT HOW TO RECIEVE INFO FROM WIX SUBSCRIPTION
+@app.post('/new_subscription')
+def new_subscription():
+	print(request.get_json())
+	return request
+
 
 
 if __name__ == "__main__":
