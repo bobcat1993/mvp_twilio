@@ -147,10 +147,12 @@ class ProfileDatum(db.Model):
 	"""A user profile."""
 
 	id = db.Column(db.Integer, primary_key=True)
+	customer_id = db.Column(db.String, nullable=True)
 	user_number = db.Column(db.String, nullable=True)
 	user_email = db.Column(db.String, nullable=True)
 	expiry_date = db.Column(db.Integer, nullable=True)
 	user_wix_id = db.Column(db.String, nullable=True)
+	status = db.Column(db.String, nullable=True)
 
 
 class UserFeedbackDatum(db.Model):
