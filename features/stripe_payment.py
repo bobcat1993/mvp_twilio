@@ -76,8 +76,7 @@ def new_user(customer_id, user_number, user_email, db, ProfileDatum):
 	if record:
 		record.customer_id = customer_id
 		record.user_number = user_number
-		record.status = status
-
+		record.status = Status.ACTIVE.value
 		db.session.commit()
 
 	else:
