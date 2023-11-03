@@ -27,6 +27,34 @@ STRIPE_SECRET = os.environ['STRIPE_SECRET']
 def time_from_timestamp(timestamp):
 	return datetime.datetime.utcfromtimestamp(timestamp)
 
+
+def get_event(request):
+	"""Gets the event from the request verifying the signature."""
+	event = None
+	payload = request.data
+
+	try:
+		event = json.loads(payload)
+	except json.decoder.JSONDecodeError as e:
+		print('⚠️  Webhook error while parsing basic request.' + str(e))
+		return jsonify(success=False)
+
+	# Make sure that the request is coming from Stripe.
+	if STRIPE_SECRET != 'None':
+		# Locally the strip secrete will be None for testing, but will not
+		sig_header = request.headers['STRIPE_SIGNATURE']
+		try:
+				event = stripe.Webhook.construct_event(
+						payload, sig_header, STRIPE_SECRET
+				)
+		except ValueError as e:
+				# Invalid payload
+				raise e
+		except stripe.error.SignatureVerificationError as e:
+				# Invalid signature
+				raise e
+	return event
+
 def new_user(customer_id, user_number, user_email, db, ProfileDatum):
 	"""Adds new users to the user Profile database."""
 
@@ -39,8 +67,6 @@ def new_user(customer_id, user_number, user_email, db, ProfileDatum):
 		user_email=user_email,
 		status=Status.ACTIVE.value,
 		)
-
-	print(data)
 
 	# Check if there is already an entry for this person:
 	record = db.session.query(ProfileDatum).filter(ProfileDatum.user_email == user_email).first()
@@ -78,32 +104,21 @@ def new_user(customer_id, user_number, user_email, db, ProfileDatum):
 
 	return response_dict
 
-def get_event(request):
-	"""Gets the event from the request verifying the signature."""
-	event = None
-	payload = request.data
+def subscription_ends(customer_id, db, ProfileDatum):
 
-	try:
-		event = json.loads(payload)
-	except json.decoder.JSONDecodeError as e:
-		print('⚠️  Webhook error while parsing basic request.' + str(e))
-		return jsonify(success=False)
+	# Find this user.
+	record = db.session.query(ProfileDatum).filter(ProfileDatum.customer_id == customer_id).all()
 
-	# Make sure that the request is coming from Stripe.
-	if STRIPE_SECRET != 'None':
-		# Locally the strip secrete will be None for testing, but will not
-		sig_header = request.headers['STRIPE_SIGNATURE']
-		try:
-				event = stripe.Webhook.construct_event(
-						payload, sig_header, STRIPE_SECRET
-				)
-		except ValueError as e:
-				# Invalid payload
-				raise e
-		except stripe.error.SignatureVerificationError as e:
-				# Invalid signature
-				raise e
-	return event
+	logging.info("[RECORD] %s", record)
+
+	if record:
+		# Update the record to reflect that the subscription has been cancelled.
+		record[-1].status = Status.CANCELLED.value
+		db.session.commit()
+		return
+
+	else:
+		raise ValueError('No customer %s found in Profile database.', customer_id)
 
 
 #TODO(toni): split this in to different functions to update the 
@@ -122,13 +137,24 @@ def stripe_webhook(request, db, ProfileDatum):
 
 		# Create a new user and add them to email octopus as well as the profile data.
 		response_dict = new_user(customer_id, user_number, user_email, db, ProfileDatum)
-		logging.info("Email octopus response dict:", response_dict)
 		return jsonify(email_octopus=response_dict, type='customer.created'), 200
 
 	elif event['type'] == 'customer.subscription.created':
 		data = event['data']['object']
+		# TODO(toni) Use this to monitor the status!
+		# For now we will simply verify when a new customer is created.
 	elif event['type'] == 'customer.subscription.deleted':
+		# A subscription has been cancelled.
 		data = event['data']['object']
+		customer_id = data['id']
+
+		try:
+			subscription_ends(customer_id, db, ProfileDatum)
+			message = f'Updated status of {customer_id} to CANCELLED.'
+			return jsonify(message=message), 200
+		except Exception as e:
+			return jsonify({'error': str(e)}), 400
+
 	# ... handle other event types
 	else:
 		print('Unhandled event type {}'.format(event['type']))
