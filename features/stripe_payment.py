@@ -146,12 +146,12 @@ def stripe_webhook(request, db, ProfileDatum):
 	elif event['type'] == 'customer.subscription.deleted':
 		# A subscription has been cancelled.
 		data = event['data']['object']
-		customer_id = data['id']
+		customer_id = data['customer']
 
 		try:
 			subscription_ends(customer_id, db, ProfileDatum)
 			message = f'Updated status of {customer_id} to CANCELLED.'
-			return jsonify(message=message), 200
+			return jsonify(message=message, type='customer.subscription.deleted'), 200
 		except Exception as e:
 			return jsonify({'error': str(e)}), 400
 

@@ -596,10 +596,36 @@ class TestApp(unittest.TestCase):
 			}
 		},
 		"type": "customer.created"
-}
+	}
+
+	_SUBSCRIPTION_DELETED_PAYLOAD = {
+		"id": "evt_1O8KhfIvT4WZgIskU1nA99kl",
+		"object": "event",
+		"api_version": "2023-10-16",
+		"created": 1699007655,
+		"data": {
+				"object": {
+						"cancellation_details": {
+								"comment": None,
+								"feedback": None,
+								"reason": "cancellation_requested"
+						},
+						"customer": "cus_OvtMKUUtrX26ck",
+						"plan": {
+								"nickname": "bobbychat-monthly-£9-45",
+								"product": "prod_OvqYwqTlW1X3Rp",
+						},
+						"start_date": 1698934142,
+						"status": "canceled",
+				}
+		},
+		"type": "customer.subscription.deleted"
+		}
+
 	@parameterized.expand([
 		('customer.created', _CUSTOMER_CREATED_PAYLOAD),
-		])
+		('customer.subscription.deleted', _SUBSCRIPTION_DELETED_PAYLOAD)
+	])
 	def test_stripe_webhook(self, name, payload):
 
 		with app.app_context():
@@ -608,7 +634,7 @@ class TestApp(unittest.TestCase):
 		response_json = response.json
 		logging.info('stripe_webbook response:', response_json)
 		self.assertEqual(response.status_code, 200)
-		self.assertEqual(response_json['type'], 'customer.created')
+		self.assertEqual(response_json['type'], name)
 
 
 if __name__ == '__main__':
