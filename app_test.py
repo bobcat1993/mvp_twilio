@@ -622,9 +622,29 @@ class TestApp(unittest.TestCase):
 		"type": "customer.subscription.deleted"
 		}
 
+	_SUBSCRIPTION_UPDATED_PAYLOAD = {
+		"id": "evt_1O8LZRIvT4WZgIskhHDAMTN0",
+		"object": "event",
+		"api_version": "2023-10-16",
+		"created": 1699010989,
+		"data": {
+				"object": {
+						"customer": "cus_OvtMKUUtrX26ck",
+						"plan": {
+								"nickname": "bobbychat-monthly-£9-45",
+								"product": "prod_OvqYwqTlW1X3Rp",
+						},
+						"start_date": 1699008202,
+						"status": "trialing",
+				}
+		},
+		"type": "customer.subscription.updated"
+	}
+
 	@parameterized.expand([
 		('customer.created', _CUSTOMER_CREATED_PAYLOAD),
-		('customer.subscription.deleted', _SUBSCRIPTION_DELETED_PAYLOAD)
+		('customer.subscription.deleted', _SUBSCRIPTION_DELETED_PAYLOAD),
+		('customer.subscription.updated', _SUBSCRIPTION_UPDATED_PAYLOAD),
 	])
 	def test_stripe_webhook(self, name, payload):
 
