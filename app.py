@@ -41,6 +41,7 @@ from features import welcome
 from features import burnout_survey
 from features import custom_reminder
 from features import journaling as journaling
+from features import stripe_payment
 
 # Import journeys
 from journeys import boundaries
@@ -1303,10 +1304,9 @@ def save_journaling_data():
 	return journaling.save_data(request=request, db=db, JournalingDatum=JournalingDatum)
 
 # TESTING OUT HOW TO RECIEVE INFO FROM WIX SUBSCRIPTION
-@app.post('/new_subscription')
-def new_subscription():
-	print(request.get_json())
-	return request
+@app.post('/stripe_webhook')
+def stripe_webhook():
+	return stripe_payment.stripe_webhook(request=request, db=db, ProfileDatum=ProfileDatum)
 
 
 

@@ -76,43 +76,59 @@ def new_user(customer_id, user_number, user_email, db, ProfileDatum):
 	response_dict = json.loads(response.text)
 	logging.info('Request to EmailOctopus: %s', str(response.status_code))
 
-	return jsonify({'eo_response':response_dict})
+	return response_dict
 
 
 #TODO(toni): split this in to different functions to update the 
 # profile database as needed.
 def stripe_webhook(request, db, ProfileDatum):
 
-  event = None
-  payload = request.data
-  sig_header = request.headers['STRIPE_SIGNATURE']
+	event = None
+	payload = request.data
 
-  # Make sure that the request is coming from Stripe.
-  try:
-      event = stripe.Webhook.construct_event(
-          payload, sig_header, STRIPE_SECRET
-      )
-  except ValueError as e:
-      # Invalid payload
-      raise e
-  except stripe.error.SignatureVerificationError as e:
-      # Invalid signature
-      raise e
+	try:
+		event = json.loads(payload)
+	except json.decoder.JSONDecodeError as e:
+		print('⚠️  Webhook error while parsing basic request.' + str(e))
+		return jsonify(success=False)
 
-  # Handle the event
-  if event['type'] == 'customer.created':
-    data = event['data']['object']
+	# Make sure that the request is coming from Stripe.
+	if STRIPE_SECRET != 'None':
+		# Locally the strip secrete will be None for testing, but will not
+		sig_header = request.headers['STRIPE_SIGNATURE']
+		try:
+				event = stripe.Webhook.construct_event(
+						payload, sig_header, STRIPE_SECRET
+				)
+		except ValueError as e:
+				# Invalid payload
+				raise e
+		except stripe.error.SignatureVerificationError as e:
+				# Invalid signature
+				raise e
 
+	# Handle the event
+	if event['type'] == 'customer.created':
+		# There is a new customer.
+		data = event['data']['object']
+		customer_id = data['id']
+		user_email = data['email']
+		user_number = data['phone']
 
-  elif event['type'] == 'customer.subscription.created':
-    data = event['data']['object']
-  elif event['type'] == 'customer.subscription.deleted':
-    data = event['data']['object']
-  # ... handle other event types
-  else:
-    print('Unhandled event type {}'.format(event['type']))
+		# Create a new user and add them to email octopus as well as the profile data.
+		response_dict = new_user(customer_id, user_number, user_email, db, ProfileDatum)
+		logging.info("Email octopus response dict:", response_dict)
+		return jsonify(email_octopus=response_dict, type='customer.created'), 200
 
-  return jsonify(success=True)
+	elif event['type'] == 'customer.subscription.created':
+		data = event['data']['object']
+	elif event['type'] == 'customer.subscription.deleted':
+		data = event['data']['object']
+	# ... handle other event types
+	else:
+		print('Unhandled event type {}'.format(event['type']))
+
+	return jsonify(success=True), 400
 
 
 

@@ -27,8 +27,27 @@ _USER_NUMBER = 'whatsapp:+4476543210'
 _CUSTOMER_ID = 'cus_123456765432'
 _USER_EMAIL = 'antonia.creswell@gmail.com'
 
+# Example json when a new customer is created.
+# Remove some fields for brevity.
+_CUSTOMER_CREATED_PAYLOAD = {
+    "object": "event",
+    "data": {
+        "object": {
+            "id": "cus_OvtMKUUtrX26ck",
+            "object": "customer",
+            "address": {
+                "country": "GB",
+            },
+            "email": "toni@bobby-chat.com",
+            "name": "test name",
+            "phone": "+447479876534",
+        }
+    },
+    "type": "customer.created"
+}
 
-class TestJournaling(unittest.TestCase):
+
+class TestStripePayment(unittest.TestCase):
 
 	def setUp(self):
 		# Setup the OpenAI key.
@@ -54,6 +73,25 @@ class TestJournaling(unittest.TestCase):
 				user_email=_USER_EMAIL,
 				db=self,
 				ProfileDatum=ProfileDatum)
+
+
+	## TEST NOT WORKING YET CAUSE OF SIGNATURES.
+	@parameterized.expand([
+		('customer.created', _CUSTOMER_CREATED_PAYLOAD),
+		])
+	def test_stripe_webhook(self, name, payload):
+
+		test_request = Mock()
+		test_request.data = payload
+
+		with app.app_context():
+			response = stripe_payment.stripe_webhook(
+				test_request, db=self, ProfileDatum=ProfileDatum)
+
+		response = response.json
+		self.assertIsNotNone(response)
+
+
 
 
 
