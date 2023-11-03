@@ -15,7 +15,7 @@ load_dotenv()
 
 class Status(Enum):
 	ACTIVE = 'active'
-	TRIAL = 'trial'
+	TRIAL = 'trialling'
 	CANCELLED = 'cancelled'
 
 
@@ -155,7 +155,11 @@ def stripe_webhook(request, db, ProfileDatum):
 		except Exception as e:
 			return jsonify({'error': str(e)}), 400
 
-	# ... handle other event types
+		# TODO(toni) Collect the reasons for cancelling.
+
+	elif event['type'] == 'customer.subscription.updated':
+		# This is needed in case the user renews their subscription.
+		data = event['data']['object']
 	else:
 		print('Unhandled event type {}'.format(event['type']))
 
