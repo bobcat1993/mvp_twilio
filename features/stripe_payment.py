@@ -74,7 +74,10 @@ def new_user(customer_id, user_number, user_email, db, ProfileDatum):
 	logging.info("[RECORD] %s", record)
 
 	if record:
+		record.customer_id = customer_id
 		record.user_number = user_number
+		record.status = status
+
 		db.session.commit()
 
 	else:
@@ -118,7 +121,7 @@ def subscription_ends(customer_id, db, ProfileDatum):
 		return
 
 	else:
-		raise ValueError('No customer %s found in Profile database.', customer_id)
+		raise ValueError(f'No customer, {customer_id}, found in Profile database.')
 
 def subscription_updated(customer_id, new_status, db, ProfileDatum):
 
@@ -139,7 +142,7 @@ def subscription_updated(customer_id, new_status, db, ProfileDatum):
 		return record[-1].status
 
 	else:
-		raise ValueError('No customer %s found in Profile database.', customer_id)
+		raise ValueError(f'No customer, {customer_id}, found in Profile database.')
 
 #TODO(toni): split this in to different functions to update the 
 # profile database as needed.
@@ -162,6 +165,7 @@ def stripe_webhook(request, db, ProfileDatum):
 		data = event['data']['object']
 		# TODO(toni) Use this to monitor the status!
 		# For now we will simply verify when a new customer is created.
+		return jsonify(message='No action taken'), 200
 	elif event['type'] == 'customer.subscription.deleted':
 		# A subscription has been cancelled.
 		data = event['data']['object']
