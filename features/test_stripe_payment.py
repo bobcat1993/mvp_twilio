@@ -105,6 +105,46 @@ class TestStripePayment(unittest.TestCase):
 		self.assertEqual(status, Status.CANCELLED.value)
 
 
+	@parameterized.expand([
+		('cancelled', 'canceled', Status.CANCELLED.value),
+		('trial', 'trailing', Status.ACTIVE.value),
+		('active', 'active', Status.ACTIVE.value),
+		# ('incomplete', 'incomplete', Status.ACTIVE.value),
+		# ('incomplete_expired', 'incomplete_expired', Status.ACTIVE.value),
+		# ('past_due', 'past_due', Status.ACTIVE.value),
+		# ('unpaid', 'unpaid', Status.ACTIVE.value),
+		])
+	def test_subscription_updated(self, name, new_status, expected_new_status):
+
+		data = [
+			{
+				'customer_id': _CUSTOMER_ID,
+				'status': None
+			},
+		]
+
+		target_number_of_days = 3
+
+		# Add the dummy UserDatum to the table.
+		for d in data:
+			datum = ProfileDatum(**d)
+			self.session.add(datum)
+		self.session.commit()
+
+		with app.app_context():
+			stripe_payment.subscription_updated(
+				customer_id=_CUSTOMER_ID,
+				new_status=new_status,
+				db=self,
+				ProfileDatum=ProfileDatum)
+
+		# Check that the status has changed.
+		record = self.session.query(ProfileDatum).filter(ProfileDatum.customer_id == _CUSTOMER_ID).all()
+		status = record[-1].status
+
+		self.assertEqual(status, expected_new_status)
+
+
 	"""
 	## TEST NOT WORKING YET CAUSE OF SIGNATURES.
 	@parameterized.expand([

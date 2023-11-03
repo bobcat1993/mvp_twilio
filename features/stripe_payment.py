@@ -120,6 +120,26 @@ def subscription_ends(customer_id, db, ProfileDatum):
 	else:
 		raise ValueError('No customer %s found in Profile database.', customer_id)
 
+def subscription_updated(customer_id, new_status, db, ProfileDatum):
+
+	# Find this user.
+	record = db.session.query(ProfileDatum).filter(ProfileDatum.customer_id == customer_id).all()
+
+	logging.info("[RECORD] %s", record)
+
+	if record:
+		# Note that this is misspelled in Stripe.
+		if new_status == 'canceled':
+			# Update the record to reflect that the subscription has been cancelled.
+			record[-1].status = Status.CANCELLED.value
+		else:
+			# For now only allow the subscription to be active or cancelled and err on the side of caution.
+			record[-1].status = Status.ACTIVE.value
+		db.session.commit()
+		return record[-1].status
+
+	else:
+		raise ValueError('No customer %s found in Profile database.', customer_id)
 
 #TODO(toni): split this in to different functions to update the 
 # profile database as needed.
@@ -138,7 +158,6 @@ def stripe_webhook(request, db, ProfileDatum):
 		# Create a new user and add them to email octopus as well as the profile data.
 		response_dict = new_user(customer_id, user_number, user_email, db, ProfileDatum)
 		return jsonify(email_octopus=response_dict, type='customer.created'), 200
-
 	elif event['type'] == 'customer.subscription.created':
 		data = event['data']['object']
 		# TODO(toni) Use this to monitor the status!
@@ -160,6 +179,15 @@ def stripe_webhook(request, db, ProfileDatum):
 	elif event['type'] == 'customer.subscription.updated':
 		# This is needed in case the user renews their subscription.
 		data = event['data']['object']
+		customer_id = data['customer']
+		new_status = data['status']
+
+		try:
+			new_status = subscription_updated(customer_id, new_status, db, ProfileDatum)
+			message = f'Updated status of {customer_id} to {new_status}.'
+			return jsonify(message=message, new_status=new_status, type='customer.subscription.updated'), 200
+		except Exception as e:
+			return jsonify({'error': str(e)}), 400
 	else:
 		print('Unhandled event type {}'.format(event['type']))
 
