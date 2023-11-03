@@ -78,11 +78,8 @@ def new_user(customer_id, user_number, user_email, db, ProfileDatum):
 
 	return response_dict
 
-
-#TODO(toni): split this in to different functions to update the 
-# profile database as needed.
-def stripe_webhook(request, db, ProfileDatum):
-
+def get_event(request):
+	"""Gets the event from the request verifying the signature."""
 	event = None
 	payload = request.data
 
@@ -106,6 +103,14 @@ def stripe_webhook(request, db, ProfileDatum):
 		except stripe.error.SignatureVerificationError as e:
 				# Invalid signature
 				raise e
+	return event
+
+
+#TODO(toni): split this in to different functions to update the 
+# profile database as needed.
+def stripe_webhook(request, db, ProfileDatum):
+
+	event = get_event(request)
 
 	# Handle the event
 	if event['type'] == 'customer.created':
