@@ -69,14 +69,14 @@ def new_user(customer_id, user_number, user_email, db, ProfileDatum):
 		)
 
 	# Check if there is already an entry for this person:
-	record = db.session.query(ProfileDatum).filter(ProfileDatum.user_email == user_email).first()
+	record = db.session.query(ProfileDatum).filter(ProfileDatum.user_email == user_email).all()
 
 	logging.info("[RECORD] %s", record)
 
 	if record:
-		record.customer_id = customer_id
-		record.user_number = user_number
-		record.status = Status.ACTIVE.value
+		record[-1].customer_id = customer_id
+		record[-1].user_number = user_number
+		record[-1].status = Status.ACTIVE.value
 		db.session.commit()
 
 	else:
@@ -159,7 +159,7 @@ def stripe_webhook(request, db, ProfileDatum):
 
 		# Create a new user and add them to email octopus as well as the profile data.
 		response_dict = new_user(customer_id, user_number, user_email, db, ProfileDatum)
-		return jsonify(email_octopus=response_dict, type='customer.created'), 200
+		return jsonify(email_octopus=response_dict, type='customer.created', customer_id=customer_id), 200
 	elif event['type'] == 'customer.subscription.created':
 		data = event['data']['object']
 		# TODO(toni) Use this to monitor the status!
@@ -173,7 +173,7 @@ def stripe_webhook(request, db, ProfileDatum):
 		try:
 			subscription_ends(customer_id, db, ProfileDatum)
 			message = f'Updated status of {customer_id} to CANCELLED.'
-			return jsonify(message=message, type='customer.subscription.deleted'), 200
+			return jsonify(message=message, type='customer.subscription.deleted', customer_id=customer_id), 200
 		except Exception as e:
 			return jsonify({'error': str(e)}), 400
 
@@ -188,7 +188,7 @@ def stripe_webhook(request, db, ProfileDatum):
 		try:
 			new_status = subscription_updated(customer_id, new_status, db, ProfileDatum)
 			message = f'Updated status of {customer_id} to {new_status}.'
-			return jsonify(message=message, new_status=new_status, type='customer.subscription.updated'), 200
+			return jsonify(message=message, new_status=new_status, type='customer.subscription.updated', customer_id=customer_id), 200
 		except Exception as e:
 			return jsonify({'error': str(e)}), 400
 	else:
