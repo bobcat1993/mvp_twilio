@@ -47,6 +47,11 @@ _CUSTOMER_CREATED_PAYLOAD = {
     "type": "customer.created"
 }
 
+# User number to test different cases.
+_USER_NUMBER_1 = 'whatsapp:+447433333333'
+_USER_NUMBER_2 = 'whatsapp:+447477777777'
+_USER_NUMBER_3 = 'whatsapp:+447479999999'
+
 
 class TestStripePayment(unittest.TestCase):
 
@@ -125,7 +130,7 @@ class TestStripePayment(unittest.TestCase):
 
 		target_number_of_days = 3
 
-		# Add the dummy UserDatum to the table.
+		# Add the dummy ProfileDatum to the table.
 		for d in data:
 			datum = ProfileDatum(**d)
 			self.session.add(datum)
@@ -143,6 +148,34 @@ class TestStripePayment(unittest.TestCase):
 		status = record[-1].status
 
 		self.assertEqual(status, expected_new_status)
+
+	@parameterized.expand([
+		('active_subscription', _USER_NUMBER_1, True),
+		('cancelled_subscription', _USER_NUMBER_2, False),
+		('no_account', _USER_NUMBER_3, False),
+	])
+	def test_authenticate_user(self, name, user_number, expected_is_active):
+
+		data = [
+			{'user_number': _USER_NUMBER_1, 'status': Status.ACTIVE.value},
+			{'user_number': _USER_NUMBER_2, 'status': Status.CANCELLED.value},
+		]
+
+		# Add the dummy ProfileDatum to the table.
+		for d in data:
+			datum = ProfileDatum(**d)
+			self.session.add(datum)
+		self.session.commit()
+
+		test_request = Mock()
+		test_request.json = {'user_number': user_number}
+
+		with app.app_context():
+			response = stripe_payment.authenticate_user(test_request, self, ProfileDatum)
+
+		response = response.json
+		self.assertEqual(response['is_active'], expected_is_active)
+
 
 
 	"""

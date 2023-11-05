@@ -27,7 +27,6 @@ STRIPE_SECRET = os.environ['STRIPE_SECRET']
 def time_from_timestamp(timestamp):
 	return datetime.datetime.utcfromtimestamp(timestamp)
 
-
 def get_event(request):
 	"""Gets the event from the request verifying the signature."""
 	event = None
@@ -160,7 +159,6 @@ def stripe_webhook(request, db, ProfileDatum):
 		# Create a new user and add them to email octopus as well as the profile data.
 		response_dict = new_user(customer_id, user_number, user_email, db, ProfileDatum)
 		return jsonify(email_octopus=response_dict, type='customer.created', customer_id=customer_id), 200
-		
 	elif event['type'] == 'customer.subscription.created':
 		data = event['data']['object']
 		customer_id = data['customer']
@@ -172,7 +170,6 @@ def stripe_webhook(request, db, ProfileDatum):
 			return jsonify(message=message, status=status, type='customer.subscription.created', customer_id=customer_id), 200
 		except Exception as e:
 			return jsonify({'error': str(e)}), 400
-		return jsonify(message='No action taken'), 200
 	elif event['type'] == 'customer.subscription.deleted':
 		# A subscription has been cancelled.
 		# TODO(toni) The customer ID does not appear to match any more.
@@ -204,6 +201,32 @@ def stripe_webhook(request, db, ProfileDatum):
 		print('Unhandled event type {}'.format(event['type']))
 
 	return jsonify(success=True), 400
+
+def authenticate_user(request, db, ProfileDatum):
+	"""Authenticates a user based on their WhatsApp number."""
+	#TODO(toni) May want to give an option to authenticate in email address.
+
+	# Get the inputs.
+	message_body = request.json
+	# User number with the 'whatsapp:' prefix.
+	user_number = message_body['user_number']
+
+	# Check if there is already an entry for this person's number:
+	record = db.session.query(ProfileDatum).filter(ProfileDatum.user_number == user_number).all()
+
+	if not record:
+		return jsonify(has_account=False, is_active=False, status=None)
+
+	if record:
+		status = record[-1].status
+		logging.info('Stats: %s', status)
+		if status == Status.ACTIVE.value:
+			return jsonify(has_account=True, is_active=True, status=status)
+		else:
+			return jsonify(has_account=True, is_active=False, status=status)
+
+
+
 
 
 
