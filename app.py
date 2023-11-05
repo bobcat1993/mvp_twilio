@@ -1303,7 +1303,7 @@ def ask_follow_up_questions_loop():
 def save_journaling_data():
 	return journaling.save_data(request=request, db=db, JournalingDatum=JournalingDatum)
 
-# TESTING OUT HOW TO RECIEVE INFO FROM WIX SUBSCRIPTION
+############## Stripe Webhook to deal with subscriptions ########
 @app.post('/stripe_webhook')
 def stripe_webhook():
 	return stripe_payment.stripe_webhook(request=request, db=db, ProfileDatum=ProfileDatum)

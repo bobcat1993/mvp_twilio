@@ -160,13 +160,23 @@ def stripe_webhook(request, db, ProfileDatum):
 		# Create a new user and add them to email octopus as well as the profile data.
 		response_dict = new_user(customer_id, user_number, user_email, db, ProfileDatum)
 		return jsonify(email_octopus=response_dict, type='customer.created', customer_id=customer_id), 200
+		
 	elif event['type'] == 'customer.subscription.created':
 		data = event['data']['object']
-		# TODO(toni) Use this to monitor the status!
-		# For now we will simply verify when a new customer is created.
+		customer_id = data['customer']
+		status = data['status']
+		try:
+			# Re-using the subscription_updated function.
+			status = subscription_updated(customer_id, status, db, ProfileDatum)
+			message = f'New subscription: Customer {customer_id} is {status}.'
+			return jsonify(message=message, status=status, type='customer.subscription.created', customer_id=customer_id), 200
+		except Exception as e:
+			return jsonify({'error': str(e)}), 400
 		return jsonify(message='No action taken'), 200
 	elif event['type'] == 'customer.subscription.deleted':
 		# A subscription has been cancelled.
+		# TODO(toni) The customer ID does not appear to match any more.
+		# TODO(toni) Might need to use the subscription ID.
 		data = event['data']['object']
 		customer_id = data['customer']
 
@@ -178,7 +188,6 @@ def stripe_webhook(request, db, ProfileDatum):
 			return jsonify({'error': str(e)}), 400
 
 		# TODO(toni) Collect the reasons for cancelling.
-
 	elif event['type'] == 'customer.subscription.updated':
 		# This is needed in case the user renews their subscription.
 		data = event['data']['object']
