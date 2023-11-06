@@ -215,15 +215,17 @@ def authenticate_user(request, db, ProfileDatum):
 	record = db.session.query(ProfileDatum).filter(ProfileDatum.user_number == user_number).all()
 
 	if not record:
-		return jsonify(has_account=False, is_active=False, status=None)
+		return jsonify(has_account=False, is_active=False, status=None), 200
 
 	if record:
 		status = record[-1].status
 		logging.info('Stats: %s', status)
 		if status == Status.ACTIVE.value:
-			return jsonify(has_account=True, is_active=True, status=status)
+			return jsonify(has_account=True, is_active=True, status=status), 200
 		else:
-			return jsonify(has_account=True, is_active=False, status=status)
+			return jsonify(has_account=True, is_active=False, status=status), 200
+
+	return jsonify(message='Error'), 400
 
 
 

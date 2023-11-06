@@ -1308,6 +1308,9 @@ def save_journaling_data():
 def stripe_webhook():
 	return stripe_payment.stripe_webhook(request=request, db=db, ProfileDatum=ProfileDatum)
 
+@app.post('/authenticate_user')
+def authenticate_user():
+	return stripe_payment.authenticate_user(request=request, db=db, ProfileDatum=ProfileDatum)
 
 
 if __name__ == "__main__":

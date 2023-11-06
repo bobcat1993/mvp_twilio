@@ -675,6 +675,19 @@ class TestApp(unittest.TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertEqual(response_json['type'], name)
 
+	# TODO(toni) Want to test different use cases -- i.e. someone has subscribed or not.
+	def test_authenticate_user(self):
+
+		with app.app_context():
+
+			payload = {"user_number": "whatsapp:+447479876534"}
+
+			response = self.app.post('/authenticate_user', json=payload)
+
+		response_json = response.json
+		logging.info('authenticate_user response:', response_json)
+		self.assertEqual(response.status_code, 200)
+
 
 if __name__ == '__main__':
 	unittest.main()
