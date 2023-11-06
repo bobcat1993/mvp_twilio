@@ -97,7 +97,7 @@ def new_user(customer_id, user_number, user_email, db, ProfileDatum):
 		'"status":"SUBSCRIBED"}'
 		)
 
-	list_id = "6a120b2e-2c6a-11ee-b889-9147f389737a"
+	list_id = "db96a3d0-7cb1-11ee-8609-d7685fc20d35"
 	response = requests.post(f'https://emailoctopus.com/api/1.6/lists/{list_id}/contacts', headers=headers, data=data)
 
 	response_dict = json.loads(response.text)
