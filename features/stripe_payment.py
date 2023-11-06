@@ -94,6 +94,7 @@ def new_user(customer_id, user_number, user_email, db, ProfileDatum):
 		'{"api_key":'
 		f'"{api_key}",'
 		f'"email_address": "{user_email}",'
+		'"fields": { "Phone" : "' + user_number + '"},'
 		'"status":"SUBSCRIBED"}'
 		)
 
