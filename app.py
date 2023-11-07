@@ -1156,6 +1156,39 @@ def new_user():
 
 	return jsonify({'message': message_body, 'eo_response':response_dict})
 
+
+@app.post('/new_subscriber')
+def new_subscriber():
+	"""Adds new newsletter subscribers to EmailOctopus: webhook from Wix."""
+
+	# These key's can be found within the Wix automations;
+	# there is an option to see the data structure.
+	message_body = request.json['data']
+	user_email = message_body['email']
+
+	# Add contact to EmailOctopus
+	api_key = str(os.environ['EMAIL_OCTOPUS_API_KEY']).strip()
+
+	headers = {
+		'Content-Type': 'application/json',
+	}
+
+	data = (
+		'{"api_key":'
+		f'"{api_key}",'
+		f'"email_address": "{user_email}",'
+		'"status":"SUBSCRIBED"}'
+		)
+
+	list_id = "5ac539a4-7d80-11ee-840f-9977612b1c6f"
+	response = requests.post(f'https://emailoctopus.com/api/1.6/lists/{list_id}/contacts', headers=headers, data=data)
+              
+	response_dict = json.loads(response.text)
+	logging.info(response_dict)
+	logging.info('Request to EmailOctopus: %s', str(response.status_code))
+
+	return jsonify({'message': message_body, 'eo_response':response_dict})
+
 @app.post('/reminder')
 def reminder():
 	return reminders.reminder(request=request, db=db, UserDatum=UserDatum, ReminderDatum=ReminderDatum)
