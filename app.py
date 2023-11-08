@@ -172,6 +172,7 @@ class ReminderDatum(db.Model):
 	user_number = db.Column(db.String, nullable=True)
 	message = db.Column(db.String, nullable=True)
 	time = db.Column(db.DateTime, nullable=True)
+
 	
 # Datum for the journeys.
 # Boundary Journey.
@@ -185,6 +186,7 @@ BoundariesStageFiveDatum = boundaries.get_BoundariesStageFiveDatum(db)
 BurnoutSurveyDatum = burnout_survey.get_BurnoutSurveyDatum(db)
 CustomReminderDatum = custom_reminder.get_CustomReminderDatum(db)
 JournalingDatum = journaling.get_JournalingDatum(db)
+WhyNotBuy = stripe_payment.get_WhyNotBuy(db)
 
 @app.before_first_request
 def init_app():
@@ -1344,6 +1346,11 @@ def stripe_webhook():
 @app.post('/authenticate_user')
 def authenticate_user():
 	return stripe_payment.authenticate_user(request=request, db=db, ProfileDatum=ProfileDatum)
+
+@app.post('/why_not_buy_save_data')
+def why_not_buy_save_data():
+	return stripe_payment.why_not_buy_save_data(request=request, db=db, WhyNotBuy=WhyNotBuy)
+
 
 
 if __name__ == "__main__":

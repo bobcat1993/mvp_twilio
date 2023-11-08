@@ -6,6 +6,7 @@ import stripe
 from dotenv import load_dotenv
 import datetime
 from absl import logging
+from hashlib import md5
 
 from flask import Flask, jsonify, request
 from enum import Enum
@@ -22,6 +23,21 @@ class Status(Enum):
 STRIPE_API_KEY = os.environ['STRIPE_API_KEY']
 # Endpoint's secret can be found in the webhook settings in the Developer Dashboard.
 STRIPE_SECRET = os.environ['STRIPE_SECRET']
+
+# TODO(toni) Move to utils.
+def string_hash(string):
+	return md5(string.encode()).hexdigest()
+
+def get_WhyNotBuy(db):
+	class WhyNotBuy(db.Model):
+		"""Stores the data from the journaling journey flow."""
+
+		id = db.Column(db.Integer, primary_key=True)
+		user_id = db.Column(db.String, nullable=True)
+		time = db.Column(db.DateTime, nullable=True)
+		why_not_buy = db.Column(db.String, nullable=True)
+
+	return WhyNotBuy
 
 
 def time_from_timestamp(timestamp):
@@ -227,6 +243,28 @@ def authenticate_user(request, db, ProfileDatum):
 			return jsonify(has_account=True, is_active=False, status=status), 200
 
 	return jsonify(message='Error'), 400
+
+
+def why_not_buy_save_data(request, db, WhyNotBuy):
+	"""Saves reasons people are not ready to buy."""
+	try:
+		message_body = request.json
+
+		# Hash the user_id so that the data is pseudo-anonyms.
+		message_body['user_id'] = string_hash(message_body['user_id'])
+
+		# Get the current time.
+		now = datetime.datetime.now()
+		message_body['time'] = now
+
+		datum = WhyNotBuy(**message_body)
+		db.session.add(datum)
+		db.session.commit()
+		return jsonify({'message': f'Flow data saved.'}), 200
+
+	except Exception as e:
+		logging.error('error: %s', str(e))
+		return jsonify({'error': str(e)}), 400
 
 
 

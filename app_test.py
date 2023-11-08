@@ -688,6 +688,16 @@ class TestApp(unittest.TestCase):
 		logging.info('authenticate_user response:', response_json)
 		self.assertEqual(response.status_code, 200)
 
+	def test_why_not_buy_save_data(self):
+		# Create a sample request payload to simulate the data sent by Twilio.
+		payload = {
+			"user_id": "whatsapp:+447479813767",
+			"why_not_buy": "Test: too expensive."
+			}
+
+		response = self.app.post('/why_not_buy_save_data', json=payload)
+		app.logger.info('response %s', response)
+		self.assertEqual(response.status_code, 200)
 
 if __name__ == '__main__':
 	unittest.main()
