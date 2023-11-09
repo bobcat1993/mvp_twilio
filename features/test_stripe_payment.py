@@ -171,7 +171,7 @@ class TestStripePayment(unittest.TestCase):
 		test_request.json = {'user_number': user_number}
 
 		with app.app_context():
-			response = stripe_payment.authenticate_user(test_request, self, ProfileDatum)
+			response, _ = stripe_payment.authenticate_user(test_request, self, ProfileDatum)
 
 		response = response.json
 		self.assertEqual(response['is_active'], expected_is_active)
