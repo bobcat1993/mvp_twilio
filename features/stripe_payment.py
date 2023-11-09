@@ -231,7 +231,8 @@ def authenticate_user(request, db, ProfileDatum):
 	user_number = message_body['user_number']
 
 	# Check if there is already an entry for this person's number:
-	record = db.session.query(ProfileDatum).filter(ProfileDatum.user_number == user_number).all()
+	# Just check that the last 5 digits match.
+	record = db.session.query(ProfileDatum).filter(ProfileDatum.user_number.endswith(user_number[-5:])).all()
 
 	if not record:
 		return jsonify(has_account=False, is_active=False, status=None), 200
