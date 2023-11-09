@@ -157,7 +157,10 @@ class TestStripePayment(unittest.TestCase):
 	def test_authenticate_user(self, name, user_number, expected_is_active):
 
 		data = [
+			# Mimic the base there _USER_NUMBER_1 has multiple accounts and only one is active.
+			{'user_number': _USER_NUMBER_1, 'status': None},
 			{'user_number': _USER_NUMBER_1, 'status': Status.ACTIVE.value},
+			{'user_number': _USER_NUMBER_1, 'status': Status.CANCELLED.value},
 			{'user_number': _USER_NUMBER_2, 'status': Status.CANCELLED.value},
 		]
 
