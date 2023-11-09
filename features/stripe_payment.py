@@ -237,8 +237,8 @@ def authenticate_user(request, db, ProfileDatum):
 	if not record:
 		return jsonify(has_account=False, is_active=False, status=None), 200
 
-	if record:
-		status = record[-1].status
+	for r in record:
+		status = r.status
 		logging.info('Stats: %s', status)
 		if status == Status.ACTIVE.value:
 			return jsonify(has_account=True, is_active=True, status=status), 200
