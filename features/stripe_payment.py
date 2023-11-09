@@ -73,6 +73,8 @@ def get_event(request):
 def new_user(customer_id, user_number, user_email, db, ProfileDatum):
 	"""Adds new users to the user Profile database."""
 
+	# Remove any spaces.
+	user_number = user_number.replace(' ', '')
 	user_number = f'whatsapp:{user_number}'
 
 	# The data
