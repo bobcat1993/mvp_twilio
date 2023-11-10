@@ -95,6 +95,7 @@ def new_user(customer_id, user_number, user_email, db, ProfileDatum, expiry_date
 		record[-1].customer_id = customer_id
 		record[-1].user_number = user_number
 		record[-1].status = Status.ACTIVE.value
+		record[-1].expiry_date = expiry_date
 		db.session.commit()
 
 	else:
@@ -244,6 +245,9 @@ def stripe_webhook(request, db, ProfileDatum):
 		response_dict = new_user(customer_id, user_number, user_email, db, ProfileDatum, expiry_date)
 
 		return jsonify(
+			customer_id=customer_id,
+			user_number=user_number,
+			user_email=user_email,
 			email_octopus=response_dict,
 			type='checkout.session.completed',
 			expiry_date=expiry_date,
