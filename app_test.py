@@ -581,11 +581,12 @@ class TestApp(unittest.TestCase):
 
 	# Example json when a new customer is created.
 	# Remove some fields for brevity.
+	_CUSTOMER_ID = "cus_test"
 	_CUSTOMER_CREATED_PAYLOAD = {
 		"object": "event",
 		"data": {
 			"object": {
-				"id": "cus_OvtMKUUtrX26ck",
+				"id": _CUSTOMER_ID,
 				"object": "customer",
 				"address": {
 					"country": "GB",
@@ -604,7 +605,7 @@ class TestApp(unittest.TestCase):
         "object": {
             "id": "sub_1O8R9sIvT4WZgIskUdQhe3kl",
             "object": "subscription",
-            "customer": "cus_OvtMKUUtrX26ck",
+            "customer": _CUSTOMER_ID,
             "plan": {
                 "nickname": "bobbychat-monthly-£9-45",
                 "product": "prod_OvqYwqTlW1X3Rp",
@@ -628,7 +629,7 @@ class TestApp(unittest.TestCase):
 								"feedback": None,
 								"reason": "cancellation_requested"
 						},
-						"customer": "cus_OvtMKUUtrX26ck",
+						"customer": _CUSTOMER_ID,
 						"plan": {
 								"nickname": "bobbychat-monthly-£9-45",
 								"product": "prod_OvqYwqTlW1X3Rp",
@@ -647,7 +648,7 @@ class TestApp(unittest.TestCase):
 		"created": 1699010989,
 		"data": {
 				"object": {
-						"customer": "cus_OvtMKUUtrX26ck",
+						"customer": _CUSTOMER_ID,
 						"plan": {
 								"nickname": "bobbychat-monthly-£9-45",
 								"product": "prod_OvqYwqTlW1X3Rp",
@@ -659,8 +660,48 @@ class TestApp(unittest.TestCase):
 		"type": "customer.subscription.updated"
 	}
 
+	# Buying a non-subscription product.
+	_CHECKOUT_SESSION_COMPLETE_1 = {
+	  "id": "evt_1OAtwxIvT4WZgIskcByI4uLa",
+	  "object": "event",
+	  "data": {
+	    "object": {
+	      "customer_details": {
+	        "email": "toni@testing.com",
+	        "phone": "+447479876534",
+	      },
+	      "customer": None,
+	      "metadata": {
+	        "number_of_months": "3",
+	        "product": "bobby-chat-3-month-pass"
+	      },
+	    }
+	  },
+	  "type": "checkout.session.completed"
+	}
+
+	# Buying a subscription product.
+	_CHECKOUT_SESSION_COMPLETE_2 = {
+	  "id": "evt_1OAtwxIvT4WZgIskcByI4uLa",
+	  "object": "event",
+	  "data": {
+	    "object": {
+	      "customer_details": {
+	        "email": "toni@bobby-chat.com",
+	        "phone": "+447479876534",
+	      },
+	      "customer": _CUSTOMER_ID,
+	      "metadata": {
+	      },
+	    }
+	  },
+	  "type": "checkout.session.completed"
+	}
+
 	@parameterized.expand([
 		('customer.created', _CUSTOMER_CREATED_PAYLOAD),
+		('checkout.session.completed', _CHECKOUT_SESSION_COMPLETE_1),
+		('checkout.session.completed', _CHECKOUT_SESSION_COMPLETE_2),
 		('customer.subscription.created', _SUBSCRIPTION_CREATED_PAYLOAD),
 		('customer.subscription.updated', _SUBSCRIPTION_UPDATED_PAYLOAD),
 		('customer.subscription.deleted', _SUBSCRIPTION_DELETED_PAYLOAD),
