@@ -274,9 +274,19 @@ def authenticate_user(request, db, ProfileDatum):
 	if not record:
 		return jsonify(has_account=False, is_active=False, status=None), 200
 
+	# Check if there is an expiry date and act upon it.
+	time_now = datetime.now()
+	for r in record:
+		expiry_date = r.expiry_date
+		if expiry_date is not None:
+			is_active = time_now < expiry_date
+			status = Status.ACTIVE.value if is_active else Status.CANCELLED.value
+
+			# Update the status in place.
+			r.status = status
+
 	for r in record:
 		status = r.status
-		logging.info('Stats: %s', status)
 		if status == Status.ACTIVE.value:
 			return jsonify(has_account=True, is_active=True, status=status), 200
 	else:

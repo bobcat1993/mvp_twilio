@@ -7,7 +7,7 @@ from flask import Flask, jsonify, request
 from absl import logging
 import os
 import json
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from freezegun import freeze_time
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -49,8 +49,10 @@ _CUSTOMER_CREATED_PAYLOAD = {
 
 # User number to test different cases.
 _USER_NUMBER_1 = 'whatsapp:+447433333333'
-_USER_NUMBER_2 = 'whatsapp:+447477777777'
-_USER_NUMBER_3 = 'whatsapp:+447479999999'
+_USER_NUMBER_2 = 'whatsapp:+447466666666'
+_USER_NUMBER_3 = 'whatsapp:+447477777777'
+_USER_NUMBER_4 = 'whatsapp:+447478888888'
+_USER_NUMBER_5 = 'whatsapp:+447479999999'
 
 
 class TestStripePayment(unittest.TestCase):
@@ -153,8 +155,13 @@ class TestStripePayment(unittest.TestCase):
 		('active_subscription', _USER_NUMBER_1, True),
 		('cancelled_subscription', _USER_NUMBER_2, False),
 		('no_account', _USER_NUMBER_3, False),
+		('expired_subscription', _USER_NUMBER_4, False),
+		('not_expired_subscription', _USER_NUMBER_5, True)
 	])
 	def test_authenticate_user(self, name, user_number, expected_is_active):
+
+		yesterday = datetime.now() - timedelta(days=1)
+		tomorrow = datetime.now() + timedelta(days=1)
 
 		data = [
 			# Mimic the base there _USER_NUMBER_1 has multiple accounts and only one is active.
@@ -162,6 +169,8 @@ class TestStripePayment(unittest.TestCase):
 			{'user_number': _USER_NUMBER_1, 'status': Status.ACTIVE.value},
 			{'user_number': _USER_NUMBER_1, 'status': Status.CANCELLED.value},
 			{'user_number': _USER_NUMBER_2, 'status': Status.CANCELLED.value},
+			{'user_number': _USER_NUMBER_4, 'status': Status.ACTIVE.value, 'expiry_date': yesterday},
+			{'user_number': _USER_NUMBER_5, 'status': Status.ACTIVE.value, 'expiry_date': tomorrow},
 		]
 
 		# Add the dummy ProfileDatum to the table.
