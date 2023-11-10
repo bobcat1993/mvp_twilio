@@ -4,13 +4,13 @@ import json
 import os
 import stripe
 from dotenv import load_dotenv
-import datetime
 from absl import logging
 from hashlib import md5
 
 from flask import Flask, jsonify, request
 from enum import Enum
 import requests
+from datetime import datetime, timedelta
 
 load_dotenv()
 
@@ -41,7 +41,7 @@ def get_WhyNotBuy(db):
 
 
 def time_from_timestamp(timestamp):
-	return datetime.datetime.utcfromtimestamp(timestamp)
+	return datetime.utcfromtimestamp(timestamp)
 
 def get_event(request):
 	"""Gets the event from the request verifying the signature."""
@@ -70,7 +70,7 @@ def get_event(request):
 				raise e
 	return event
 
-def new_user(customer_id, user_number, user_email, db, ProfileDatum):
+def new_user(customer_id, user_number, user_email, db, ProfileDatum, expiry_date=None):
 	"""Adds new users to the user Profile database."""
 
 	# Remove any spaces.
@@ -83,6 +83,7 @@ def new_user(customer_id, user_number, user_email, db, ProfileDatum):
 		user_number=user_number,
 		user_email=user_email,
 		status=Status.ACTIVE.value,
+		expiry_date=expiry_date,
 		)
 
 	# Check if there is already an entry for this person:
@@ -216,10 +217,42 @@ def stripe_webhook(request, db, ProfileDatum):
 			return jsonify(message=message, new_status=new_status, type='customer.subscription.updated', customer_id=customer_id), 200
 		except Exception as e:
 			return jsonify({'error': str(e)}), 400
+	elif event['type'] == 'checkout.session.completed':
+		# This is for products that are not subscriptions.
+		expiry_date = None
+		error_message = None
+
+		# Get the data.
+		data = event['data']['object']
+		# customer_id will be None for non-subscription products.
+		customer_id = data['customer']
+		user_email = data['customer_details']['email']
+		user_number = data['customer_details']['phone']
+		meta_data = data['metadata']
+
+		if meta_data:
+			try:
+				number_of_months = int(meta_data['number_of_months'])
+				product = meta_data['product']
+
+				expiry_date = datetime.now() + timedelta(days=number_of_months * 31)
+			except Exception as e:
+				logging.error('error: %s', str(e))
+				error_message = str(e)
+			
+		# Add the new user.
+		response_dict = new_user(customer_id, user_number, user_email, db, ProfileDatum, expiry_date)
+
+		return jsonify(
+			email_octopus=response_dict,
+			type='checkout.session.completed',
+			expiry_date=expiry_date,
+			error_message=error_message), 200
+
 	else:
 		print('Unhandled event type {}'.format(event['type']))
 
-	return jsonify(success=True), 400
+	return jsonify(success=False), 400
 
 def authenticate_user(request, db, ProfileDatum):
 	"""Authenticates a user based on their WhatsApp number."""
@@ -257,7 +290,7 @@ def why_not_buy_save_data(request, db, WhyNotBuy):
 		message_body['user_id'] = string_hash(message_body['user_id'])
 
 		# Get the current time.
-		now = datetime.datetime.now()
+		now = datetime.now()
 		message_body['time'] = now
 
 		datum = WhyNotBuy(**message_body)
