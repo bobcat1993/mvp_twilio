@@ -151,7 +151,7 @@ class ProfileDatum(db.Model):
 	customer_id = db.Column(db.String, nullable=True)
 	user_number = db.Column(db.String, nullable=True)
 	user_email = db.Column(db.String, nullable=True)
-	expiry_date = db.Column(db.Integer, nullable=True)
+	expiry_date = db.Column(db.DateTime, nullable=True)
 	user_wix_id = db.Column(db.String, nullable=True)
 	status = db.Column(db.String, nullable=True)
 
