@@ -282,7 +282,7 @@ def authenticate_user(request, db, ProfileDatum):
 	for r in record:
 		expiry_date = r.expiry_date
 		if expiry_date is not None:
-			is_active = time_now < expiry_date
+			is_active = time_now <= expiry_date
 			status = Status.ACTIVE.value if is_active else Status.CANCELLED.value
 
 			# Update the status in place.
