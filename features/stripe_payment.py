@@ -127,6 +127,7 @@ def new_user(customer_id, user_number, user_email, db, ProfileDatum, expiry_date
 	return response_dict
 
 def subscription_ends(customer_id, db, ProfileDatum):
+	"""Update the ProfileDatum to reflect that a subscription has ended for customer, customer_id."""
 
 	# Find this user.
 	record = db.session.query(ProfileDatum).filter(ProfileDatum.customer_id == customer_id).all()
@@ -143,6 +144,7 @@ def subscription_ends(customer_id, db, ProfileDatum):
 		raise ValueError(f'No customer, {customer_id}, found in Profile database.')
 
 def subscription_updated(customer_id, new_status, db, ProfileDatum):
+	"""Handles updated subscriptions."""
 
 	# Find this user.
 	record = db.session.query(ProfileDatum).filter(ProfileDatum.customer_id == customer_id).all()
@@ -166,6 +168,7 @@ def subscription_updated(customer_id, new_status, db, ProfileDatum):
 #TODO(toni): split this in to different functions to update the 
 # profile database as needed.
 def stripe_webhook(request, db, ProfileDatum):
+	"""Handles the Stripe webhooks."""
 
 	event = get_event(request)
 
