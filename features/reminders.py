@@ -65,6 +65,7 @@ def reminder(request, db, UserDatum, ReminderDatum):
 	# Get the message.
 	message = _REMINDER_MESSAGES[int(idx) - 1]
 
+	# TODO(toni) Change this to come from the request.
 	whatsapp_from = os.environ['WHATSAPP_NUMBER']
 
 	if len(today_rows) > 0:
