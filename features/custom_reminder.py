@@ -145,7 +145,8 @@ def set_custom_reminder(request, scheduler):
 	# Add the job to the scheduler using the DateTrigger
 	scheduler.add_job(send_message, args=(user_number,), trigger=trigger)
 
-	return f'Custom reminder set for {trigger_date}.'
+	return jsonify({
+	  'message': f'Custom reminder set for {trigger_date}.'}), 200
 
 
 def save_data(request, db, CustomReminderDatum):
