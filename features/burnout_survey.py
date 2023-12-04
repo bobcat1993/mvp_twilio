@@ -37,6 +37,8 @@ def string_hash(string):
 
 def get_burnout_infographic(request):
 
+	# TODO(toni) Handle the case where all of the scores are None.
+
 	# Get the inputs.
 	message_body = request.json
 
