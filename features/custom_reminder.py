@@ -45,23 +45,6 @@ def get_CustomReminderDatum(db):
 
 	return CustomReminderDatum
 
-
-# _ASK_DAY_OF_REMINDER_SYSTEM_PROMPT = """The user will tell you when to schedule their next session. Given that today is {weekday_today} give that day of the week as "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" or "Sunday". Do not show any working, just return the string."""
-
-# _ASSISTANT_ASKS_FOR_DAY = """When you would like to schedule your next session?"""
-
-# _WEEKDAYS = {
-# 	0: 'Monday',
-# 	1: 'Tuesday',
-# 	2: 'Wednesday',
-# 	3: 'Thursday',
-# 	4: 'Friday',
-# 	5: 'Saturday',
-# 	6: 'Sunday',
-# 	}
-
-# _REVERSE_WEEKDAYS = {v: k for k, v in _WEEKDAYS.items()}
-
 def send_message(user_number):
 
 	body = """Hi, you asked me to remind you to chat with Bobby today. I'm here whenever you are ready."""
