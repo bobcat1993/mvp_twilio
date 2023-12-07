@@ -51,12 +51,12 @@ def send_message(user_number):
 
 	print("\nUSER_NUMBER:", user_number)
 
-	if not user_number.startswith('+'):
-		user_number = f'+{user_number}'
+	# if not user_number.startswith('whatsapp:+'):
+	# 	user_number = f'whatsapp:+{user_number}'
 
 	message = client.messages.create(
 		from_=f'whatsapp:{whatsapp_from}',
-		status_callback='https://95c2-31-48-55-232.ngrok-free.app/MessageSatus',
+		status_callback='https://8747-81-103-170-52.ngrok-free.app/MessageSatus',
 		body=body,
 		to=user_number,
 	)
@@ -79,7 +79,10 @@ def set_custom_reminder(request, scheduler):
 	trigger = DateTrigger(run_date=trigger_date)
 
 	# Add the job to the scheduler using the DateTrigger
-	scheduler.add_job(send_message, args=(user_number,), trigger=trigger)
+	scheduler.add_job(func=send_message,
+	                  args=(user_number,),
+	                  trigger=trigger,
+	                  misfire_grace_time=None)
 
 	return jsonify({
 	  'message': f'Custom reminder set for {trigger_date}.'}), 200

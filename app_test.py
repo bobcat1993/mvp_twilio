@@ -6,6 +6,7 @@ from abc_types import Sentiment
 import logging
 from freezegun import freeze_time
 from datetime import date, timedelta
+from datetime import datetime, date, timedelta
 
 # See all the logs.
 app.logger.setLevel(logging.INFO)
@@ -538,46 +539,53 @@ class TestApp(unittest.TestCase):
 	# 	app.logger.info('response %s', response)
 	# 	self.assertEqual(response.status_code, 200)
 
-	# """ Do not include this function.
-	# def test_set_custom_reminder(self):
-	# 	# Create a sample request payload to simulate the data sent by 
-	# 	# Twilio
-	# 	payload = {
-	# 		"user_number_of_days": 1,
-	# 		"user_number": "whatsapp:+447479813767"
-	# 		}
+	# Do not include this function.
+	"""@parameterized.expand([
+	  ('message_from_twilio', 'whatsapp:+447479813767'),
+	  # TODO(toni) Setup for switch over to WhatsApp only (no Twilio).
+	  # ('message_from_whatsapp', '447479813767')
+	  ])
+	def test_set_custom_reminder(self, user_number):
+		# Create a sample request payload to simulate the data sent by 
+		# Twilio
+		payload = {
+			"user_number_of_days": 1,
+			"user_number": "whatsapp:+447479813767"
+			}
 
-	# 	response = self.app.post('custom_reminder/set_custom_reminder', json=payload)
-	# 	app.logger.info('response %s', response)
-	# 	self.assertEqual(response.status_code, 200)"""
+		one_day_and_ago = datetime.now() + timedelta(days=1)
+		with freeze_time(one_day_and_ago):
+			response = self.app.post('custom_reminder/set_custom_reminder', json=payload)
+			app.logger.info('response %s', response.json)
+			self.assertEqual(response.status_code, 200)"""
 
-	# def test_save_journaling_data(self):
-	# 	# Create a sample request payload to simulate the data sent by 
-	# 	# Twilio
-	# 	payload = {
-	# 		"prompt": "What's on your mind?",
-	# 		"user_topic_intro": "Family",
-	# 		"topic_history": [],
-	# 		"last_user_topic_response": None,
-	# 		"free_style_user_event": None,
-	# 		"user_event_var": "I went skating with my family in CT",
-	# 		"user_event": "I went skating with my family in CT",
-	# 		"start_time": "Sat, 07 Oct 2023 11:31:11 GMT",
-	# 		"history": [],
-	# 		"last_user_response": "No.. it was quite a while a go.",
-	# 		"approx_end_time": "Sat, 07 Oct 2023 11:32:19 GMT",
-	# 		"user_feel_after": "4",
-	# 		"user_unsure": None,
-	# 		"user_does_not_commit": None,
-	# 		"user_id": "whatsapp:+447479813767",
-	# 		"origin": "twilio_flow",
-	# 		"flow_sid": "FWd82d15bd01c67e7fd87dfdc1072f49b3",
-	# 		"error": "None"
-	# 	 }
+	def test_save_journaling_data(self):
+		# Create a sample request payload to simulate the data sent by 
+		# Twilio
+		payload = {
+			"prompt": "What's on your mind?",
+			"user_topic_intro": "Family",
+			"topic_history": [],
+			"last_user_topic_response": None,
+			"free_style_user_event": None,
+			"user_event_var": "I went skating with my family in CT",
+			"user_event": "I went skating with my family in CT",
+			"start_time": "Sat, 07 Oct 2023 11:31:11 GMT",
+			"history": [],
+			"last_user_response": "No.. it was quite a while a go.",
+			"approx_end_time": "Sat, 07 Oct 2023 11:32:19 GMT",
+			"user_feel_after": "4",
+			"user_unsure": None,
+			"user_does_not_commit": None,
+			"user_id": "whatsapp:+447479813767",
+			"origin": "twilio_flow",
+			"flow_sid": "FWd82d15bd01c67e7fd87dfdc1072f49b3",
+			"error": "None"
+		 }
 
-	# 	response = self.app.post('/journaling/save_data', json=payload)
-	# 	app.logger.info('response %s', response)
-	# 	self.assertEqual(response.status_code, 200)
+		response = self.app.post('/journaling/save_data', json=payload)
+		app.logger.info('response %s', response)
+		self.assertEqual(response.status_code, 200)
 
 	# Example json when a new customer is created.
 	# Remove some fields for brevity.
