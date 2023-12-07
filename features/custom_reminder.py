@@ -68,6 +68,9 @@ def send_message(user_number):
 
 	print("\nUSER_NUMBER:", user_number)
 
+	if not user_number.startswith('+'):
+		user_number = f'+{user_number}'
+
 	message = client.messages.create(
 		from_=f'whatsapp:{whatsapp_from}',
 		status_callback='https://95c2-31-48-55-232.ngrok-free.app/MessageSatus',
@@ -75,56 +78,6 @@ def send_message(user_number):
 		to=user_number,
 	)
 	return message
-
-
-# def set_custom_reminder(request, scheduler):
-
-# 	# Get the inputs.
-# 	message_body = request.json
-
-# 	# Get the list of results.
-# 	user_weekday = message_body['user_weekday']
-# 	user_number = message_body['user_number']
-
-# 	# Add today's date into the system prompt.
-# 	weekday_today_idx = datetime.now().weekday()
-# 	weekday_today = _WEEKDAYS[weekday_today_idx]
-# 	system_prompt = _ASK_DAY_OF_REMINDER_SYSTEM_PROMPT.format(weekday_today=weekday_today)
-
-# 	messages = [
-# 	{"role": "system", "content": system_prompt},
-# 	{"role": "assistant", "content": _ASSISTANT_ASKS_FOR_DAY},
-# 	{"role": "user", "content": user_weekday},
-# 	]
-
-# 	model_output = utils.chat_completion(
-# 		model="gpt-3.5-turbo-0613",
-# 		messages=messages,
-# 		max_tokens=8,
-# 		temperature=0.0,
-# 		)
-
-# 	user_weekday = model_output['choices'][0]['message']['content']
-
-# 	if user_weekday.capitalize() in _REVERSE_WEEKDAYS:
-# 		print("user_weekday:", user_weekday.capitalize())
-# 		user_weekday_idx = _REVERSE_WEEKDAYS[user_weekday.capitalize()]
-
-# 		if user_weekday_idx > weekday_today_idx:
-# 			# If the reminder is for another day this week:
-# 			trigger_days_from_now = (user_weekday_idx - weekday_today_idx)
-# 		else:
-# 			# If the reminder is for new week:
-# 			trigger_days_from_now = (user_weekday_idx - weekday_today_idx) + 7
-
-# 		trigger_date = datetime.now() + timedelta(days=trigger_days_from_now)
-
-# 		# Create a DateTrigger for the specified date and time
-# 		trigger = DateTrigger(run_date=job_date)
-
-# 		# Add the job to the scheduler using the DateTrigger
-# 		scheduler.add_job(my_one_time_job, trigger=trigger)
-
 
 def set_custom_reminder(request, scheduler):
 	"""More simple reminder what expects the user to give a number of days."""
