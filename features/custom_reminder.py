@@ -51,9 +51,6 @@ def send_message(user_number):
 
 	print("\nUSER_NUMBER:", user_number)
 
-	# if not user_number.startswith('whatsapp:+'):
-	# 	user_number = f'whatsapp:+{user_number}'
-
 	message = client.messages.create(
 		from_=f'whatsapp:{whatsapp_from}',
 		status_callback='https://8747-81-103-170-52.ngrok-free.app/MessageSatus',
