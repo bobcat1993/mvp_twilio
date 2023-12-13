@@ -73,8 +73,8 @@ def get_event(request):
 def new_user(customer_id, user_number, user_email, db, ProfileDatum, expiry_date=None):
 	"""Adds new users to the user Profile database."""
 
-	# Remove any spaces.
-	user_number = user_number.replace(' ', '')
+	# Remove any non-numeric or '+' characters.
+	user_number = ''.join([c for c in user_number if c in '1234567890+'])
 	user_number = f'whatsapp:{user_number}'
 
 	# The data
