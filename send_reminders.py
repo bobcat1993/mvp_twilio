@@ -1,3 +1,9 @@
+"""This script is used to send "reminder" messages to users.
+
+Specify the WhatsApp numbers of recipients in _NUMBER_LIST and the
+message to be sent in _BODY.
+"""
+
 from twilio.rest import Client
 from dotenv import load_dotenv
 import os
@@ -11,8 +17,12 @@ import time
 load_dotenv()
 
 # A list of WhatsApp numbers to send messages to.
-# These must be in the form "+447479876543".
-NUMBER_LIST = []
+# These must be in the form "whatsapp:+447479876543".
+_NUMBER_LIST = ['whatsapp:+4474798176543']
+
+# The message to be send to the users in the _NUMBER_LIST.
+_BODY="""Hi, did you know that journaling can be a great way to process strong emotions -- good or bad. We've added topics to our journaling feature so you can focus on specific areas such as boundary setting, self-care and even time management. There's always an option to Journal Free Style - if you prefer. Just press "Start Journaling" to get started."""
+
 
 account_sid = os.environ['TWILIO_ACCOUNT_SID']
 auth_token = os.environ['TWILIO_AUTH_TOKEN']
@@ -30,17 +40,15 @@ signature = validator.compute_signature(assets_url, params={})
 
 
 # Get the person running the script to confirm they want to run this:
-input(f"This will send a message to {len(NUMBER_LIST)} contacts."
+input(f"This will send a message to {len(_NUMBER_LIST)} contacts."
 			" Press enter to continue...")
-
-_BODY="""Hi, did you know that journaling can be a great way to process strong emotions -- good or bad. We've added topics to our journaling feature so you can focus on specific areas such as boundary setting, self-care and even time management. There's always an option to Journal Free Style - if you prefer. Just press "Start Journaling" to get started."""
 
 input(f"This is the message you are about to send:\n {_BODY}"
 			"\nAre you sure this is the message you would like to send?")
 
 client = Client(account_sid, auth_token)
 
-for number in NUMBER_LIST:
+for number in _NUMBER_LIST:
 	print(f'Sending message to {number}.')
 
 	# TODO(toni) Check who has not already checked in today and only 
