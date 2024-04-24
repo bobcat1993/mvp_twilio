@@ -1,0 +1,1294 @@
+{
+  "description": "MVP0-v0.15",
+  "states": [
+    {
+      "name": "Trigger",
+      "type": "trigger",
+      "transitions": [
+        {
+          "next": "set_variables_0",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "incomingCall"
+        },
+        {
+          "event": "incomingConversationMessage"
+        },
+        {
+          "event": "incomingRequest"
+        },
+        {
+          "event": "incomingParent"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 70,
+          "y": -3960
+        }
+      }
+    },
+    {
+      "name": "user_chooses_skill",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "eval_user_choice_step_1",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "time_out_message",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 20,
+          "y": -920
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "content_sid": "HX6beb9f6abbae217cc591bb5d00732d00",
+        "body": "What would you like to do today? Please select an option  0 - 5 🔢",
+        "media_url": "https://storage.googleapis.com/####/new_menu.jpg",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "eval_user_skill_choice",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "user_feeling",
+          "event": "noMatch"
+        },
+        {
+          "next": "run_subflow_reflect",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value matches_any_of 2",
+              "arguments": [
+                "{{flow.variables.user_skill}}"
+              ],
+              "type": "matches_any_of",
+              "value": "2, reflect, Reflect, reflection, Reflection, 2., two, Two"
+            }
+          ]
+        },
+        {
+          "next": "run_subflow_control",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value matches_any_of 3",
+              "arguments": [
+                "{{flow.variables.user_skill}}"
+              ],
+              "type": "matches_any_of",
+              "value": "3, three, Three, three., Three., Release and Focus, release and focus, release, focus, release & focus, Release & focus, Release and focus, Release, Focus"
+            }
+          ]
+        },
+        {
+          "next": "run_burnout_quiz_subflow",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value matches_any_of 4",
+              "arguments": [
+                "{{flow.variables.user_skill}}"
+              ],
+              "type": "matches_any_of",
+              "value": "4, four, 4., Four, Four., four., quiz, burnout quiz, Quiz, Burnout quiz"
+            }
+          ]
+        },
+        {
+          "next": "run_journal_subflow",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value matches_any_of 1",
+              "arguments": [
+                "{{flow.variables.user_skill}}"
+              ],
+              "type": "matches_any_of",
+              "value": "1, journal, Journal, 1., journal challenge, Journal challenge, Journal., journal., journal challenge., Journal Challenge., Journal challenge., one, One, one., One."
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{flow.variables.user_skill}}",
+        "offset": {
+          "x": -280,
+          "y": 640
+        }
+      }
+    },
+    {
+      "name": "run_subflow_reflect",
+      "type": "run-subflow",
+      "transitions": [
+        {
+          "next": "set_variables_3",
+          "event": "completed"
+        },
+        {
+          "next": "set_variables_3",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "flow_sid": "FW90be214d7d6feaa1ce50b5036564a215",
+        "flow_revision": "LatestPublished",
+        "offset": {
+          "x": -830,
+          "y": 1060
+        }
+      }
+    },
+    {
+      "name": "set_variables_1",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "eval_user_skill_choice",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "{{widgets.user_chooses_skill.inbound.Body}}",
+            "key": "user_skill"
+          },
+          {
+            "value": "https://bobby-chat-####.herokuapp.com",
+            "key": "server_path"
+          }
+        ],
+        "offset": {
+          "x": -30,
+          "y": 290
+        }
+      }
+    },
+    {
+      "name": "user_feedback",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "thanks_message",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "http_save_feedback",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -620,
+          "y": 2420
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "timeout": "300"
+      }
+    },
+    {
+      "name": "http_save_feedback",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "event": "success"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -670,
+          "y": 2910
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"flow_name\":\"{{flow.variables.user_skill}}\",\n\"user_feedback\": \"{{widgets.user_feedback.inbound.Body}}\"\n}",
+        "url": "{{flow.variables.server_path}}/save_user_feedback"
+      }
+    },
+    {
+      "name": "set_variables_3",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "pause_0",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "reflect",
+            "key": "user_skill"
+          }
+        ],
+        "offset": {
+          "x": -830,
+          "y": 1310
+        }
+      }
+    },
+    {
+      "name": "pause_0",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "run_custom_reminder_subflow",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": -250,
+          "y": 1740
+        },
+        "function_sid": "ZHb5694098c03ec14fe3bdef0280324b68",
+        "url": "https://####.twil.io/pause"
+      }
+    },
+    {
+      "name": "thanks_message",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "http_save_feedback",
+          "event": "sent"
+        },
+        {
+          "next": "http_save_feedback",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -640,
+          "y": 2640
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "Thanks for your feedback.\n\nTo start another conversation with Bobby just say \"Hi\"."
+      }
+    },
+    {
+      "name": "feedback_survey",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "function_pause_4",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 180,
+          "y": 2970
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "If you have any feedback good or bad, we would really appreciate if you could share this with us via this link https://forms.gle/WgipMQBSRkxMWyqk9."
+      }
+    },
+    {
+      "name": "run_subflow_control",
+      "type": "run-subflow",
+      "transitions": [
+        {
+          "next": "set_variables_6",
+          "event": "completed"
+        },
+        {
+          "next": "set_variables_6",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "flow_sid": "FW66aa1ad7e5c9052f7403689738d2e22d",
+        "flow_revision": "LatestPublished",
+        "offset": {
+          "x": -100,
+          "y": 1060
+        }
+      }
+    },
+    {
+      "name": "set_variables_6",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "pause_0",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "sphere_of_influence",
+            "key": "user_skill"
+          }
+        ],
+        "offset": {
+          "x": -110,
+          "y": 1320
+        }
+      }
+    },
+    {
+      "name": "eval_user_choice_step_1",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "set_variables_1",
+          "event": "noMatch"
+        },
+        {
+          "next": "user_feeling",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 5",
+              "arguments": [
+                "{{widgets.user_chooses_skill.inbound.Body}}"
+              ],
+              "type": "equal_to",
+              "value": "5"
+            }
+          ]
+        },
+        {
+          "next": "run_welcome_subflow",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 0",
+              "arguments": [
+                "{{widgets.user_chooses_skill.inbound.Body}}"
+              ],
+              "type": "equal_to",
+              "value": "0"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.user_chooses_skill.inbound.Body}}",
+        "offset": {
+          "x": -60,
+          "y": -670
+        }
+      }
+    },
+    {
+      "name": "http_recommend_tool_to_user",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "user_choice_after_recommendation",
+          "event": "success"
+        },
+        {
+          "next": "http_recommend_tool_to_user",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -980,
+          "y": -430
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_feeling\": {{widgets.user_feeling.inbound.Body | to_json}}\n}",
+        "url": "{{flow.variables.server_path}}/recommend_tool"
+      }
+    },
+    {
+      "name": "set_variables_0",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "eval_trigger_before_authentication",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "https://bobby-chat-####.herokuapp.com",
+            "key": "server_path"
+          },
+          {
+            "value": "https://buy.stripe.com/####",
+            "key": "buy_link"
+          }
+        ],
+        "offset": {
+          "x": 40,
+          "y": -3460
+        }
+      }
+    },
+    {
+      "name": "user_feeling",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "http_recommend_tool_to_user",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -960,
+          "y": -730
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "body": "Please tell me how you are feeling or what you would like help with and I'll do my best to recommend a tool.",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "set_variables_9",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "eval_user_skill_choice",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "{{widgets.user_choice_after_recommendation.inbound.Body}}",
+            "key": "user_skill"
+          }
+        ],
+        "offset": {
+          "x": -340,
+          "y": -140
+        }
+      }
+    },
+    {
+      "name": "user_choice_after_recommendation",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "set_variables_9",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -970,
+          "y": -140
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "body": "{{widgets.http_recommend_tool_to_user.parsed.response}}\n\nThis is just a recommendation, the choice is yours...\n\n1 - Interactive Journaling\n2 - Reflect\n3 - Release and Focus\n4 - Burnout Quiz\n\nPlease, enter a number between 1 and 4. \n🔢",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "return_to_home",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "function_pause_3",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 640,
+          "y": -120
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "That's it. You are now ready to start your first session with Bobby... I'll re-direct you to the main menu."
+      }
+    },
+    {
+      "name": "function_pause_2",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "return_to_home",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 640,
+          "y": -330
+        },
+        "function_sid": "ZHb5694098c03ec14fe3bdef0280324b68",
+        "url": "https://####.twil.io/pause"
+      }
+    },
+    {
+      "name": "function_pause_3",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "wait_for_menu",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 640,
+          "y": 190
+        },
+        "function_sid": "ZHb5694098c03ec14fe3bdef0280324b68",
+        "url": "https://####.twil.io/pause"
+      }
+    },
+    {
+      "name": "run_burnout_quiz_subflow",
+      "type": "run-subflow",
+      "transitions": [
+        {
+          "next": "run_custom_reminder_subflow",
+          "event": "completed"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "flow_sid": "FW1059b8b41ad88c29b81e23e5ae3bc1fa",
+        "flow_revision": "LatestPublished",
+        "offset": {
+          "x": 240,
+          "y": 1060
+        }
+      }
+    },
+    {
+      "name": "run_custom_reminder_subflow",
+      "type": "run-subflow",
+      "transitions": [
+        {
+          "next": "feedback_survey",
+          "event": "completed"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "flow_sid": "FWe1baa04efde30163e7217b5dfa3047d1",
+        "flow_revision": "LatestPublished",
+        "offset": {
+          "x": 470,
+          "y": 2700
+        }
+      }
+    },
+    {
+      "name": "eval_trigger",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "wait_for_menu",
+          "event": "noMatch"
+        },
+        {
+          "next": "run_burnout_quiz_subflow_trigger",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to Burnout Check-In",
+              "arguments": [
+                "{{trigger.message.Body}}"
+              ],
+              "type": "equal_to",
+              "value": "Burnout Check-In"
+            }
+          ]
+        },
+        {
+          "next": "run_journal_subflow",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to Start Journaling",
+              "arguments": [
+                "{{trigger.message.Body}}"
+              ],
+              "type": "equal_to",
+              "value": "Start Journaling"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{trigger.message.Body}}",
+        "offset": {
+          "x": -10,
+          "y": -1490
+        }
+      }
+    },
+    {
+      "name": "run_burnout_quiz_subflow_trigger",
+      "type": "run-subflow",
+      "transitions": [
+        {
+          "next": "function_long_pause_4",
+          "event": "completed"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "flow_sid": "FW1059b8b41ad88c29b81e23e5ae3bc1fa",
+        "flow_revision": "LatestPublished",
+        "offset": {
+          "x": 1380,
+          "y": -1220
+        }
+      }
+    },
+    {
+      "name": "redirecting_user_to_main_menu",
+      "type": "send-message",
+      "transitions": [
+        {
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 1980,
+          "y": 10
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Ready to start a conversation? Press \"Home\" to return to the main menu."
+      }
+    },
+    {
+      "name": "function_long_pause_4",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "function_long_pause_5",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 1390,
+          "y": -990
+        },
+        "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
+        "url": "https://abc-service-5257.twil.io/long_pause"
+      }
+    },
+    {
+      "name": "function_long_pause_5",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "function_long_pause_6",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 1740,
+          "y": -990
+        },
+        "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
+        "url": "https://abc-service-5257.twil.io/long_pause"
+      }
+    },
+    {
+      "name": "function_long_pause_6",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "http_authenticate_user_2",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 2090,
+          "y": -990
+        },
+        "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
+        "url": "https://abc-service-5257.twil.io/long_pause"
+      }
+    },
+    {
+      "name": "run_welcome_subflow",
+      "type": "run-subflow",
+      "transitions": [
+        {
+          "next": "function_pause_2",
+          "event": "completed"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "flow_sid": "FWb6b27c1c4900013e313776cdcae56dff",
+        "flow_revision": "LatestPublished",
+        "offset": {
+          "x": 630,
+          "y": -560
+        }
+      }
+    },
+    {
+      "name": "button_to_start_a_conversation",
+      "type": "send-message",
+      "transitions": [
+        {
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 500,
+          "y": 3430
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "I'm here whenever you want to talk. Just say \"Hi\" and I'll be right with you."
+      }
+    },
+    {
+      "name": "run_journal_subflow",
+      "type": "run-subflow",
+      "transitions": [
+        {
+          "next": "run_custom_reminder_subflow",
+          "event": "completed"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "flow_sid": "FW016e4cfda2c05cf8863a67f5cfb52e3b",
+        "flow_revision": "LatestPublished",
+        "offset": {
+          "x": 1090,
+          "y": 1060
+        }
+      }
+    },
+    {
+      "name": "function_pause_4",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "button_to_start_a_conversation",
+          "event": "success"
+        },
+        {
+          "next": "button_to_start_a_conversation",
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 490,
+          "y": 3190
+        },
+        "function_sid": "ZHb5694098c03ec14fe3bdef0280324b68",
+        "url": "https://####.twil.io/pause"
+      }
+    },
+    {
+      "name": "time_out_message",
+      "type": "send-message",
+      "transitions": [
+        {
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 860,
+          "y": -960
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "This session has timed out. But, I'm here when you need me.You can start a conversation anytime. Just say \"Hi\" to start a conversation with Bobby."
+      }
+    },
+    {
+      "name": "wait_for_menu",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "user_chooses_skill",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 30,
+          "y": -1140
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Please wait a moment while I pull up the menu of skills we can practice today..."
+      }
+    },
+    {
+      "name": "http_authenticate_user",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "eval_valid_user",
+          "event": "success"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -10,
+          "y": -2660
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_number\": \"{{trigger.message.From}}\"\n}",
+        "url": "{{flow.variables.server_path}}/authenticate_user"
+      }
+    },
+    {
+      "name": "eval_valid_user",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "send_to_buy_subscription",
+          "event": "noMatch"
+        },
+        {
+          "next": "eval_trigger",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to true",
+              "arguments": [
+                "{{widgets.http_authenticate_user.parsed.is_active}}"
+              ],
+              "type": "equal_to",
+              "value": "true"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.http_authenticate_user.parsed.is_active}}",
+        "offset": {
+          "x": -140,
+          "y": -2440
+        }
+      }
+    },
+    {
+      "name": "send_to_buy_subscription",
+      "type": "send-message",
+      "transitions": [
+        {
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -860,
+          "y": -2170
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Hi, thank you so much for being one of the first users of BobbyChat!\n\nUnfortunately it is no longer possible to purchase a subscription.\n\nIf you have any questions please message me at toni@bobby-chat.com and I'll help you out right away."
+      }
+    },
+    {
+      "name": "eval_trigger_before_authentication",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "http_authenticate_user",
+          "event": "noMatch"
+        },
+        {
+          "next": "run_burnout_quiz_subflow_trigger",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to Burnout Check-In",
+              "arguments": [
+                "{{trigger.message.Body}}"
+              ],
+              "type": "equal_to",
+              "value": "Burnout Check-In"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{trigger.message.Body}}",
+        "offset": {
+          "x": 220,
+          "y": -3000
+        }
+      }
+    },
+    {
+      "name": "http_authenticate_user_2",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "eval_valid_user_2",
+          "event": "success"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 1800,
+          "y": -560
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_number\": \"{{trigger.message.From}}\"\n}",
+        "url": "{{flow.variables.server_path}}/authenticate_user"
+      }
+    },
+    {
+      "name": "eval_valid_user_2",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "redirect_to_website_black_friday",
+          "event": "noMatch"
+        },
+        {
+          "next": "redirecting_user_to_main_menu",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to true",
+              "arguments": [
+                "{{widgets.http_authenticate_user_2.parsed.is_active}}"
+              ],
+              "type": "equal_to",
+              "value": "true"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.http_authenticate_user_2.parsed.is_active}}",
+        "offset": {
+          "x": 1800,
+          "y": -330
+        }
+      }
+    },
+    {
+      "name": "redirect_to_stripe_payment",
+      "type": "send-message",
+      "transitions": [
+        {
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 1610,
+          "y": 20
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Thanks for taking our burnout quiz.\n\nAs a next step, we invite you to sing-up for a *7-day free trial* here: {{flow.variables.buy_link}}.\n\n🎁 Use discount code BURNOUTQUIZ25 for 25% off for the first 6 months after the free trial period."
+      }
+    },
+    {
+      "name": "ask_why_not_buy",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "thanks_for_your_feedback",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -860,
+          "y": -1770
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "body": "If you are not quite ready to purchase a subscription, we would love to understand why? or at what price you would feel comfortable to purchase Bobby?",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "thanks_for_your_feedback",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "http_save_why_not_buy_data",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -870,
+          "y": -1570
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Thanks for your feedback."
+      }
+    },
+    {
+      "name": "pause_4",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "ask_why_not_buy",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": -860,
+          "y": -1970
+        },
+        "function_sid": "ZHb5694098c03ec14fe3bdef0280324b68",
+        "url": "https://####.twil.io/pause"
+      }
+    },
+    {
+      "name": "http_save_why_not_buy_data",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "event": "success"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -870,
+          "y": -1360
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_id\": \"{{trigger.message.From}}\",\n\"why_not_buy\": {{widgets.ask_why_not_buy.inbound.Body | to_json}} \n}",
+        "url": "{{flow.variables.server_path}}/why_not_buy_save_data"
+      }
+    },
+    {
+      "name": "product_hunt_review",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "function_pause_4",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 860,
+          "y": 2950
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Please leave us a review on ProductHunt:\n\nhttps://www.producthunt.com/products/bobbychat/reviews/new"
+      }
+    },
+    {
+      "name": "redirect_to_website_black_friday",
+      "type": "send-message",
+      "transitions": [
+        {
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 1260,
+          "y": 30
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Thanks for taking our burnout quiz.\n\nIt it not possible to purchase a subscription at this time."
+      }
+    }
+  ],
+  "initial_state": "Trigger",
+  "flags": {
+    "allow_concurrent_calls": true
+  }
+}
