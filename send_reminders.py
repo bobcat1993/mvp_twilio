@@ -10,6 +10,10 @@ import time
 
 load_dotenv()
 
+# A list of WhatsApp numbers to send messages to.
+# These must be in the form "+447479876543".
+NUMBER_LIST = []
+
 account_sid = os.environ['TWILIO_ACCOUNT_SID']
 auth_token = os.environ['TWILIO_AUTH_TOKEN']
 
@@ -23,15 +27,10 @@ print(f"from: {whatsapp_from}")
 # Create an HTTP GET request to fetch the JSON asset
 validator = RequestValidator(auth_token)
 signature = validator.compute_signature(assets_url, params={})
-headers = {'X-Twilio-Signature': signature}
-response = requests.get(assets_url, headers=headers)
-
-# # white_list = response.json()
-white_list = []
 
 
 # Get the person running the script to confirm they want to run this:
-input(f"This will send a message to {len(white_list)} contacts."
+input(f"This will send a message to {len(NUMBER_LIST)} contacts."
 			" Press enter to continue...")
 
 _BODY="""Hi, did you know that journaling can be a great way to process strong emotions -- good or bad. We've added topics to our journaling feature so you can focus on specific areas such as boundary setting, self-care and even time management. There's always an option to Journal Free Style - if you prefer. Just press "Start Journaling" to get started."""
@@ -41,7 +40,7 @@ input(f"This is the message you are about to send:\n {_BODY}"
 
 client = Client(account_sid, auth_token)
 
-for number in white_list:
+for number in NUMBER_LIST:
 	print(f'Sending message to {number}.')
 
 	# TODO(toni) Check who has not already checked in today and only 
