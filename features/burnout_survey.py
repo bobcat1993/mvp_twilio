@@ -119,11 +119,6 @@ def get_burnout_infographic(request):
 		expiration=timedelta(hours=1),
 		client=storage_client)
 
-
-	# This URL is not needed anymore.
-	# TODO(toni) Remove in future CL.
-	# image_url = f'https://storage.googleapis.com/bobby-chat-survey/temp/{path}'
-
 	# Remove the local image once done.
 	os.remove(temp_path)
 
