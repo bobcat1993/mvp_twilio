@@ -1,0 +1,499 @@
+{
+  "description": "Reflect-Flow-v0.2",
+  "states": [
+    {
+      "name": "Trigger",
+      "type": "trigger",
+      "transitions": [
+        {
+          "next": "set_variables_1",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "incomingCall"
+        },
+        {
+          "event": "incomingConversationMessage"
+        },
+        {
+          "event": "incomingRequest"
+        },
+        {
+          "next": "set_variables_1",
+          "event": "incomingParent"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 0,
+          "y": -2810
+        }
+      }
+    },
+    {
+      "name": "how_you_feel_after",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "thank_you",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "thank_you",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -140,
+          "y": 1590
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "After reflection, on a scale of 1 to 5, how do you feel about the situation now?\n1 - I feel worse.\n3 - I feel the same.\n5 - I feel better.\n🔢",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "user_belief",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "eval_belief_loop_done",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 170,
+          "y": -860
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "{{widgets.http_belief_loop.parsed.question}}",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "http_save_data",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "event": "success"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -150,
+          "y": 2190
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_feeling\" : {{widgets.user_event.inbound.Body | to_json}},\n\"bot_feeling\" : \"\",\n\"user_event\" : {{widgets.user_event.inbound.Body | to_json}},\n\"user_belief\" : {{widgets.user_belief.inbound.Body| to_json}},\n\"bot_distortions\" : \"\",\n\"user_rephrase\" : {{widgets.follow_up_on_distortion_question.inbound.Body| to_json}},\n\"user_feel_after\" : {{widgets.how_you_feel_after.inbound.Body| to_json}},\n\"user_feedback\" : {{widgets.feed_back_.inbound.Body| to_json}},\n\"flow_sid\" : \"{{flow.flow_sid}}\",\n\"origin\" : \"twilio_flow\",\n\"user_id\": \"{{trigger.message.From}}\",\n\"event_history\": \"\",\n\"distortion_history\": {% if widgets.http_distortion_loop.parsed.history %}\n{{widgets.http_distortion_loop.parsed.history}} {% else %} [] {% endif %},\n\"error\": \"None\"\n}",
+        "url": "{{flow.variables.ngrok_path}}/save_abc_data"
+      }
+    },
+    {
+      "name": "set_variables_1",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "http_save_user_info",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "https://bobby-chat-####.herokuapp.com",
+            "key": "ngrok_path"
+          }
+        ],
+        "offset": {
+          "x": 130,
+          "y": -2490
+        }
+      }
+    },
+    {
+      "name": "http_belief_loop",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "user_belief",
+          "event": "success"
+        },
+        {
+          "next": "http_belief_loop",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 160,
+          "y": -1150
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_event\": {{widgets.user_event.inbound.Body | to_json}} ,\n\"history\": {{flow.variables.belief_history}},\n\"last_user_response\": {{flow.variables.last_user_response}}\n}",
+        "url": "{{flow.variables.ngrok_path}}/reflect/ask_for_belief_loop"
+      }
+    },
+    {
+      "name": "ask_distortion_question",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "distortion_variables",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "pause_2",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 960,
+          "y": 610
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "{{widgets.http_distortion_loop.parsed.question}}",
+        "timeout": "1800"
+      }
+    },
+    {
+      "name": "distortion_variables",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "http_distortion_loop",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "{% if widgets.http_distortion_loop.parsed.history %}  {{widgets.http_distortion_loop.parsed.history}}\n{% else %}\n  []\n{% endif %}",
+            "key": "distortion_history"
+          },
+          {
+            "value": "{% if widgets.ask_distortion_question.inbound.Body %}{{widgets.ask_distortion_question.inbound.Body | to_json}}{% else %}null{% endif %}",
+            "key": "last_user_response"
+          }
+        ],
+        "offset": {
+          "x": 230,
+          "y": -180
+        }
+      }
+    },
+    {
+      "name": "http_distortion_loop",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "eval_distortion_loop_done",
+          "event": "success"
+        },
+        {
+          "next": "http_distortion_loop",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -180,
+          "y": 280
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_event\": {{widgets.user_event.inbound.Body | to_json}} ,\n\"belief_history\": {{widgets.http_belief_loop.parsed.history}},\n\"user_belief\": {{widgets.user_belief.inbound.Body | to_json}} ,\n\"distortion_history\": {{flow.variables.distortion_history}},\n\"last_user_response\": {{flow.variables.last_user_response}}\n}",
+        "url": "{{flow.variables.ngrok_path}}/reflect/distortion_loop"
+      }
+    },
+    {
+      "name": "eval_distortion_loop_done",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "next": "end_ask_distortion_loop",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to true",
+              "arguments": [
+                "{{widgets.http_distortion_loop.parsed.is_done}}"
+              ],
+              "type": "equal_to",
+              "value": "true"
+            }
+          ]
+        },
+        {
+          "next": "ask_distortion_question",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to false",
+              "arguments": [
+                "{{widgets.http_distortion_loop.parsed.is_done}}"
+              ],
+              "type": "equal_to",
+              "value": "false"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.http_distortion_loop.parsed.is_done}}",
+        "offset": {
+          "x": -450,
+          "y": 710
+        }
+      }
+    },
+    {
+      "name": "http_save_user_info",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "Welcome",
+          "event": "success"
+        },
+        {
+          "next": "http_save_user_info",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 130,
+          "y": -2240
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_number\" : \"{{trigger.message.From}}\",\n\"flow_name\": \"reflect\"\n}",
+        "url": "{{flow.variables.ngrok_path}}/save_user_info"
+      }
+    },
+    {
+      "name": "user_event",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "belief_variables",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 150,
+          "y": -1720
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "To begin, I'd love for you to share with me a particular event, challenge or situation that's been playing on your mind recently.",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "thank_you",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "http_save_data",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -160,
+          "y": 1930
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "Thanks for joining us today. Just say \"Hi\" anytime you want to chat 💬 or reflect 🌈.\n\nIf you found this helpful, please consider sharing this link to Bobby https://bit.ly/47agg8g with a friend."
+      }
+    },
+    {
+      "name": "end_ask_distortion_loop",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "pause_2",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -490,
+          "y": 1080
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "{{widgets.http_distortion_loop.parsed.question}}"
+      }
+    },
+    {
+      "name": "pause_2",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "how_you_feel_after",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": -140,
+          "y": 1310
+        },
+        "function_sid": "ZHb5694098c03ec14fe3bdef0280324b68",
+        "url": "https://####.twil.io/pause"
+      }
+    },
+    {
+      "name": "Welcome",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "user_event",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 140,
+          "y": -1980
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "Hi. I'm glad you decided to dedicate a few mintutes to reflect with me today. I'm here you to take a step back and free yourself from any thoughts that have been troubling you."
+      }
+    },
+    {
+      "name": "belief_variables",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "http_belief_loop",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "{% if widgets.http_belief_loop.parsed.history %}  {{widgets.http_belief_loop.parsed.history}}\n{% else %}\n  []\n{% endif %}",
+            "key": "belief_history"
+          },
+          {
+            "value": "{% if widgets.user_belief.inbound.Body %}  {{widgets.user_belief.inbound.Body | to_json}}\n{% else %}\n null\n{% endif %}",
+            "key": "last_user_response"
+          }
+        ],
+        "offset": {
+          "x": 160,
+          "y": -1430
+        }
+      }
+    },
+    {
+      "name": "eval_belief_loop_done",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "next": "distortion_variables",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to true",
+              "arguments": [
+                "{{widgets.http_belief_loop.parsed.is_done}}"
+              ],
+              "type": "equal_to",
+              "value": "true"
+            }
+          ]
+        },
+        {
+          "next": "belief_variables",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to false",
+              "arguments": [
+                "{{widgets.http_belief_loop.parsed.is_done}}"
+              ],
+              "type": "equal_to",
+              "value": "false"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.http_belief_loop.parsed.is_done}}",
+        "offset": {
+          "x": 170,
+          "y": -580
+        }
+      }
+    }
+  ],
+  "initial_state": "Trigger",
+  "flags": {
+    "allow_concurrent_calls": true
+  }
+}

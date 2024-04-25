@@ -44,11 +44,22 @@ Note: At the end of the survey the user is presented with an infographic this cu
 
 ### Reflect-Flow-v0.2
 
+Inspired by the ABC (Activating event, Behaviour, Consequences) of Cognitive Behavioural Therapy (CBT) this flow was designed to help people challenge negative thought patterns.
+
+TIP: This was the first feature we built and has been through many iterations. This is also a great stand alone feature to test in Twilio.
+
+Note: We built channels for feedback directly into the conversation, significantly reducing friction for our users and maximising the real-time feedback we were getting. The data we collected gave us a gauge for what was working/ not working and helped us understand how outcomes related to engagement.
+
+Note: The `ngrok_path` variable in the `set_variables_1` widget needs to be set to YOUR_SERVER_PATH.
+
+
 ### Sphere-of-Influence-Flow-v0.1
 
 Sphere of Influence is a technique often used by coaches to help individuals navigate situations where they feel a lack of control. This features guides users towards letting go of things that are outside of their control and re-focus their energy on what they can control.
 
-Note: While this technique has two clear stages, first identifying what's outside of an individuals control then identifying what they can control. Efforts to split this process in two, prompting two different language models, lead to challenges because language models were not able to reliably identifying when users had finished with each stage.
+Note: While this technique has two clear stages, first identifying what's outside of an individuals control then identifying what they can control. Efforts to split this process in two -- prompting two different language models -- lead to challenges because language models were not able to reliably identifying when users had finished with each stage.
+
+Note: The `server_path` variable in the `server_var` widget needs to be set to YOUR_SERVER_PATH.
 
 
 ### Journaling-Flow-v0.6
@@ -64,3 +75,8 @@ TIP: It's very quick and easy to get started with Free-Style journaling and most
 Allow users to set their own pace with custom reminders. Users can choose to set a reminder in 1-7 days. At their chosen time they will be sent a reminder via WhatsApp.
 
 TIP: We've seen that individuals are far more likely to respond to reminders when they have autonomy over their own reminder schedule -- some people also just don't need a reminder.
+
+### General comments
+
+
+
