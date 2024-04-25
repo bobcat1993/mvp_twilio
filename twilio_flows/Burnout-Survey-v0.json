@@ -1,0 +1,1022 @@
+{
+  "description": "Simple Survey",
+  "states": [
+    {
+      "name": "Trigger",
+      "type": "trigger",
+      "transitions": [
+        {
+          "next": "set_variables_1",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "incomingCall"
+        },
+        {
+          "event": "incomingConversationMessage"
+        },
+        {
+          "event": "incomingRequest"
+        },
+        {
+          "next": "set_variables_1",
+          "event": "incomingParent"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 30,
+          "y": -690
+        }
+      }
+    },
+    {
+      "name": "wellbeing-question-1",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "wellbeing-question-2",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -530,
+          "y": 0
+        },
+        "from": "{{flow.channel.address}}",
+        "body": "Right now, how happy are you, on a scale from 0 to10?\n\n0   = not at all\n10 = completely",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "wellbeing-question-2",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "wellbeing-question-3",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -530,
+          "y": 210
+        },
+        "from": "{{flow.channel.address}}",
+        "body": "Thanks!  How much do you feel like the things you do in your life are worth it right now, on a scale from 0 to 10?\n\n0   = not at all\n10 = completely",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "wellbeing-question-3",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "start_burnout_questions",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -530,
+          "y": 420
+        },
+        "from": "{{flow.channel.address}}",
+        "body": "Next one:  How would you rate your overall level of anxiety yesterday, on a scale from 0 to 10?\n\n0   = not at all anxious\n10 = completely anxious",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "burnout-question-2",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "burnout-question-3",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "http_burnout_info_graphic",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 40,
+          "y": 610
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "2. After a day of work, I find it harder to recover my energy\n\n1 = never,  2 = rarely, 3 = sometimes, 4 = often, 5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "burnout-question-3",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "burnout-question-4",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "http_burnout_info_graphic",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 40,
+          "y": 850
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "3. At work, I feel physically exhausted\n\n1 = never,  2 = rarely, 3 = sometimes, 4 = often, 5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "burnout-question-4",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "burnout-question-5",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "http_burnout_info_graphic",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 40,
+          "y": 1070
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "4. I struggle to find any enthusiasm for work\n\n1 = never,  2 = rarely, 3 = sometimes, 4 = often, 5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "burnout-question-5",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "burnout-question-6",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "http_burnout_info_graphic",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 30,
+          "y": 1290
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "5. I feel a strong aversion to my job\n\n1 = never,  2 = rarely, 3 = sometimes, 4 = often, 5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "burnout-question-6",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "burnout-question-7",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "http_burnout_info_graphic",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 30,
+          "y": 1490
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "6. I’m cynical about what my work means to others\n\n1 = never,  2 = rarely, 3 = sometimes, 4 = often, 5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "burnout-question-7",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "burnout-question-8",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "http_burnout_info_graphic",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 30,
+          "y": 1700
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "7. At work, I have trouble staying focused\n\n1 = never,  2 = rarely, 3 = sometimes, 4 = often, 5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "burnout-question-8",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "burnout-question-9",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "http_burnout_info_graphic",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 30,
+          "y": 1920
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "8. When I’m working, I have trouble concentrating\n\n1 = never,  2 = rarely, 3 = sometimes, 4 = often, 5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "burnout-question-9",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "burnout-question-10",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "http_burnout_info_graphic",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 30,
+          "y": 2130
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "9. I make mistakes in my work because I have my mind on other things\n\n1 = never,  2 = rarely, 3 = sometimes, 4 = often, 5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "burnout-question-10",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "burnout-question-11",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 30,
+          "y": 2350
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "10. At work, I feel unable to control my emotions\n\n1 = never,  2 = rarely, 3 = sometimes, 4 = often, 5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "burnout-question-11",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "burnout-question-12",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "http_burnout_info_graphic",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 30,
+          "y": 2590
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "11. I do not recognise myself in the way I react emotionally at work\n\n1 = never,  2 = rarely, 3 = sometimes, 4 = often, 5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "burnout-question-12",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "http_burnout_info_graphic",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "http_burnout_info_graphic",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 40,
+          "y": 2830
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "12. At work I may overreact unintentionally\n\n1 = never,  2 = rarely, 3 = sometimes, 4 = often, 5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "work-question-1",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "work-question-2",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -490,
+          "y": 4130
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "During the last 6 months how often have you felt unwell at work because of stress?\n\n0 = never\n5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "work-question-2",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "work-question-3",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -490,
+          "y": 4360
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "Next, have you needed time off work over the last 6 months because of stress? Yes or No.",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "work-question-3",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "work-question-4",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -490,
+          "y": 4600
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "Are you feeling so stressed that you are actively planning to leave your job within the next 6 months? Yes or No.",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "work-question-4",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "work-question-5",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -500,
+          "y": 4800
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "Are you feeling so stressed that you are actively looking to cut down on your hours within the next 6 months? Yes or No.",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "work-question-5",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "work-question-6",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -490,
+          "y": 5040
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "We want to help empower you to rise to any challenge in the workplace.  How often do you feel confident to have difficult conversations at work?\n\n0 = never\n5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "work-question-6",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "work-question-7",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -490,
+          "y": 5260
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "How often do you feel confident to be able to proactively look after your wellbeing at work?\n\n0 = never\n5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "work-question-7",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "work-question-8",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -490,
+          "y": 5490
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "How often would you agree with this statement?\n\"I feel I am productive at work most of the time\"\n \n0 = never\n5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "work-question-8",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "work-question-9",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -490,
+          "y": 5710
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "How often do you agree with this statement: \"I feel I am able to deliver work as expected and work to a high standard consistently\"\n\n0= never\n5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "work-question-9",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "send_message_3",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -510,
+          "y": 5930
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "Last question now!  Thank you so much for getting this far.  How often do you agree with this statement: \n\"I feel confident in my ability to develop and grow in my career\"\n\n0= never\n5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "welcome_message",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "function_pause_0",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 30,
+          "y": -60
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Hi, we are thrilled that you are chatting with Bobby and we hope that you are benefiting from your conversations.\n.\nWe'd like to invite you to answer some  short questions that will help you keep track of your progress with Bobby. We will share these questions with you once every two weeks.\n.\nYour privacy is important to us and your data is kept confidential.  Please visit our website to read more about our privacy policy.\n.\nLet's get started by measuring how burnt out you are feeling right now."
+      }
+    },
+    {
+      "name": "burnout-question-1",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "burnout-question-2",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "http_burnout_info_graphic",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 40,
+          "y": 370
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "1. At work, I feel mentally exhausted\n\n1 = never,  2 = rarely, 3 = sometimes, 4 = often, 5 = always",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "start_burnout_questions",
+      "type": "send-message",
+      "transitions": [
+        {
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -530,
+          "y": 630
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Thank you!  We're done with the general wellbeing questions, now we move onto measuring how burnt out you are feeling right now.\n\nFor this set of questions, please pick the number that most corresponds to the statement given."
+      }
+    },
+    {
+      "name": "intro_work_questions",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "work-question-1",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -480,
+          "y": 3910
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Thank you!  We're nearly done now.  Here at Bobby, your work wellbeing really matters to us.  Please help us understand how you are currently finding your work, so that we can help you to stay well at work!"
+      }
+    },
+    {
+      "name": "send_message_3",
+      "type": "send-message",
+      "transitions": [
+        {
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -510,
+          "y": 6160
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Thank you for taking this assesment. Please wait a moment while we process your results..."
+      }
+    },
+    {
+      "name": "http_burnout_info_graphic",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "analysing_scores",
+          "event": "success"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 40,
+          "y": 3070
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"results\" : [\n{{widgets.burnout-question-1.inbound.Body | to_json}}, \n{{widgets.burnout-question-2.inbound.Body | to_json}}, \n{{widgets.burnout-question-3.inbound.Body | to_json}}, \n{{widgets.burnout-question-4.inbound.Body | to_json}}, \n{{widgets.burnout-question-5.inbound.Body | to_json}}, \n{{widgets.burnout-question-6.inbound.Body | to_json}}, \n{{widgets.burnout-question-7.inbound.Body | to_json}}, \n{{widgets.burnout-question-8.inbound.Body | to_json}}, \n{{widgets.burnout-question-9.inbound.Body | to_json}}, \n{{widgets.burnout-question-10.inbound.Body | to_json}}, \n{{widgets.burnout-question-11.inbound.Body | to_json}}, \n{{widgets.burnout-question-12.inbound.Body | to_json}}\n],\n\"user_number\": \"{{trigger.message.From}}\"\n}",
+        "url": "{{flow.variables.server_path}}/burnout_survey/get_burnout_infographic"
+      }
+    },
+    {
+      "name": "show_burnout_infographic",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "function_long_pause_1",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 40,
+          "y": 3540
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "{{widgets.http_burnout_info_graphic.parsed.title}}",
+        "media_url": "{{widgets.http_burnout_info_graphic.parsed.image_url}}"
+      }
+    },
+    {
+      "name": "set_variables_1",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "http_save_user_info",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "https://bobby-chat-289346e1f4e7.herokuapp.com",
+            "key": "server_path"
+          }
+        ],
+        "offset": {
+          "x": 10,
+          "y": -470
+        }
+      }
+    },
+    {
+      "name": "http_save_data",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "event": "success"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 20,
+          "y": 4030
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"results\" : [\n{{widgets.burnout-question-1.inbound.Body | to_json}}, \n{{widgets.burnout-question-2.inbound.Body | to_json}}, \n{{widgets.burnout-question-3.inbound.Body | to_json}}, \n{{widgets.burnout-question-4.inbound.Body | to_json}}, \n{{widgets.burnout-question-5.inbound.Body | to_json}}, \n{{widgets.burnout-question-6.inbound.Body | to_json}}, \n{{widgets.burnout-question-7.inbound.Body | to_json}}, \n{{widgets.burnout-question-8.inbound.Body | to_json}}, \n{{widgets.burnout-question-9.inbound.Body | to_json}}, \n{{widgets.burnout-question-10.inbound.Body | to_json}}, \n{{widgets.burnout-question-11.inbound.Body | to_json}}, \n{{widgets.burnout-question-12.inbound.Body | to_json}}\n],\n\"user_number\": \"{{trigger.message.From}}\",\n\"flow_sid\": \"{{flow.flow_sid}}\",\n\"origin\": \"twilio_flow\",\n\"error\": \"none\"\n}",
+        "url": "{{flow.variables.server_path}}/burnout_survey/save_data"
+      }
+    },
+    {
+      "name": "function_pause_0",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "burnout-question-1",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 30,
+          "y": 150
+        },
+        "function_sid": "ZHb5694098c03ec14fe3bdef0280324b68",
+        "url": "https://abc-service-5257.twil.io/pause"
+      }
+    },
+    {
+      "name": "analysing_scores",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "show_burnout_infographic",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 40,
+          "y": 3310
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Thank you for answering these questions. Please wait a moment while we analyse your results..."
+      }
+    },
+    {
+      "name": "http_save_user_info",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "welcome_message",
+          "event": "success"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 20,
+          "y": -280
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_number\": \"{{trigger.message.From}}\",\n\"flow_name\": \"burnout_quiz\"\n}",
+        "url": "{{flow.variables.server_path}}/save_user_info"
+      }
+    },
+    {
+      "name": "function_long_pause_1",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "function_long_pause_2",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 40,
+          "y": 3780
+        },
+        "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
+        "url": "https://abc-service-5257.twil.io/long_pause"
+      }
+    },
+    {
+      "name": "function_long_pause_2",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "function_long_pause_3",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 390,
+          "y": 3780
+        },
+        "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
+        "url": "https://abc-service-5257.twil.io/long_pause"
+      }
+    },
+    {
+      "name": "function_long_pause_3",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "http_save_data",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 740,
+          "y": 3780
+        },
+        "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
+        "url": "https://abc-service-5257.twil.io/long_pause"
+      }
+    }
+  ],
+  "initial_state": "Trigger",
+  "flags": {
+    "allow_concurrent_calls": true
+  }
+}
