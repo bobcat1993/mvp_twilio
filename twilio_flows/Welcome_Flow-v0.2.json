@@ -1,0 +1,470 @@
+{
+  "description": "Welcome_Flow-v0.2",
+  "states": [
+    {
+      "name": "Trigger",
+      "type": "trigger",
+      "transitions": [
+        {
+          "next": "set_variables_1",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "incomingCall"
+        },
+        {
+          "event": "incomingConversationMessage"
+        },
+        {
+          "next": "set_variables_1",
+          "event": "incomingRequest"
+        },
+        {
+          "next": "set_variables_1",
+          "event": "incomingParent"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -60,
+          "y": -2020
+        }
+      }
+    },
+    {
+      "name": "set_variables_1",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "save_user_info",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "https://bobby-chat-289346e1f4e7.herokuapp.com",
+            "key": "server_path"
+          },
+          {
+            "value": "{% if flow.data.user_number %}{{flow.data.user_number}}{% else %}{{trigger.message.From}}{% endif %}",
+            "key": "user_number"
+          }
+        ],
+        "offset": {
+          "x": -30,
+          "y": -1720
+        }
+      }
+    },
+    {
+      "name": "save_user_info",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "welcome_message",
+          "event": "success"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -20,
+          "y": -1510
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_number\": \"{{flow.variables.user_number}}\",\n\"flow_name\": \"welcome\"\n}",
+        "url": "{{flow.variables.server_path}}/save_user_info"
+      }
+    },
+    {
+      "name": "welcome_message",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "welcome_video_part_1",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -10,
+          "y": -1280
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Hi, welcome to BobbyChat 💛! We are so glad you have taken this first step toward self-care with us.\n\nDr Claire is going to give you a short intro to BobbyChat... please allow a few seconds for the welcome video to load."
+      }
+    },
+    {
+      "name": "welcome_video_part_1",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "function_long_pause_0",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -10,
+          "y": -1020
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Dr Claire Ashely",
+        "media_url": "https://storage.googleapis.com/bobby-chat-welcome/welcome_video_part_1.mp4"
+      }
+    },
+    {
+      "name": "help_info",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "function_pause_0",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 0,
+          "y": 260
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Bobby is here to help you manage work stress. Unfortunately, Bobby cannot and should not be used to treat mental health conditions such as anxiety or depression. For these we remind you to seek medical advice from a professional and you may find these links useful:\nhttps://www.bobby-chat.com/help"
+      }
+    },
+    {
+      "name": "function_long_pause_0",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "function_long_pause_2",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": -20,
+          "y": -750
+        },
+        "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
+        "url": "https://abc-service-5257.twil.io/long_pause"
+      }
+    },
+    {
+      "name": "function_long_pause_2",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "function_long_pause_3",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 320,
+          "y": -750
+        },
+        "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
+        "url": "https://abc-service-5257.twil.io/long_pause"
+      }
+    },
+    {
+      "name": "function_long_pause_3",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "how_to_get_the_most",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 700,
+          "y": -750
+        },
+        "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
+        "url": "https://abc-service-5257.twil.io/long_pause"
+      }
+    },
+    {
+      "name": "how_to_get_the_most",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "welcome_video_part_2",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 0,
+          "y": -490
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "How can you get the most out of BobbyChat?"
+      }
+    },
+    {
+      "name": "welcome_video_part_2",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "function_long_pause_4",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 10,
+          "y": -280
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Dr Claire Ashley",
+        "media_url": "https://storage.googleapis.com/bobby-chat-welcome/welcome_video_part_2.mp4"
+      }
+    },
+    {
+      "name": "function_long_pause_4",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "function_long_pause_5",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
+        "url": "https://abc-service-5257.twil.io/long_pause"
+      }
+    },
+    {
+      "name": "function_long_pause_5",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "function_long_pause_6",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 360,
+          "y": -30
+        },
+        "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
+        "url": "https://abc-service-5257.twil.io/long_pause"
+      }
+    },
+    {
+      "name": "function_long_pause_6",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "help_info",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 700,
+          "y": -20
+        },
+        "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
+        "url": "https://abc-service-5257.twil.io/long_pause"
+      }
+    },
+    {
+      "name": "function_pause_0",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "features_description",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 10,
+          "y": 480
+        },
+        "function_sid": "ZHb5694098c03ec14fe3bdef0280324b68",
+        "url": "https://abc-service-5257.twil.io/pause"
+      }
+    },
+    {
+      "name": "features_description",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "long_pause_10",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 0,
+          "y": 720
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Bobby can teach you all kinds of skills in short 1-3 min sessions.",
+        "media_url": "https://storage.googleapis.com/bobby-chat-welcome/new_skills_infographic.jpg"
+      }
+    },
+    {
+      "name": "long_pause_10",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "long_pause_11",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 10,
+          "y": 950
+        },
+        "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
+        "url": "https://abc-service-5257.twil.io/long_pause"
+      }
+    },
+    {
+      "name": "long_pause_11",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "long_pause_12",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 360,
+          "y": 950
+        },
+        "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
+        "url": "https://abc-service-5257.twil.io/long_pause"
+      }
+    },
+    {
+      "name": "long_pause_12",
+      "type": "run-function",
+      "transitions": [
+        {
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 710,
+          "y": 950
+        },
+        "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
+        "url": "https://abc-service-5257.twil.io/long_pause"
+      }
+    }
+  ],
+  "initial_state": "Trigger",
+  "flags": {
+    "allow_concurrent_calls": true
+  }
+}
