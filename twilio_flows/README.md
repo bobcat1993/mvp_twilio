@@ -44,6 +44,8 @@ The interactive journaling feature. Users can either journal by topic or free st
 
 Note: The `server_path` varible in the `server_var` widget needs to be set to YOUR_SERVER_PATH.
 
+TIP: It's very quick and easy to get started with Free-Style journaling and most people prefer to journal about what's on their mind today rather then being confined to a specific topic series. That being said, it can also be hard to get started, so topics can server as a great starting point for individuals. Bobby's follow up questions can help individuals to explore their thoughts. User's can also say "I don't know" and Bobby will reframe the question.
+
 ### Custom-Reminders_Flow-v0.1
 
 Allow users to set their own pace with custom reminders. Users can choose to set a reminder in 1-7 days. At their chosen time they will be sent a reminder via WhatsApp.
