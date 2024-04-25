@@ -20,11 +20,17 @@ We connect each feature to the main flow, MVP-v0.15, via the "Run Subflow" widge
 
 TODO(tonicreswell) Update this once I've writen the secion on how to launch the app via Heroku / ngrock.
 
-You will need to lauch the app *publicly* so that Twilio can see it. Then make sure that the "server_path" in the flow variables is set to that path.
+You will need to lauch the app *publicly* so that Twilio can see it at YOUR_SERVER_PATH. Then make sure that the "server_path" in the flow variables is set to YOUR_SERVER_PATH.
 
-## Subflows
+## Feature Subflows
 
 ### Welcome_Flow-v0.2
+
+The welcome feature, which welcomes new users to the app and talks them through the features available.
+
+Note: This feature requires several assets that were stored on google cloud storage, but are not publicly accessible. 
+
+TODO(tonicreswell) Include these assets (videos and images) in the github repo and give instructions to update the links in the Twilio flow.
 
 ### Burnout-Survey-v0
 
@@ -35,6 +41,8 @@ You will need to lauch the app *publicly* so that Twilio can see it. Then make s
 ### Journaling-Flow-v0.6
 
 The interactive journaling feature. Users can either journal by topic or free style. If the user chooses to journal by topic, Bobby will help them choose a topic. Bobby helps the user explore their thoughts and feelings by asking thoughtful follow up questions.
+
+Note: The `server_path` varible in the `server_var` widget needs to be set to YOUR_SERVER_PATH.
 
 ### Custom-Reminders_Flow-v0.1
 
