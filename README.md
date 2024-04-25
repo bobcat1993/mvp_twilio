@@ -38,8 +38,14 @@ We decided to open source the code with these elements to help others if they de
 	* Then you should have a `DATABASE_URL` something similar to `postgresql:///<db_name>`. Add this to your .env file.
 
 * ChatGPT (required).
-	* An OpenAI account with a `OPENAI_API_KEY` which you can find [here](https://platform.openai.com/api-keys).
+	* An [OpenAI account](https://platform.openai.com/signup) with a `OPENAI_API_KEY` which you can find [here](https://platform.openai.com/api-keys).
 	* Add `OPENAI_API_KEY` to your .env file.
+
+* Stripe (optional and not recommended).
+	* To access BobbyChat our users had to purchase a subscription via Stripe. When a purchase was complete Stripe would send a webhook to our app (https://docs.stripe.com/webhooks/quickstart) with the user's phone number and this allowed us to seamlessly authenticate paying users via their phone number. Stripe also sent webhooks when the subscription expired.
+	* Add `STRIPE_API_KEY` and `STRIPE_SECRET` to your .env file.
+
+* Google Cloud Storage (optional and not recommended).
 
 **Important** Everything in your .env file is a secret, don't share it with anyone else (and don't accidentally commit it -- it could be an expensive mistake).
 
