@@ -22,4 +22,20 @@ TODO(tonicreswell) Update this once I've writen the secion on how to launch the 
 
 You will need to lauch the app *publicly* so that Twilio can see it. Then make sure that the "server_path" in the flow variables is set to that path.
 
+## Subflows
+
+### Welcome_Flow-v0.2
+
+### Burnout-Survey-v0
+
+### Reflect-Flow-v0.2
+
+### Sphere-of-Influence-Flow-v0.1
+
+### Journaling-Flow-v0.6
+
+The interactive journaling feature. Users can either journal by topic or free style. If the user chooses to journal by topic, Bobby will help them choose a topic. Bobby helps the user explore their thoughts and feelings by asking thoughtful follow up questions.
+
+### Custom-Reminders_Flow-v0.1
+
   

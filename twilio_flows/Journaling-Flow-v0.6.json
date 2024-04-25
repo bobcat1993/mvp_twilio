@@ -1,0 +1,1200 @@
+{
+  "description": "Journaling-Flow-v0.6",
+  "states": [
+    {
+      "name": "Trigger",
+      "type": "trigger",
+      "transitions": [
+        {
+          "next": "server_var",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "incomingCall"
+        },
+        {
+          "event": "incomingConversationMessage"
+        },
+        {
+          "event": "incomingRequest"
+        },
+        {
+          "next": "server_var",
+          "event": "incomingParent"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -40,
+          "y": -3980
+        }
+      }
+    },
+    {
+      "name": "server_var",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "http_save_user_info",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "https://bobby-chat-####.herokuapp.com",
+            "key": "server_path"
+          }
+        ],
+        "offset": {
+          "x": -40,
+          "y": -3760
+        }
+      }
+    },
+    {
+      "name": "http_save_user_info",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "http_get_journaling_prompt",
+          "event": "success"
+        },
+        {
+          "next": "http_save_user_info",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -50,
+          "y": -3510
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_number\" : \"{{trigger.message.From}}\",\n\"flow_name\": \"journaling\"\n}",
+        "url": "{{flow.variables.server_path}}/save_user_info"
+      }
+    },
+    {
+      "name": "http_get_journaling_prompt",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "welcome",
+          "event": "success"
+        },
+        {
+          "next": "http_get_journaling_prompt",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -50,
+          "y": -3240
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_number\": \"{{trigger.message.From}}\"\n}",
+        "url": "{{flow.variables.server_path}}/journaling/get_journal_prompt"
+      }
+    },
+    {
+      "name": "user_event",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "eval_users_intent",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "next": "free_style_user_event",
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 20,
+          "y": 390
+        },
+        "content_variables": [
+          {
+            "value": "{{widgets.http_get_journaling_prompt.parsed.prompt}}",
+            "key": "1"
+          }
+        ],
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "content_sid": "HX6f36e23d98bfc46b4c2429a0499d4600",
+        "body": "{{flow.variables.prompt}} \n✍️\nPlease, let me know if you are not sure.",
+        "media_url": "",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "set_variables_1",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "http_journal_loop",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "{% if widgets.http_journal_loop.parsed.history %} {{widgets.http_journal_loop.parsed.history}} {% else %} [] {% endif %}",
+            "key": "history"
+          },
+          {
+            "value": "{% if widgets.user_journaling.inbound.Body %}{{widgets.user_journaling.inbound.Body | to_json }} {% else %} null {% endif %}",
+            "key": "last_user_response"
+          }
+        ],
+        "offset": {
+          "x": -40,
+          "y": 1370
+        }
+      }
+    },
+    {
+      "name": "http_journal_loop",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "eval_is_done",
+          "event": "success"
+        },
+        {
+          "next": "http_journal_loop",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -40,
+          "y": 1610
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_event\": {{flow.variables.user_event | to_json}},\n\"prompt\": {{flow.variables.prompt | to_json}},\n\"follow_up_questions\": {{flow.variables.follow_up_questions}},\n\"history\": {{flow.variables.history}},\n\"last_user_response\": {{flow.variables.last_user_response}}\n}",
+        "url": "{{flow.variables.server_path}}/journaling/ask_follow_up_questions_loop"
+      }
+    },
+    {
+      "name": "eval_is_done",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "next": "user_journaling",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to false",
+              "arguments": [
+                "{{widgets.http_journal_loop.parsed.is_done}}"
+              ],
+              "type": "equal_to",
+              "value": "false"
+            }
+          ]
+        },
+        {
+          "next": "last_bot_response",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to true",
+              "arguments": [
+                "{{widgets.http_journal_loop.parsed.is_done}}"
+              ],
+              "type": "equal_to",
+              "value": "true"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.http_journal_loop.parsed.is_done}}",
+        "offset": {
+          "x": -190,
+          "y": 1820
+        }
+      }
+    },
+    {
+      "name": "user_journaling",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "set_variables_1",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "function_pause_0",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -620,
+          "y": 2030
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "body": "{{widgets.http_journal_loop.parsed.question}}",
+        "timeout": "1200"
+      }
+    },
+    {
+      "name": "user_feel_after",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "eval_user_feel_after",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "http_save_data",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -390,
+          "y": 2530
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "body": "Your journaling session has come to and end. How did you enjoy the experience on a scale from 1 to 5.\n\n1 - Not at all, I will not keep it up.\n3 - It was okay, not sure I will keep it up.\n5 - It was great, I will keep it up. \n🔢",
+        "timeout": "300"
+      }
+    },
+    {
+      "name": "user_commits",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "function_pause_1",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -840,
+          "y": 3110
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Well done for making time for yourself today and commiting to this process. See you tomorrow."
+      }
+    },
+    {
+      "name": "eval_user_feel_after",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "user_commits",
+          "event": "noMatch"
+        },
+        {
+          "next": "user_commits",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value greater_than 3",
+              "arguments": [
+                "{{widgets.user_feel_after.outbound.Body}}"
+              ],
+              "type": "greater_than",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "next": "user_unsure",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 3",
+              "arguments": [
+                "{{widgets.user_feel_after.outbound.Body}}"
+              ],
+              "type": "equal_to",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "next": "user_does_not_commit",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value less_than 3",
+              "arguments": [
+                "{{widgets.user_feel_after.outbound.Body}}"
+              ],
+              "type": "less_than",
+              "value": "3"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.user_feel_after.outbound.Body}}",
+        "offset": {
+          "x": -460,
+          "y": 2800
+        }
+      }
+    },
+    {
+      "name": "http_save_data",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "ask_for_feedback",
+          "event": "success"
+        },
+        {
+          "next": "ask_for_feedback",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -350,
+          "y": 3860
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"prompt\": {{flow.variables.prompt | to_json}}, \n\"user_topic_intro\":  {% if flow.variables.user_topic_intro %} {{flow.variables.user_topic_intro}} {% else %} null {% endif %},\n\"topic_history\": {% if widgets.http_topic_loop_1.parsed.history %} {{widgets.http_topic_loop_1.parsed.history}} {% else %} [] {% endif %},\n\"last_user_topic_response\": \n{% if widgets.user_topic_1.inbound.Body %} {{widgets.user_topic_1.inbound.Body | to_json}} {% else %} null {% endif %},\n\"user_event\" : {{flow.variables.user_event}},\n\"free_style_user_event\": {{widgets.free_style_user_event.inbound.Body | to_json}}, \n\"user_event_var\": {{flow.variables.user_event}}, \n\"start_time\": \"{{widgets.http_get_journaling_prompt.parsed.time}}\", \n\"history\": {{widgets.http_journal_loop.parsed.history}}, \n\"last_user_response\": {{widgets.user_journaling.inbound.Body | to_json}},\n\"approx_end_time\": \"{{widgets.http_journal_loop.parsed.time}}\", \n\"user_feel_after\" : {{widgets.user_feel_after.inbound.Body | to_json}},\n\"user_unsure\": {{widgets.user_unsure_.inbound.Body | to_json}},\n\"user_does_not_commit\": {{widgets.user_does_not_commit_.inbound.Body | to_json}},\n\"topic\": {{flow.variables.topic}},\n\"topic_idx\": {{flow.variables.topic_idx}}, \n\"user_id\": \"{{trigger.message.From}}\", \n\"origin\": \"twilio_flow\",\n\"flow_sid\" : \"{{flow.flow_sid}}\",\n\"user_id\": \"{{trigger.message.From}}\",\n\"error\": \"None\"\n}",
+        "url": "{{flow.variables.server_path}}/journaling/save_data"
+      }
+    },
+    {
+      "name": "last_bot_response",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "function_pause_0",
+          "event": "sent"
+        },
+        {
+          "next": "function_pause_0",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 0,
+          "y": 2060
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "{{widgets.http_journal_loop.parsed.question}}"
+      }
+    },
+    {
+      "name": "function_pause_0",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "user_feel_after",
+          "event": "success"
+        },
+        {
+          "next": "user_feel_after",
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": -370,
+          "y": 2320
+        },
+        "function_sid": "ZHb5694098c03ec14fe3bdef0280324b68",
+        "url": "https://####.twil.io/pause"
+      }
+    },
+    {
+      "name": "function_pause_1",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "http_save_data",
+          "event": "success"
+        },
+        {
+          "next": "http_save_data",
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": -680,
+          "y": 3640
+        },
+        "function_sid": "ZHb5694098c03ec14fe3bdef0280324b68",
+        "url": "https://####.twil.io/pause"
+      }
+    },
+    {
+      "name": "ask_for_feedback",
+      "type": "send-message",
+      "transitions": [
+        {
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -330,
+          "y": 4110
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "If you have any other feedback, feel free to let us know here: https://forms.gle/rC6eCGv8bECWfDwz9"
+      }
+    },
+    {
+      "name": "user_unsure",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "function_pause_1",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -440,
+          "y": 3110
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Well done for making time for yourself. Journaling may seem tricky at first, but I'm here to help and it will get easier over time."
+      }
+    },
+    {
+      "name": "user_does_not_commit",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "function_pause_1",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -30,
+          "y": 3110
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Well done for setting aside some time for yourself. Journaling may not be for everyone. Is there anything inparticular that you didn't like? I'd love to learn and try to improve, please let us know in the form below."
+      }
+    },
+    {
+      "name": "welcome",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "function_pause_2",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -50,
+          "y": -2990
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "{{widgets.http_get_journaling_prompt.parsed.message}}"
+      }
+    },
+    {
+      "name": "eval_select_new_topic",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "next": "user_topic_intro",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to true",
+              "arguments": [
+                "{{widgets.http_get_journaling_prompt.parsed.select_new_topic}}"
+              ],
+              "type": "equal_to",
+              "value": "true"
+            }
+          ]
+        },
+        {
+          "next": "set_prompt_1",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to false",
+              "arguments": [
+                "{{widgets.http_get_journaling_prompt.parsed.select_new_topic}}"
+              ],
+              "type": "equal_to",
+              "value": "false"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.http_get_journaling_prompt.parsed.select_new_topic}}",
+        "offset": {
+          "x": -60,
+          "y": -2540
+        }
+      }
+    },
+    {
+      "name": "user_topic_intro",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "split_1",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "switch_to_free_style",
+          "event": "timeout"
+        },
+        {
+          "next": "free_style_user_event",
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -270,
+          "y": -2250
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "body": "Before we start this session, let's pick a topic to journal about this week. Think about your day or week so far. Is there a particular experience or feeling that has been on your mind, something you'd like to explore and understand better through journaling? It could be related to self-care, time management, work, personal growth, or any other aspect that comes to mind.\n🌊\nOr you can skip selecting a topic and journal free style.",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "set_prompt_1",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "function_pause_5",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "{{widgets.http_get_journaling_prompt.parsed.prompt}}",
+            "key": "prompt"
+          },
+          {
+            "value": "{{widgets.http_get_journaling_prompt.parsed.follow_up_questions | to_json}}",
+            "key": "follow_up_questions"
+          },
+          {
+            "value": "{{widgets.http_get_journaling_prompt.parsed.topic | to_json}}",
+            "key": "topic"
+          },
+          {
+            "value": "{{widgets.http_get_journaling_prompt.parsed.topic_idx}}",
+            "key": "topic_idx"
+          }
+        ],
+        "offset": {
+          "x": 400,
+          "y": -150
+        }
+      }
+    },
+    {
+      "name": "function_pause_5",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "user_event",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": 10,
+          "y": 170
+        },
+        "function_sid": "ZHb5694098c03ec14fe3bdef0280324b68",
+        "url": "https://####.twil.io/pause"
+      }
+    },
+    {
+      "name": "eval_users_intent",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "set_variables_3",
+          "event": "noMatch"
+        },
+        {
+          "next": "change_of_topic",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to Change topic",
+              "arguments": [
+                "{{widgets.user_event.inbound.Body}}"
+              ],
+              "type": "equal_to",
+              "value": "Change topic"
+            }
+          ]
+        },
+        {
+          "next": "free_style_user_event",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to Free Style",
+              "arguments": [
+                "{{widgets.user_event.inbound.Body}}"
+              ],
+              "type": "equal_to",
+              "value": "Free Style"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.user_event.inbound.Body}}",
+        "offset": {
+          "x": 20,
+          "y": 690
+        }
+      }
+    },
+    {
+      "name": "free_style_user_event",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "set_variables_2",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 970,
+          "y": 910
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "body": "What's been on your mind lately?",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "set_variables_2",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "set_variables_1",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "\"What's been on your mind lately?\"",
+            "key": "prompt"
+          },
+          {
+            "value": "\"What thoughts or beliefs do you have?\"",
+            "key": "follow_up_questions"
+          },
+          {
+            "value": "{{widgets.free_style_user_event.inbound.Body | to_json}}",
+            "key": "user_event"
+          },
+          {
+            "value": "null",
+            "key": "topic"
+          },
+          {
+            "value": "null",
+            "key": "topic_idx"
+          }
+        ],
+        "offset": {
+          "x": 970,
+          "y": 1150
+        }
+      }
+    },
+    {
+      "name": "set_topic_variables_3",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "http_topic_loop_1",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "[]",
+            "key": "topic_history"
+          },
+          {
+            "value": "null",
+            "key": "last_user_topic_response"
+          }
+        ],
+        "offset": {
+          "x": -280,
+          "y": -1220
+        }
+      }
+    },
+    {
+      "name": "http_topic_loop_1",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "eval_topic_loop_1",
+          "event": "success"
+        },
+        {
+          "next": "http_topic_loop_1",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -280,
+          "y": -950
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_topic_intro\": {{flow.variables.user_topic_intro}},\n\"history\": {{flow.variables.topic_history}},\n\"last_user_response\": {{flow.variables.last_user_topic_response}}\n}",
+        "url": "{{flow.variables.server_path}}/journaling/ask_user_for_journaling_topic_loop"
+      }
+    },
+    {
+      "name": "eval_topic_loop_1",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "next": "user_topic_1",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to false",
+              "arguments": [
+                "{{widgets.http_topic_loop_1.parsed.is_done}}"
+              ],
+              "type": "equal_to",
+              "value": "false"
+            }
+          ]
+        },
+        {
+          "next": "journaling_topic_1",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to true",
+              "arguments": [
+                "{{widgets.http_topic_loop_1.parsed.is_done}}"
+              ],
+              "type": "equal_to",
+              "value": "true"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.http_topic_loop_1.parsed.is_done}}",
+        "offset": {
+          "x": -280,
+          "y": -720
+        }
+      }
+    },
+    {
+      "name": "journaling_topic_1",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "set_prompt_3",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 30,
+          "y": -470
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Over the new few sessions we will focus on the topic of \"{{widgets.http_topic_loop_1.parsed.topic}}\". Let's get started."
+      }
+    },
+    {
+      "name": "user_topic_1",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "set_topic_variables_4",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -560,
+          "y": -460
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "body": "{{widgets.http_topic_loop_1.parsed.question}}",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "change_of_topic",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "set_topic_variables_2",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -1980,
+          "y": 680
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "body": "Sure, let's change topic.\n\nThink about your week so far. Is there a particular experience or feeling that has been on your mind, something you'd like to explore and understand better through journaling? It could be related to self-care, time management, work, personal growth, or any other aspect that comes to mind.\n\nJust let me know if you want a full list of topics.",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "set_prompt_3",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "function_pause_5",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "{{widgets.http_topic_loop_1.parsed.prompt}}",
+            "key": "prompt"
+          },
+          {
+            "value": "{{widgets.http_topic_loop_1.parsed.follow_up_questions| to_json}}",
+            "key": "follow_up_questions"
+          },
+          {
+            "value": "{{widgets.http_topic_loop_1.parsed.topic | to_json}}",
+            "key": "topic"
+          },
+          {
+            "value": "{{widgets.http_topic_loop_1.parsed.topic_idx}}",
+            "key": "topic_idx"
+          }
+        ],
+        "offset": {
+          "x": -160,
+          "y": -190
+        }
+      }
+    },
+    {
+      "name": "set_variables_3",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "set_variables_1",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "{{widgets.user_event.inbound.Body | to_json}}",
+            "key": "user_event"
+          }
+        ],
+        "offset": {
+          "x": -30,
+          "y": 1050
+        }
+      }
+    },
+    {
+      "name": "set_topic_variables_4",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "http_topic_loop_1",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "{{widgets.user_topic_1.inbound.Body | to_json}}",
+            "key": "last_user_topic_response"
+          },
+          {
+            "value": "{{widgets.http_topic_loop_1.parsed.history}}",
+            "key": "topic_history"
+          }
+        ],
+        "offset": {
+          "x": -550,
+          "y": -210
+        }
+      }
+    },
+    {
+      "name": "set_topic_variables_2",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "set_topic_variables_3",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "{{widgets.change_of_topic.inbound.Body | to_json}}",
+            "key": "user_topic_intro"
+          }
+        ],
+        "offset": {
+          "x": -650,
+          "y": -1620
+        }
+      }
+    },
+    {
+      "name": "set_topic_variables_1",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "set_topic_variables_3",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "{{widgets.user_topic_intro.inbound.Body | to_json}}",
+            "key": "user_topic_intro"
+          }
+        ],
+        "offset": {
+          "x": -280,
+          "y": -1630
+        }
+      }
+    },
+    {
+      "name": "function_pause_2",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "eval_select_new_topic",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": -50,
+          "y": -2760
+        },
+        "function_sid": "ZHb5694098c03ec14fe3bdef0280324b68",
+        "url": "https://####.twil.io/pause"
+      }
+    },
+    {
+      "name": "split_1",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "free_style_user_event",
+          "event": "noMatch"
+        },
+        {
+          "next": "set_topic_variables_1",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value not_equal_to Journal Free Style",
+              "arguments": [
+                "{{widgets.user_topic_intro.inbound.Body}}"
+              ],
+              "type": "not_equal_to",
+              "value": "Journal Free Style"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.user_topic_intro.inbound.Body}}",
+        "offset": {
+          "x": -270,
+          "y": -2010
+        }
+      }
+    },
+    {
+      "name": "switch_to_free_style",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "free_style_user_event",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 940,
+          "y": 530
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Let's skip choosing a topic for now and focus on more open-ended journaling. 🙌 Let's being..."
+      }
+    }
+  ],
+  "initial_state": "Trigger",
+  "flags": {
+    "allow_concurrent_calls": true
+  }
+}
