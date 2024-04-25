@@ -46,4 +46,8 @@ Note: The `server_path` varible in the `server_var` widget needs to be set to YO
 
 ### Custom-Reminders_Flow-v0.1
 
+Allow users to set their own pace with custom reminders. Users can choose to set a reminder in 1-7 days. At their chosen time they will be sent a reminder via WhatsApp.
+
+TIP: We've seen that invidiuals are far more likely to respond to reminders when they have autonomy over their own reminder schedule -- some people also just don't need a reminder.
+
   
