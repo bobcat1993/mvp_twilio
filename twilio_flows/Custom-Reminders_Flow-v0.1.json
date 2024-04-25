@@ -43,7 +43,7 @@
       "properties": {
         "variables": [
           {
-            "value": "https://bobby-chat-289346e1f4e7.herokuapp.com",
+            "value": "https://bobby-chat-###.herokuapp.com",
             "key": "server_path"
           }
         ],
@@ -354,30 +354,6 @@
         "timeout": "3600"
       }
     },
-    {
-      "name": "redirect_timeout",
-      "type": "add-twiml-redirect",
-      "transitions": [
-        {
-          "event": "return"
-        },
-        {
-          "event": "timeout"
-        },
-        {
-          "event": "fail"
-        }
-      ],
-      "properties": {
-        "offset": {
-          "x": 820,
-          "y": 890
-        },
-        "method": "POST",
-        "url": "https://handler.twilio.com/twiml/EH5db44a41ec063dcb692354b25fc6ce10",
-        "timeout": "1"
-      }
-    }
   ],
   "initial_state": "Trigger",
   "flags": {
