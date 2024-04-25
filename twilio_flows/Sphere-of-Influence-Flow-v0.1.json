@@ -1,0 +1,753 @@
+{
+  "description": "Sphere-of-Influence-Flow-v0.1",
+  "states": [
+    {
+      "name": "Trigger",
+      "type": "trigger",
+      "transitions": [
+        {
+          "next": "server_var",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "incomingCall"
+        },
+        {
+          "event": "incomingConversationMessage"
+        },
+        {
+          "event": "incomingRequest"
+        },
+        {
+          "next": "server_var",
+          "event": "incomingParent"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -200,
+          "y": -1070
+        }
+      }
+    },
+    {
+      "name": "vars",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "http_control_loop",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "{% if widgets.http_control_loop.parsed.history %} {{widgets.http_control_loop.parsed.history}} {% else %} [] {% endif %}",
+            "key": "history"
+          },
+          {
+            "value": "{% if widgets.user_control.inbound.Body %} {{widgets.user_control.inbound.Body | to_json }} {% else %} null {% endif %}",
+            "key": "last_user_response"
+          }
+        ],
+        "offset": {
+          "x": -60,
+          "y": 410
+        }
+      }
+    },
+    {
+      "name": "http_control_loop",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "eval_control_loop_done",
+          "event": "success"
+        },
+        {
+          "next": "http_control_loop",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -60,
+          "y": 660
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_event\": {{widgets.user_event.inbound.Body|to_json}},\n\"history\": {{flow.variables.history}},\n\"last_user_response\": {{flow.variables.last_user_response}}\n}",
+        "url": "{{flow.variables.server_path}}/sphere_of_influence/control_loop"
+      }
+    },
+    {
+      "name": "server_var",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "http_save_user_info",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "https://bobby-chat-####.herokuapp.com",
+            "key": "server_path"
+          }
+        ],
+        "offset": {
+          "x": -50,
+          "y": -830
+        }
+      }
+    },
+    {
+      "name": "http_save_user_info",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "Welcome",
+          "event": "success"
+        },
+        {
+          "next": "http_save_user_info",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -50,
+          "y": -590
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_number\" : \"{{trigger.message.From}}\",\n\"flow_name\": \"sphere_of_influence\"\n}",
+        "url": "{{flow.variables.server_path}}/save_user_info"
+      }
+    },
+    {
+      "name": "user_control",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "vars",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "set_variables_1",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -820,
+          "y": 1080
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "{{widgets.http_control_loop.parsed.question}}",
+        "timeout": "600"
+      }
+    },
+    {
+      "name": "eval_control_loop_done",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "next": "user_control",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to false",
+              "arguments": [
+                "{{widgets.http_control_loop.parsed.is_done}}"
+              ],
+              "type": "equal_to",
+              "value": "false"
+            }
+          ]
+        },
+        {
+          "next": "last_user_control",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to true",
+              "arguments": [
+                "{{widgets.http_control_loop.parsed.is_done}}"
+              ],
+              "type": "equal_to",
+              "value": "true"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.http_control_loop.parsed.is_done}}",
+        "offset": {
+          "x": -150,
+          "y": 1020
+        }
+      }
+    },
+    {
+      "name": "user_feel_after",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "split_1",
+          "event": "incomingMessage"
+        },
+        {
+          "next": "thank_you",
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -140,
+          "y": 1700
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "After consider what is inside and outside of your control, on a scale 1 to 5, how do you feel about your next step?\n1 - I don't know where to focus my energy.\n3 - I'm conflicted about where to focus my energy.\n5 - I know where to focus my energy.\n🔢",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "thank_you",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "set_variables_2",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -440,
+          "y": 2640
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "Thanks for joining today! Just say \"Hi\" anytime you want to chat ✨!\n\nIf you found this helpful, please consider sharing this link to Bobby https://bit.ly/3DyLhVS with a friend."
+      }
+    },
+    {
+      "name": "http_save_control_data",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "event": "success"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 40,
+          "y": 3340
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_event\" : {{widgets.user_event.inbound.Body | to_json}},\n\"history\": {{widgets.http_control_loop.parsed.history}},\n\"user_feel_after\" : {{widgets.user_feel_after.inbound.Body | to_json}},\n\"origin\": \"twilio_flow\",\n\"flow_sid\" : \"{{flow.flow_sid}}\",\n\"user_id\": \"{{trigger.message.From}}\",\n\"error\": {{flow.variables.error}}\n}",
+        "url": "{{flow.variables.server_path}}/sphere_of_influence/save_control_data"
+      }
+    },
+    {
+      "name": "Welcome",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "function_long_pause_0",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -50,
+          "y": -320
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "Hey there! It's great to have you here. Today I'm going to guide you through an exercise, called \"Sphere of Influence\", that will help you focus on what you can control and identify what you might need to accept and let go of.",
+        "media_url": "https://storage.googleapis.com/####/release_and_focus_infographic.jpeg"
+      }
+    },
+    {
+      "name": "user_event",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "vars",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -50,
+          "y": 140
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "To start off, please tell be about a specific challenge or issue you'd like to focus on today, something that's been on your mind?",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "function_pause",
+      "type": "run-function",
+      "transitions": [
+        {
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": -1960,
+          "y": 1680
+        },
+        "function_sid": "ZHb5694098c03ec14fe3bdef0280324b68",
+        "url": "https://####.twil.io/pause"
+      }
+    },
+    {
+      "name": "http_summarise_outside",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "summarise_outside",
+          "event": "success"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -1950,
+          "y": 1240
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_event\": \"{{widgets.user_event.inbound.Body}}\",\n\"history\": {{flow.variables.history}},\n\"last_user_response\": \"{{flow.variables.last_user_response}}\"\n}",
+        "url": "{{flow.variables.server_path}}/sphere_of_influence/summarise_outside"
+      }
+    },
+    {
+      "name": "summarise_outside",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "function_pause",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -1940,
+          "y": 1460
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "{{widgets.http_summarise_outside.parsed.response}}\n\nNow, let's shift our focus to what is within your control and work on addressing that."
+      }
+    },
+    {
+      "name": "vars_1",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "http_inside_loop",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "{% if widgets.http_inside_loop.parsed.history %} {{widgets.http_inside_loop.parsed.history}} {% else %} [] {% endif %}",
+            "key": "history"
+          },
+          {
+            "value": "{% if widgets.user_inside_control.inbound.Body %} \"{{widgets.user_inside_control.inbound.Body}}\" {% else %} null {% endif %}",
+            "key": "last_user_response"
+          }
+        ],
+        "offset": {
+          "x": -1430,
+          "y": 1800
+        }
+      }
+    },
+    {
+      "name": "http_inside_loop",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "eval_inside_loop_done",
+          "event": "success"
+        },
+        {
+          "next": "http_inside_loop",
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -1440,
+          "y": 2060
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_event\": \"{{widgets.user_event.inbound.Body}}\",\n\"history\": {{flow.variables.history}},\n\"last_user_response\": {{flow.variables.last_user_response}}\n}",
+        "url": "{{flow.variables.server_path}}/sphere_of_influence/inside_loop"
+      }
+    },
+    {
+      "name": "eval_inside_loop_done",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "next": "user_inside_control",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to false",
+              "arguments": [
+                "{{widgets.http_inside_loop.parsed.is_done}}"
+              ],
+              "type": "equal_to",
+              "value": "false"
+            }
+          ]
+        },
+        {
+          "next": "last_user_inside_control",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to true",
+              "arguments": [
+                "{{widgets.http_inside_loop.parsed.is_done}}"
+              ],
+              "type": "equal_to",
+              "value": "true"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.http_inside_loop.parsed.is_done}}",
+        "offset": {
+          "x": -1440,
+          "y": 2340
+        }
+      }
+    },
+    {
+      "name": "user_inside_control",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "vars_1",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -1880,
+          "y": 2180
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "{{widgets.http_inside_loop.parsed.question}}",
+        "timeout": "600"
+      }
+    },
+    {
+      "name": "last_user_control",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "user_feel_after",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 100,
+          "y": 1300
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "{{widgets.http_control_loop.parsed.question}}"
+      }
+    },
+    {
+      "name": "last_user_inside_control",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "pause_0",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -1480,
+          "y": 2660
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "{{widgets.http_inside_loop.parsed.question}}"
+      }
+    },
+    {
+      "name": "pause_0",
+      "type": "run-function",
+      "transitions": [
+        {
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": -1500,
+          "y": 2940
+        },
+        "function_sid": "ZHb5694098c03ec14fe3bdef0280324b68",
+        "url": "https://####.twil.io/pause"
+      }
+    },
+    {
+      "name": "split_1",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "thank_you",
+          "event": "noMatch"
+        },
+        {
+          "next": "why_not_set_a_goal",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value greater_than 3",
+              "arguments": [
+                "{{widgets.user_feel_after.inbound.Body}}"
+              ],
+              "type": "greater_than",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "next": "suggest_help",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value less_than 3",
+              "arguments": [
+                "{{widgets.user_feel_after.inbound.Body}}"
+              ],
+              "type": "less_than",
+              "value": "3"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.user_feel_after.inbound.Body}}",
+        "offset": {
+          "x": -20,
+          "y": 2080
+        }
+      }
+    },
+    {
+      "name": "why_not_set_a_goal",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "set_variables_2",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 130,
+          "y": 2360
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "I'm so glad that you know where to focus your energy  \n⚡️. You might want to try out they \"daily goal setting\" skill to help you on the next step of your journey.\n\nJust say \"Hi\" to get started  🤩."
+      }
+    },
+    {
+      "name": "set_variables_1",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "user_feel_after",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "\"time-out\"",
+            "key": "error"
+          }
+        ],
+        "offset": {
+          "x": -690,
+          "y": 1460
+        }
+      }
+    },
+    {
+      "name": "set_variables_2",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "http_save_control_data",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "\"None\"",
+            "key": "error"
+          }
+        ],
+        "offset": {
+          "x": 40,
+          "y": 3090
+        }
+      }
+    },
+    {
+      "name": "suggest_help",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "set_variables_2",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 510,
+          "y": 2360
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Sorry that you were not able to find the best way to focus your energy.\n\nIf you need to seek help from a professional you many find the information on our website helpful https://www.bobby-chat.com/help."
+      }
+    },
+    {
+      "name": "function_long_pause_0",
+      "type": "run-function",
+      "transitions": [
+        {
+          "next": "user_event",
+          "event": "success"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "service_sid": "ZSfca412af7dee91a6470efd3b15583c19",
+        "environment_sid": "ZEbab13cd523f440d72f60440d5fff9797",
+        "offset": {
+          "x": -40,
+          "y": -90
+        },
+        "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
+        "url": "https://####.twil.io/long_pause"
+      }
+    }
+  ],
+  "initial_state": "Trigger",
+  "flags": {
+    "allow_concurrent_calls": true
+  }
+}

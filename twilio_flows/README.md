@@ -26,6 +26,8 @@ You will need to launch the app *publicly* so that Twilio can see it at YOUR_SER
 
 TODO(tonicreswell) Explain the interactions between Google Cloud Storage, Twilio (WhatsApp), Stripe, the API (which can be hosted on ngrok for testing or Heroku for launch), and the database.
 
+TODO(tonicreswell) The building philosophy: merging traditional conversation design (e.g. Siri) with language models to implement therapeutic and coaching techniques.
+
 ### Welcome_Flow-v0.2
 
 The welcome feature, which welcomes new users to the app and talks them through the features available.
@@ -43,6 +45,11 @@ Note: At the end of the survey the user is presented with an infographic this cu
 ### Reflect-Flow-v0.2
 
 ### Sphere-of-Influence-Flow-v0.1
+
+Sphere of Influence is a technique often used by coaches to help individuals navigate situations where they feel a lack of control. This features guides users towards letting go of things that are outside of their control and re-focus their energy on what they can control.
+
+Note: While this technique has two clear stages, first identifying what's outside of an individuals control then identifying what they can control. Efforts to split this process in two, prompting two different language models, lead to challenges because language models were not able to reliably identifying when users had finished with each stage.
+
 
 ### Journaling-Flow-v0.6
 
