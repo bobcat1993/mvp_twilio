@@ -842,7 +842,7 @@
       "properties": {
         "variables": [
           {
-            "value": "https://bobby-chat-289346e1f4e7.herokuapp.com",
+            "value": "https://bobby-chat-####.herokuapp.com",
             "key": "server_path"
           }
         ],
@@ -894,7 +894,7 @@
           "y": 150
         },
         "function_sid": "ZHb5694098c03ec14fe3bdef0280324b68",
-        "url": "https://abc-service-5257.twil.io/pause"
+        "url": "https://####.twil.io/pause"
       }
     },
     {
@@ -965,7 +965,7 @@
           "y": 3780
         },
         "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
-        "url": "https://abc-service-5257.twil.io/long_pause"
+        "url": "https://####.twil.io/long_pause"
       }
     },
     {
@@ -988,7 +988,7 @@
           "y": 3780
         },
         "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
-        "url": "https://abc-service-5257.twil.io/long_pause"
+        "url": "https://####.twil.io/long_pause"
       }
     },
     {
@@ -1011,7 +1011,7 @@
           "y": 3780
         },
         "function_sid": "ZH91a51ddf045ea5f31d624e1e7837394b",
-        "url": "https://abc-service-5257.twil.io/long_pause"
+        "url": "https://####.twil.io/long_pause"
       }
     }
   ],

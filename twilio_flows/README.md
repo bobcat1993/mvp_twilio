@@ -24,6 +24,8 @@ You will need to lauch the app *publicly* so that Twilio can see it at YOUR_SERV
 
 ## Feature Subflows
 
+TODO(tonicreswell) Explain the interactions between Google Cloud Storage, Twilio (WhatsApp), Stripe, the API (which can be hosted on ngrok for testing or Heroku for launch), and the database.
+
 ### Welcome_Flow-v0.2
 
 The welcome feature, which welcomes new users to the app and talks them through the features available.
@@ -33,6 +35,10 @@ Note: This feature requires several assets that were stored on google cloud stor
 TODO(tonicreswell) Include these assets (videos and images) in the github repo and give instructions to update the links in the Twilio flow.
 
 ### Burnout-Survey-v0
+
+A quiz based on the [Burnout Assessment Tool](https://burnoutassessmenttool.be/wp-content/uploads/2020/08/User-Manual-BAT-version-2.0.pdf) to help individuals understand their risk of burnout.
+
+At the end of the survey the user is presented with an infographic
 
 ### Reflect-Flow-v0.2
 
