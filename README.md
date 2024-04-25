@@ -54,6 +54,10 @@ We decided to open source the code with these elements to help others if they de
 
 **Apologies in advanced**
 
+**Bypass Stripe Authentication (Recommended)** In `strip_payement.py` > `authenticate_user` change this to return `jsonify(has_account=True, is_active=True, status=Status.ACTIVE.value), 200`. Alternatively, you can bypass the authentication in Twilio Studio (see the image below).
+
+![Bypass the user authentication](bypass_authentication.png)
+
 
 ## Further Reading
 
