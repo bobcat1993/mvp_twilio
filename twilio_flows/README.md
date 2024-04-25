@@ -76,7 +76,9 @@ Allow users to set their own pace with custom reminders. Users can choose to set
 
 TIP: We've seen that individuals are far more likely to respond to reminders when they have autonomy over their own reminder schedule -- some people also just don't need a reminder.
 
-### General comments
+### Where are the rest of the flows?
+
+Thought Bobby's (short) life, we built and tested many different features, not all of them made the cut. In the code base you will see some features that did not make the cut. For example, our boundaries and gratitude challenges.
 
 
 
