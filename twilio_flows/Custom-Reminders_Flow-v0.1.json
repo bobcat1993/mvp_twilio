@@ -1,0 +1,362 @@
+{
+  "description": "Custom-Reminders_Flow-v0.1",
+  "states": [
+    {
+      "name": "Trigger",
+      "type": "trigger",
+      "transitions": [
+        {
+          "next": "set_variables_1",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "incomingCall"
+        },
+        {
+          "event": "incomingConversationMessage"
+        },
+        {
+          "next": "set_variables_1",
+          "event": "incomingRequest"
+        },
+        {
+          "next": "set_variables_1",
+          "event": "incomingParent"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -60,
+          "y": -2020
+        }
+      }
+    },
+    {
+      "name": "set_variables_1",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "ask_set_reminder",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "https://bobby-chat-###.herokuapp.com",
+            "key": "server_path"
+          }
+        ],
+        "offset": {
+          "x": -30,
+          "y": -1720
+        }
+      }
+    },
+    {
+      "name": "ask_set_reminder",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "split_eval_choice_to_set_reminder",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -20,
+          "y": -1300
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "body": "Would you like to set a reminder for your next conversation with Bobby? Yes or No.",
+        "timeout": "120"
+      }
+    },
+    {
+      "name": "split_eval_choice_to_set_reminder",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "next": "choose_day",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value matches_any_of Yes, yes, y, Yes., yes., yeah, yea, yup",
+              "arguments": [
+                "{{widgets.ask_set_reminder.inbound.Body}}"
+              ],
+              "type": "matches_any_of",
+              "value": "Yes, yes, y, Yes., yes., yeah, yea, yup"
+            }
+          ]
+        },
+        {
+          "next": "http_save_data",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value matches_any_of no, No, no., No., n, N, nope, Nope",
+              "arguments": [
+                "{{widgets.ask_set_reminder.inbound.Body}}"
+              ],
+              "type": "matches_any_of",
+              "value": "no, No, no., No., n, N, nope, Nope"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.ask_set_reminder.inbound.Body}}",
+        "offset": {
+          "x": -20,
+          "y": -1070
+        }
+      }
+    },
+    {
+      "name": "choose_day",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "set_variables_2",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 10,
+          "y": -790
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "body": "In how many days would you like to talk to Bobby? We suggest two or three, but it's up to you.\n\nPlease enter the number of days between 1 and 7 🔢.",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "http_schedule_reminder",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "reminder_set_message",
+          "event": "success"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 340,
+          "y": 260
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"user_number_of_days\": {{flow.variables.number_of_days}},\n\"user_number\": \"{{trigger.message.From}}\"\n}",
+        "url": "{{flow.variables.server_path}}/custom_reminder/set_custom_reminder"
+      }
+    },
+    {
+      "name": "is_valid_number_of_days",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "error_message",
+          "event": "noMatch"
+        },
+        {
+          "next": "error_message",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value less_than 1",
+              "arguments": [
+                "{{flow.variables.number_of_days}}"
+              ],
+              "type": "less_than",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "next": "error_message",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value greater_than 7",
+              "arguments": [
+                "{{flow.variables.number_of_days}}"
+              ],
+              "type": "greater_than",
+              "value": "7"
+            }
+          ]
+        },
+        {
+          "next": "http_schedule_reminder",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value matches_any_of 1, 2, 3, 4, 5, 6, 7",
+              "arguments": [
+                "{{flow.variables.number_of_days}}"
+              ],
+              "type": "matches_any_of",
+              "value": "1, 2, 3, 4, 5, 6, 7"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{flow.variables.number_of_days}}",
+        "offset": {
+          "x": 10,
+          "y": -280
+        }
+      }
+    },
+    {
+      "name": "set_variables_2",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "is_valid_number_of_days",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "{{widgets.choose_day.inbound.Body}}",
+            "key": "number_of_days"
+          }
+        ],
+        "offset": {
+          "x": 10,
+          "y": -550
+        }
+      }
+    },
+    {
+      "name": "set_variables_3",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "is_valid_number_of_days",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "{{widgets.error_message.inbound.Body}}",
+            "key": "number_of_days"
+          }
+        ],
+        "offset": {
+          "x": -620,
+          "y": -300
+        }
+      }
+    },
+    {
+      "name": "http_save_data",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "event": "success"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 810,
+          "y": 680
+        },
+        "method": "POST",
+        "content_type": "application/json;charset=utf-8",
+        "body": "{\n\"is_reminder_set\" : {{widgets.ask_set_reminder.inbound.Body | to_json}},\n\"why_not_set_reminder\": {{widgets.why_not.inbound.Body | to_json}},\n\"user_number_of_days\": {{flow.variables.number_of_days| to_json}},\n\"flow_sid\": \"{{flow.flow_sid}}\",\n\"origin\": \"twilio_flow\",\n\"user_id\": {{trigger.message.From | to_json}},\n\"error\": \"none\"\n}",
+        "url": "{{flow.variables.server_path}}/custom_reminder/save_data"
+      }
+    },
+    {
+      "name": "reminder_set_message",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "http_save_data",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 340,
+          "y": 460
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "to": "{{contact.channel.address}}",
+        "body": "Great! Your reminder has been set for {{flow.variables.number_of_days}} days from now. If you want to start a conversation before that just send \"Hi Bobby\" and this will start a conversation. See you soon."
+      }
+    },
+    {
+      "name": "error_message",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "set_variables_3",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -500,
+          "y": 100
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "message_type": "custom",
+        "body": "Please select a number between 1 and 7.",
+        "timeout": "3600"
+      }
+    },
+  ],
+  "initial_state": "Trigger",
+  "flags": {
+    "allow_concurrent_calls": true
+  }
+}
