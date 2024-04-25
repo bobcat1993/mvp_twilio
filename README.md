@@ -31,7 +31,17 @@ We decided to open source the code with these elements to help others if they de
 	* Add these to a .env file ([what is a .env file?](https://medium.com/@sujathamudadla1213/what-is-the-use-of-env-8d6b3eb94843)).
 
 * [Heroku](https://www.heroku.com/) or [Ngrok](https://ngrok.com/docs/getting-started/) account (or equivalent, required) for hosting your API on the internet so that Twilio can communicate with it.
-	* The path at which your website is hosted is `YOUR_SERVER_PATH`.
+	* The path at which your website is hosted is `YOUR_SERVER_PATH` (we will use this later).
+
+* A PostgreSQL database (required).
+	* This can either be [setup as an add-on](https://devcenter.heroku.com/articles/heroku-postgresql) in Heroku or setup [locally](https://www.postgresql.org/).
+	* Then you should have a `DATABASE_URL` something similar to `postgresql:///<db_name>`. Add this to your .env file.
+
+* ChatGPT (required).
+	* An OpenAI account with a `OPENAI_API_KEY` which you can find [here](https://platform.openai.com/api-keys).
+	* Add `OPENAI_API_KEY` to your .env file.
+
+**Important** Everything in your .env file is a secret, don't share it with anyone else (and don't accidentally commit it -- it could be an expensive mistake).
 
 
 ### Setup
