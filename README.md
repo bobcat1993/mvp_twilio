@@ -17,7 +17,7 @@
 3. [Further Reading](#reading)
 	1. [What is a medical device?](#md)
 	2. [Why did you use WhatsApp?](#whatsapp)
-	3. [How can we make conversations purposeful?](#purpose)
+	3. [How did you make conversations purposeful?](#purpose)
 
 ### Back story to this code.<a name="back-story"></a>
 
@@ -28,7 +28,7 @@ BobbyChat communicates with users via WhatsApp. To send and receive messages via
 
 ![Example conversation structure](goal_setting_demo.png).
 
-Twilio communicates with our language models via an API which needs to be hosted publicly (so that Twilio can access the end-points). We used [Heroku](https://www.heroku.com/) (with a PostgreSQL database), and ngrok for testing and developing locally.
+Twilio communicates with our language models via an API which needs to be hosted publicly (so that Twilio can access the end-points). We used [Heroku](https://www.heroku.com/) (with a PostgreSQL database), and Ngrok for testing and developing locally.
 
 Our API also communicated with Stripe, Google Cloud Storage and EmailOctopus. Integrations with Stripe and EmailOctopus allowed us to put up a paywall (despite serving our app through WhatsApp), only allow signed-up users and integrate other marketing channels. These elements can be easily removed/ skipped (done easily on the Twilio Studio side). 
 We decided to open source the code with these elements to help others if they decided to build a product in WhatsApp. See a high-level overview of the architecture below.
@@ -192,7 +192,7 @@ If you are anything like me, you probably already have 100 apps on your phone, s
 
 Building in WhatsApp has some challenges, for example adding payments, menus etc... but with WhatsApp's new features this is getting easier every day!
 
-### How can we make conversations purposeful?<a name="purpose"></a>
+### How did you make conversations purposeful?<a name="purpose"></a>
 
 As you can probably tell, Bobby is not just a single LLM, it's actually quite complex. Rather than users having purely open-ended conversations, we wanted to guide users through tried-and-tested techniques used in therapy/ coaching. To this end we took a hybrid approach to design, mixing _hard coded conversation design_ (e.g. Siri) with open ended LLMs. This allowed for purposeful, structured conversations with an open-ended feel.
 There was still a lot of work to do here, but this is a significant starting point.
