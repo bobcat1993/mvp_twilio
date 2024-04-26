@@ -4,3 +4,7 @@ venv/*
 data/*
 data/*.json
 bobby-chat-a760fde3a7fb.json
+save_numbers_to_db.py
+delete_address_config.py
+delete_conversation.py
+auto_create_conversation.py
