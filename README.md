@@ -52,7 +52,15 @@ We decided to open source the code with these elements to help others if they de
 
 ### Setup
 
-**Apologies in advanced** Since Bobby interacts with many other external API's and micro-services (e.g. Stripe, EmailOctopus etc) it's
+**Apologies in advanced** Since Bobby interacts with many other external API's and micro-services (e.g. Stripe, EmailOctopus etc) this code will **not** run out of the box and will require some setup.
+
+#### 1. Importing the Twilio Flows into Twilio.
+
+Once you have forked this repo, you will have a folder named `twilio_flows`. This folder holds the Twilio Flow json's that execute the conversation. You will need to navigate to your [Twilio Console](https://console.twilio.com/) > Studio > Flows > Create new Flow > _name the flow the same as the file name_ > Import from JSON.
+
+You can either experiment with one flow at a time (recommended) or import them all with the main flow being MVP0-v0.15.
+
+You will need to connect the flow to a Twilio WhatsApp number. **Be sure to connect it to a WhatsApp number (not a regular number)**.
 
 **Bypass Stripe Authentication (Recommended)** In `strip_payement.py` > `authenticate_user` change this to return `jsonify(has_account=True, is_active=True, status=Status.ACTIVE.value), 200`. Alternatively, you can bypass the authentication in Twilio Studio (see the image below).
 
