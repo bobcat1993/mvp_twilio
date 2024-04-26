@@ -62,6 +62,8 @@ You can either experiment with one flow at a time (recommended) or import them a
 
 You will need to [connect the flow to a Twilio WhatsApp sender (phone number)](https://www.twilio.com/docs/studio/tutorials/customer-support-menu#connect-your-whatsapp-sender-to-your-studio-flow). **Be sure to connect it to a WhatsApp number (not a regular number)**.
 
+It's recommended to start with one feature, for example, Sphere-of-Influence-Flow-v0.1 (since the flow is more simple).
+
 #### 2. Launch the app using Ngrok (for testing and personal use only).
 
 You can launch the app using [Ngrok](https://ngrok.com/docs/getting-started/) or Heroku or any other service. Ngrok is perfect for testing and personal use.
@@ -86,10 +88,38 @@ Create a database:
 Your `DATABASE_URL` will have the form `postgresql://<username>:<password>@<hostname>:<port>/<database_name>`. You can find out this info using the `\conninfo` command.
 
 
-#### 4. Setup your .env file.
+#### 4. Setup Google Cloud Storage (not recommended).
+
+TODO(tonicreswell) Write this section.
 
 
-#### 5. Initiate in an interaction.
+#### 5. Setup your .env file.
+
+Create a .env file (inside the **twilio** folder):
+
+`$ vim .env`
+
+Open the file and paste the following, replacing the #### values with your own (the Google credentials are optional and only required for the Burnout Survey flow). For local testing STRIPE_SECRET should be set to None.
+
+```
+OPENAI_API_KEY=####
+DATABASE_URL=postgresql:///####
+TWILIO_AUTH_TOKEN=####
+TWILIO_ACCOUNT_SID=####
+WHATSAPP_NUMBER=+####
+
+GOOGLE_API_KEY=####
+GOOGLE_CREDENTIALS=####.json
+GOOGLE_APPLICATION_CREDENTIALS=####.json
+
+STRIPE_API_KEY=sk_test_####
+STRIPE_SECRET=####
+```
+
+#### 6. Initiate in an interaction.
+
+
+#### 7. Trouble Shooting
 
 
 #### Final details 
