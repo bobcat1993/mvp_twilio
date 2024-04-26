@@ -22,7 +22,7 @@
 ### <a name="back-story"></a>Back story to this code.
 
 
-### Overview<a name="overview"></a>
+### <a name="overview"></a>Overview
 
 BobbyChat communicates with users via WhatsApp. To send and receive messages via WhatsApp, we use [Twilio Studio](https://www.twilio.com/docs/studio/user-guide). Twilio Studio allows us to design the structure of a conversation (see example image below) while executing each step of the conversation using language models (aka GenAI).
 
@@ -36,7 +36,7 @@ We decided to open source the code with these elements to help others if they de
 ![Bobby architecture overview](bobby_architecutre_overview.png)
 
 
-### What you will need<a name="need"></a>
+### <a name="need"></a>What you will need
 
 * Twilio (required)
 	* A Twilio account.
@@ -67,11 +67,11 @@ We decided to open source the code with these elements to help others if they de
 **Important** Everything in your .env file is a secret, don't share it with anyone else (and don't accidentally commit it -- it could be an expensive mistake).
 
 
-### Setup<a name="setup"></a>
+### <a name="setup"></a>Setup
 
 Since Bobby interacts with many other external API's and micro-services (e.g. Stripe, EmailOctopus etc) this code will **not** run out of the box and will require some setup.
 
-#### 1. Importing the Twilio Flows into Twilio Studio.<a name="import"></a>
+#### <a name="import"></a>1. Importing the Twilio Flows into Twilio Studio.
 
 Once you have forked this repo, you will have a folder named `twilio_flows`. This folder holds the Twilio Flow JSONs that execute the conversation. You will need to navigate to your [Twilio Console](https://console.twilio.com/) > Studio > Flows > Create new Flow > _name the flow the same as the file name_ > Import from JSON.
 
@@ -81,7 +81,7 @@ You will need to [connect the flow to a Twilio WhatsApp sender (phone number)](h
 
 It's recommended to start with one feature, for example, Sphere-of-Influence-Flow-v0.1 (since the flow is more simple).
 
-#### 2. Launch the app using Ngrok (for testing and personal use only).<a name="ngrok"></a>
+#### <a name="ngrok"></a>2. Launch the app using Ngrok (for testing and personal use only).
 
 You can launch the app using [Ngrok](https://ngrok.com/docs/getting-started/) or Heroku or any other service. Ngrok is perfect for testing and personal use.
 
@@ -91,7 +91,7 @@ Launch the app (from inside the **twilio** folder):
 Launch the app on the internet:
 `ngrok http 8000`
 
-#### 3. Setup your PostgreSQL database (locally).<a name="postgresql"></a>
+#### <a name="postgresql"></a>3. Setup your PostgreSQL database (locally).
 
 Once you had installed PostgreSQL run the following command to login to your PostgreSQL server using your username and hostname (if you have them).
 
@@ -105,12 +105,12 @@ Create a database:
 Your `DATABASE_URL` will have the form `postgresql://<username>:<password>@<hostname>:<port>/<database_name>`. You can find out this info using the `\conninfo` command.
 
 
-#### 4. Setup Google Cloud Storage (optional).<a name="gcs"></a>
+#### <a name="gcs"></a>4. Setup Google Cloud Storage (optional).
 
 TODO(tonicreswell) Write this section.
 
 
-#### 5. Setup your .env file.<a name="env"></a>
+#### <a name="env"></a>5. Setup your .env file.
 
 Create a .env file (inside the **twilio** folder):
 
@@ -133,11 +133,11 @@ STRIPE_API_KEY=sk_test_####
 STRIPE_SECRET=####
 ```
 
-#### 6. Initiate a conversation.<a name="start"></a>
+#### <a name="start"></a>6. Initiate a conversation.
 
 Make sure that you have connected one of your WhatsApp senders to one of the flows (we recommend the Sphere-of-Influence flow to get started) and send a "Hi" message via WhatsApp to that connected number. This will initiate the conversation and the magic will begin.
 
-#### 7. Trouble Shooting<a name="TS"></a>
+#### <a name="TS"></a>7. Trouble Shooting
 
 a. What is a WhatsApp sender?
 
@@ -176,23 +176,23 @@ h. Some images are missing, where are they?
 
 TODO(tonicreswell) Add images to repo.
 
-## Further Reading<a name="back-story"></a>
+## <a name="back-story"></a>Further Reading
 
 Below are a collection of some of our learnings and some helpful resources if you are interested in building in the mental health/ wellbeing space.
 
-### What is a medical device?<a name="md"></a>
+### <a name="md"></a>What is a medical device?
 
 If you are serious about building mental health apps, check out this [document](https://assets.publishing.service.gov.uk/media/64a7d22d7a4c230013bba33c/Medical_device_stand-alone_software_including_apps__including_IVDMDs_.pdf) to get an understanding of what it means to build a medical device. It comes down to the "intended purpose" (see the figure below taken from the document above). If your app intends to treat, prevent, diagnose or monitor it could be a medical device and will need to be regulated (depending on your country).
 
 ![MHRA Intended purpose](intended_purpose.png)
 
-### Why did you use WhatsApp?<a name="whatsapp"></a>
+### <a name="whatsapp"></a>Why did you use WhatsApp?
 
 If you are anything like me, you probably already have 100 apps on your phone, some of which you NEVER open. One app I, and 2 billion other people, use regularly is WhatsApp. It's a familiar user interface with no download required. It's also easy to send people notifications of new features and reminders. You can even give people a link to connect directly to your bot, `https://wa.me/<number>`. Yes, it's really THAT SIMPLE!
 
 Building in WhatsApp was challenging, but it forced us to make sure that every interaction the user had was a conversation rather than a button pressing exercise.
 
-### How did you make conversations purposeful?<a name="purpose"></a>
+### <a name="purpose"></a>How did you make conversations purposeful?
 
 As you can probably tell, Bobby is not just a single LLM, it's actually quite complex. Rather than users having purely open-ended conversations, we wanted to guide users through tried-and-tested techniques used in therapy/ coaching. To this end we took a hybrid approach to design, mixing _hard coded conversation design_ (e.g. Siri) with open ended LLMs. This allowed for purposeful, structured conversations with an open-ended feel.
 There was still a lot of work to do here, but this is a significant starting point.
