@@ -1,3 +1,4 @@
+"""Creating a social media post with specific text."""
 import requests, json
 from dotenv import load_dotenv
 import os
