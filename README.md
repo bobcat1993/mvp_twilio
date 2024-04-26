@@ -2,9 +2,15 @@
 
 ## BobbyChat
 
+In 2023 we (my co-founder and I) saw the growing need for *someone* to build *something* to solve the mental health crisis. To this end we started BobbyChat, with a clear mission to make mental well-being accessible to everyone.
+A year on, and while we were able to help thousands of individuals with workplace stress, we have made the difficult decision to retire BobbyChat.
+
+
+However, we still get messages almost every week from individuals asking how they can access Bobby and so we've decided to share our MVP and some learnings (see the READMEs) in the hopes that it inspires others to build mental well-being solutions in a responsible manner.
+
+
 # Table of contents
-1. [Back story to this code](#back-story)
-2. [Overview](#overview)
+1. [Overview](#overview)
     1. [What you will need](#need)
     2. [Setup](#setup)
     	1. [Importing the Twilio Flows into Twilio Studio.](#import)
@@ -14,12 +20,11 @@
     	5. [Setup your .env file.](#env)
     	6. [Initiate a conversation](#start)
     	7. [Trouble Shooting](#TS)
-3. [Further Reading](#reading)
+2. [Further Reading](#reading)
 	1. [What is a medical device?](#md)
-	2. [Why did you use WhatsApp?](#whatsapp)
-	3. [How did you make conversations purposeful?](#purpose)
-
-### <a name="back-story"></a>Back story to this code.
+	2. [How can I make my app GDPR compliant?](#gdpr)
+	3. [Why did you use WhatsApp?](#whatsapp)
+	4. [How did you make conversations purposeful?](#purpose)
 
 
 ### <a name="overview"></a>Overview
@@ -185,6 +190,10 @@ Below are a collection of some of our learnings and some helpful resources if yo
 If you are serious about building mental health apps, check out this [document](https://assets.publishing.service.gov.uk/media/64a7d22d7a4c230013bba33c/Medical_device_stand-alone_software_including_apps__including_IVDMDs_.pdf) to get an understanding of what it means to build a medical device. It comes down to the "intended purpose" (see the figure below taken from the document above). If your app intends to treat, prevent, diagnose or monitor it could be a medical device and will need to be regulated (depending on your country).
 
 ![MHRA Intended purpose](intended_purpose.png)
+
+### <a name="gdpr"></a>Where can I learn more about GDPR?
+
+A great place to learn about GDPR is the [Information Commissioners Office](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/).
 
 ### <a name="whatsapp"></a>Why did you use WhatsApp?
 
