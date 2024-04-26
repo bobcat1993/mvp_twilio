@@ -7,9 +7,10 @@
 2. [Overview](#overview)
     1. [What you will need](#need)
     2. [Setup](#setup)
-    3. [What you will need](#need)
-    4. [What you will need](#need)
-3. [Another paragraph](#paragraph2)
+3. [Further Reading](#reading)
+	1. [What is a medical device?](#md)
+	2. [Why did you use WhatsApp?](#whatsapp)
+	3. [How can we make conversations purposeful?](#purpose)
 
 ### Back story to this code.<a name="back-story"></a>
 
@@ -168,23 +169,23 @@ h. Some images are missing, where are they?
 
 TODO(tonicreswell) Add images to repo.
 
-## Further Reading
+## Further Reading<a name="back-story"></a>
 
 Below are a collection of some of our learnings and some helpful resources if you are interested in building in the mental health/ wellbeing space.
 
-### What is a medical device?
+### What is a medical device?<a name="md"></a>
 
 If you are serious about building mental health apps, check out this [document](https://assets.publishing.service.gov.uk/media/64a7d22d7a4c230013bba33c/Medical_device_stand-alone_software_including_apps__including_IVDMDs_.pdf) to get an understanding of what it means to build a medical device. It comes down to the "intended purpose" (see the figure below taken from the document above). If your app intends to treat, prevent, diagnose or monitor it could be a medical device and will need to be regulated (depending on your country).
 
 ![MHRA Intended purpose](intended_purpose.png)
 
-### Why did you use WhatsApp?
+### Why did you use WhatsApp?<a name="whatsapp"></a>
 
 If you are anything like me, you probably already have 100 apps on your phone, some of which you NEVER open. One app I, and 2 billion other people, use regularly is WhatsApp. It's a familiar user interface with no download required. You can even give people a link to connect directly to your bot, `https://wa.me/<number>`. Yes, it's really THAT SIMPLE!
 
 Building in WhatsApp has some challenges, for example adding payments, menus etc... but with WhatsApp's new features this is getting easier every day!
 
-### How can we make conversations purposeful?
+### How can we make conversations purposeful?<a name="purpose"></a>
 
 As you can probably tell, Bobby is not just a single LLM, it's actually quite complex. Rather than users having purely open-ended conversations, we wanted to guide users through tried-and-tested techniques used in therapy/ coaching. To this end we took a hybrid approach to design, mixing _hard coded conversation design_ (e.g. Siri) with open ended LLMs. This allowed for purposeful, structured conversations with an open-ended feel.
-There was still a lot of work to do here, but this was a significant starting point.
+There was still a lot of work to do here, but this is a significant starting point.
