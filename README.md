@@ -19,7 +19,7 @@
 	2. [Why did you use WhatsApp?](#whatsapp)
 	3. [How did you make conversations purposeful?](#purpose)
 
-### Back story to this code.<a name="back-story"></a>
+### <a name="back-story"></a>Back story to this code.
 
 
 ### Overview<a name="overview"></a>
