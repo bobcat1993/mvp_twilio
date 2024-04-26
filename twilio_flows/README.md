@@ -4,15 +4,17 @@ This folder contains the Twilio flows used to control the flow of the user-bot c
 
 ## What is a Twilio Flow?
 
-Check out the Twilio user guided [here](https://www.twilio.com/docs/studio/user-guide).
+Check out the Twilio Studio user guided [here](https://www.twilio.com/docs/studio/user-guide).
+
+[This short tutorial](https://www.twilio.com/docs/studio/tutorials/customer-support-menu) is also great for understanding how to use Twilio Studio with WhatsApp.
 
 ## How do I use these flows?
 
-Simply create a new flow from a json as shown [here](https://www.twilio.com/docs/studio/user-guide#importing-flow-data).
+Simply create a new flow from a json as shown [here](https://www.twilio.com/docs/studio/user-guide#importing-flow-data) and connect to your Twilio WhatsApp senders as shown [here](https://www.twilio.com/docs/studio/tutorials/customer-support-menu#connect-your-whatsapp-sender-to-your-studio-flow).
 
 ## There are quite a lot of flows, what's going on?
 
-Each feature has it's own flow and is connected to the main flow, MVP-v0.15. You can only connect a phone number to one flow at a time. If you want to test out a single feature you can connect import that feature into Twilio and connect it to one of your Twilio numbers, [here](https://www.twilio.com/docs/conversations/connect-to-studio).
+Each feature has it's own flow and is connected to the main flow, MVP-v0.15. You can only connect a WhatsApp number to one flow at a time. If you want to test out a single feature you can import that feature into Twilio and connect it to one of your Twilio WhatsApp senders, [here](https://www.twilio.com/docs/studio/tutorials/customer-support-menu).
 
 We connect each feature to the main flow, MVP-v0.15, via the "Run Subflow" widget. These point to subflows based on their name and revision, so make sure when you are importing each feature flow into Twilio that the flow names are the same.
 
