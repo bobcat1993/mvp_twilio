@@ -52,17 +52,38 @@ We decided to open source the code with these elements to help others if they de
 
 ### Setup
 
-**Apologies in advanced** Since Bobby interacts with many other external API's and micro-services (e.g. Stripe, EmailOctopus etc) this code will **not** run out of the box and will require some setup.
+Since Bobby interacts with many other external API's and micro-services (e.g. Stripe, EmailOctopus etc) this code will **not** run out of the box and will require some setup.
 
-#### 1. Importing the Twilio Flows into Twilio.
+#### 1. Importing the Twilio Flows into Twilio Studio.
 
-Once you have forked this repo, you will have a folder named `twilio_flows`. This folder holds the Twilio Flow json's that execute the conversation. You will need to navigate to your [Twilio Console](https://console.twilio.com/) > Studio > Flows > Create new Flow > _name the flow the same as the file name_ > Import from JSON.
+Once you have forked this repo, you will have a folder named `twilio_flows`. This folder holds the Twilio Flow JSONs that execute the conversation. You will need to navigate to your [Twilio Console](https://console.twilio.com/) > Studio > Flows > Create new Flow > _name the flow the same as the file name_ > Import from JSON.
 
 You can either experiment with one flow at a time (recommended) or import them all with the main flow being MVP0-v0.15.
 
-You will need to connect the flow to a Twilio WhatsApp number. **Be sure to connect it to a WhatsApp number (not a regular number)**.
+You will need to [connect the flow to a Twilio WhatsApp sender (phone number)](https://www.twilio.com/docs/studio/tutorials/customer-support-menu#connect-your-whatsapp-sender-to-your-studio-flow). **Be sure to connect it to a WhatsApp number (not a regular number)**.
 
-**Bypass Stripe Authentication (Recommended)** In `strip_payement.py` > `authenticate_user` change this to return `jsonify(has_account=True, is_active=True, status=Status.ACTIVE.value), 200`. Alternatively, you can bypass the authentication in Twilio Studio (see the image below).
+#### 2. Launch the app using Ngrok (for testing and personal use only).
+
+You can launch the app using [Ngrok](https://ngrok.com/docs/getting-started/) or Heroku or any other service. Ngrok is perfect for testing and personal use.
+
+Launch the app (from inside the **twilio** folder):
+`$ python3 app.py`
+
+Launch the app on the internet:
+`ngrok http 8000`
+
+#### 3. Setup your database.
+
+
+#### 4. Setup your .env file.
+
+
+#### 5. Initiate in an interaction.
+
+
+#### Final details 
+
+**Bypass Stripe Authentication (Recommended)** You can bypass the user authentication in the MVP0-v0.15 Flow in Twilio Studio by directly connecting `eval_trigger_before_authentication [No Condition Matches]` to `eval_trigger` (see the image below).
 
 ![Bypass the user authentication](bypass_authentication.png)
 
@@ -73,6 +94,10 @@ You will need to connect the flow to a Twilio WhatsApp number. **Be sure to conn
 ### Why did you use WhatsApp?
 
 ### Design principles; why not just converse with a single language model?
+
+### Why are some tests commented out?
+
+These tests use LLMs which means that running them all can be expensive.
 
 
 
