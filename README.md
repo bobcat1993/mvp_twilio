@@ -155,7 +155,13 @@ g. When I start a conversation I'm being told it's not possible to buy a subscri
 
 ![Bypass the user authentication](bypass_authentication.png)
 
+h. Some images are missing, where are they?
+
+TODO(tonicreswell) Add images to repo.
+
 ## Further Reading
+
+Below are a collection of some of our learnings and some helpful resources if you are interested in building in the mental health/ wellbeing space.
 
 ### What is a medical device?
 
@@ -165,7 +171,16 @@ If you are serious about building mental health apps, check out this [document](
 
 ### Why did you use WhatsApp?
 
-### Design principles; why not just converse with a single language model?
+If you are anything like me, you probably already have 100 apps on your phone, some of which you NEVER open. One app I, and 2 billion other people, use regularly is WhatsApp. It's a familiar user interface with no download required. You can even give people a link to connect directly to your bot, `https://wa.me/<number>`. Yes, it's really THAT SIMPLE!
+
+Building in WhatsApp has some challenges, for example adding payments, menus etc... but with WhatsApp's new features this is getting easier every day!
+
+### How can we make conversations purposeful?
+
+As you can probably tell, Bobby is not just a single LLM, it's actually quite complex. Rather than users having purely open-ended conversations, we wanted to guide users through tried-and-tested techniques used in therapy/ coaching. To this end we took a hybrid approach to design, mixing _hard coded conversation design_ (e.g. Siri) with open ended LLMs. This allowed for purposeful, structured conversations with an open-ended feel.
+
+There was still a lot of work to do here, but this was a significant starting point.
+
 
 ### Why are some tests commented out?
 
