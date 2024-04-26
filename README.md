@@ -72,7 +72,18 @@ Launch the app (from inside the **twilio** folder):
 Launch the app on the internet:
 `ngrok http 8000`
 
-#### 3. Setup your database.
+#### 3. Setup your PostgreSQL database (locally).
+
+Once you had installed PostgreSQL run the following command to login to your PostgreSQL server using your username and hostname (if you have them).
+
+`$ psql -U <username> -h <hostname>`
+
+Create a database:
+
+`$ CREATE DATABASE <database_name>;`
+
+
+Your `DATABASE_URL` will have the form `postgresql://<username>:<password>@<hostname>:<port>/<database_name>`. You can find out this info using the `\conninfo` command.
 
 
 #### 4. Setup your .env file.
