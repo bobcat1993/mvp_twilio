@@ -161,7 +161,7 @@ g. When I start a conversation I'm being told it's not possible to buy a subscri
 
 If you are serious about building mental health apps, check out this [document](https://assets.publishing.service.gov.uk/media/64a7d22d7a4c230013bba33c/Medical_device_stand-alone_software_including_apps__including_IVDMDs_.pdf) to get an understanding of what it means to build a medical device. It comes down to the "intended purpose" (see the figure below taken from the document above). If your app intends to treat, prevent, diagnose or monitor it could be a medical device and will need to be regulated (depending on your country).
 
-![MHRA Intended purpose](intened_purpose.png)
+![MHRA Intended purpose](intended_purpose.png)
 
 ### Why did you use WhatsApp?
 
