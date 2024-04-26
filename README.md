@@ -176,7 +176,7 @@ h. Some images are missing, where are they?
 
 TODO(tonicreswell) Add images to repo.
 
-## <a name="back-story"></a>Further Reading
+## <a name="reading"></a>Further Reading
 
 Below are a collection of some of our learnings and some helpful resources if you are interested in building in the mental health/ wellbeing space.
 
