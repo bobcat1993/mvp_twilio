@@ -35,8 +35,8 @@ BobbyChat communicates with users via WhatsApp. To send and receive messages via
 
 Twilio communicates with our language models via an API which needs to be hosted publicly (so that Twilio can access the end-points). We used [Heroku](https://www.heroku.com/) (with a PostgreSQL database), and Ngrok for testing and developing locally.
 
-Our API also communicated with Stripe, Google Cloud Storage and EmailOctopus. Integrations with Stripe and EmailOctopus allowed us to put up a paywall (despite serving our app through WhatsApp), only allow signed-up users and integrate other marketing channels. These elements can be easily removed/ skipped (done easily on the Twilio Studio side). 
-We decided to open source the code with these elements to help others if they decided to build a product in WhatsApp. See a high-level overview of the architecture below.
+Our API also communicated with Stripe, Google Cloud Storage and EmailOctopus. Integrations with Stripe and EmailOctopus allowed us to put up a paywall (despite serving our app through WhatsApp), authenticate users and integrate other marketing channels. These elements can be easily removed/ skipped. 
+We decided to open source the code with these elements to serve as a _starting point_ for others looking to build paid-for-products in WhatsApp. See a high-level overview of the architecture below.
 
 ![Bobby architecture overview](bobby_architecutre_overview.png)
 
@@ -195,7 +195,7 @@ If you are serious about building mental health apps, check out this [document](
 
 If you are anything like me, you probably already have 100 apps on your phone, some of which you NEVER open. One app I, and 2 billion other people, use regularly is WhatsApp. It's a familiar user interface with no download required. It's also easy to send people notifications of new features and reminders. You can even give people a link to connect directly to your bot, `https://wa.me/<number>`. Yes, it's really THAT SIMPLE!
 
-Building in WhatsApp was challenging, but it forced us to make sure that every interaction the user had was a conversation rather than a button pressing exercise.
+Building in WhatsApp allowed us to iterate faster; there was no "front-end variable" forcing us to focus our efforts on improving the conversational interaction that the user was having. It also meant that every interaction our users had with Bobby, had to be a conversation, which made the interaction more authentic.
 
 ### <a name="purpose"></a>How did you make conversations purposeful?
 
