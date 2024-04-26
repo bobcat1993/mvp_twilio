@@ -2,10 +2,19 @@
 
 ## BobbyChat
 
-### Back story to this code.
+# Table of contents
+1. [Back story to this code](#back-story)
+2. [Overview](#overview)
+    1. [What you will need](#need)
+    2. [Setup](#setup)
+    3. [What you will need](#need)
+    4. [What you will need](#need)
+3. [Another paragraph](#paragraph2)
+
+### Back story to this code.<a name="back-story"></a>
 
 
-### Overview
+### Overview<a name="overview"></a>
 
 BobbyChat communicates with users via WhatsApp. To send and receive messages via WhatsApp, we use [Twilio Studio](https://www.twilio.com/docs/studio/user-guide). Twilio Studio allows us to design the structure of a conversation (see example image below) while executing each step of the conversation using language models (aka GenAI).
 
@@ -19,7 +28,7 @@ We decided to open source the code with these elements to help others if they de
 ![Bobby architecture overview](bobby_architecutre_overview.png)
 
 
-### What you will need
+### What you will need<a name="need"></a>
 
 * Twilio (required)
 	* A Twilio account.
@@ -50,7 +59,7 @@ We decided to open source the code with these elements to help others if they de
 **Important** Everything in your .env file is a secret, don't share it with anyone else (and don't accidentally commit it -- it could be an expensive mistake).
 
 
-### Setup
+### Setup<a name="setup"></a>
 
 Since Bobby interacts with many other external API's and micro-services (e.g. Stripe, EmailOctopus etc) this code will **not** run out of the box and will require some setup.
 
@@ -178,15 +187,4 @@ Building in WhatsApp has some challenges, for example adding payments, menus etc
 ### How can we make conversations purposeful?
 
 As you can probably tell, Bobby is not just a single LLM, it's actually quite complex. Rather than users having purely open-ended conversations, we wanted to guide users through tried-and-tested techniques used in therapy/ coaching. To this end we took a hybrid approach to design, mixing _hard coded conversation design_ (e.g. Siri) with open ended LLMs. This allowed for purposeful, structured conversations with an open-ended feel.
-
 There was still a lot of work to do here, but this was a significant starting point.
-
-
-### Why are some tests commented out?
-
-These tests use LLMs which means that running them all can be expensive.
-
-
-
-
-
