@@ -149,18 +149,19 @@ f. I'm getting an error on the `Make HTTP Request` widgets and I've set my serve
 
 Visit `https://####-##-##-##-###.ngrok-free.app` and you may see an error message. Ngrok also have brilliant inspectors which show you exactly where things are going wrong in the HTTP calls.
 
+g. When I start a conversation I'm being told it's not possible to buy a subscription. How do I bypass this?
 
-
-
-#### Final details 
-
-**Bypass Stripe Authentication (Recommended)** You can bypass the user authentication in the MVP0-v0.15 Flow in Twilio Studio by directly connecting `eval_trigger_before_authentication [No Condition Matches]` to `eval_trigger` (see the image below).
+**Bypass Stripe Authentication (required)** You can bypass the user authentication in the MVP0-v0.15 Flow in Twilio Studio by directly connecting `eval_trigger_before_authentication [No Condition Matches]` to `eval_trigger` (see the image below).
 
 ![Bypass the user authentication](bypass_authentication.png)
 
 ## Further Reading
 
-### Is this a medical device?
+### What is a medical device?
+
+If you are serious about building mental health apps, check out this [document](https://assets.publishing.service.gov.uk/media/64a7d22d7a4c230013bba33c/Medical_device_stand-alone_software_including_apps__including_IVDMDs_.pdf) to get an understanding of what it means to build a medical device. It comes down to the "intended purpose" (see the figure below taken from the document above). If your app intends to treat, prevent, diagnose or monitor it could be a medical device and will need to be regulated (depending on your country).
+
+![MHRA Intended purpose](intened_purpose.png)
 
 ### Why did you use WhatsApp?
 
