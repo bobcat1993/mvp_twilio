@@ -7,6 +7,13 @@
 2. [Overview](#overview)
     1. [What you will need](#need)
     2. [Setup](#setup)
+    	1. [Importing the Twilio Flows into Twilio Studio.](#import)
+    	2. [Launch the app using Ngrok](#ngrok)
+    	3. [Setup your PostgreSQL database](#postgresql)
+    	4. [Setup Google Cloud Storage (optional)](#gcs)
+    	5. [Setup your .env file.](#env)
+    	6. [Initiate a conversation](#start)
+    	7. [Trouble Shooting](#TS)
 3. [Further Reading](#reading)
 	1. [What is a medical device?](#md)
 	2. [Why did you use WhatsApp?](#whatsapp)
@@ -64,7 +71,7 @@ We decided to open source the code with these elements to help others if they de
 
 Since Bobby interacts with many other external API's and micro-services (e.g. Stripe, EmailOctopus etc) this code will **not** run out of the box and will require some setup.
 
-#### 1. Importing the Twilio Flows into Twilio Studio.
+#### 1. Importing the Twilio Flows into Twilio Studio.<a name="import"></a>
 
 Once you have forked this repo, you will have a folder named `twilio_flows`. This folder holds the Twilio Flow JSONs that execute the conversation. You will need to navigate to your [Twilio Console](https://console.twilio.com/) > Studio > Flows > Create new Flow > _name the flow the same as the file name_ > Import from JSON.
 
@@ -74,7 +81,7 @@ You will need to [connect the flow to a Twilio WhatsApp sender (phone number)](h
 
 It's recommended to start with one feature, for example, Sphere-of-Influence-Flow-v0.1 (since the flow is more simple).
 
-#### 2. Launch the app using Ngrok (for testing and personal use only).
+#### 2. Launch the app using Ngrok (for testing and personal use only).<a name="ngrok"></a>
 
 You can launch the app using [Ngrok](https://ngrok.com/docs/getting-started/) or Heroku or any other service. Ngrok is perfect for testing and personal use.
 
@@ -84,7 +91,7 @@ Launch the app (from inside the **twilio** folder):
 Launch the app on the internet:
 `ngrok http 8000`
 
-#### 3. Setup your PostgreSQL database (locally).
+#### 3. Setup your PostgreSQL database (locally).<a name="postgresql"></a>
 
 Once you had installed PostgreSQL run the following command to login to your PostgreSQL server using your username and hostname (if you have them).
 
@@ -98,12 +105,12 @@ Create a database:
 Your `DATABASE_URL` will have the form `postgresql://<username>:<password>@<hostname>:<port>/<database_name>`. You can find out this info using the `\conninfo` command.
 
 
-#### 4. Setup Google Cloud Storage (not recommended).
+#### 4. Setup Google Cloud Storage (optional).<a name="gcs"></a>
 
 TODO(tonicreswell) Write this section.
 
 
-#### 5. Setup your .env file.
+#### 5. Setup your .env file.<a name="env"></a>
 
 Create a .env file (inside the **twilio** folder):
 
@@ -126,11 +133,11 @@ STRIPE_API_KEY=sk_test_####
 STRIPE_SECRET=####
 ```
 
-#### 6. Initiate in an interaction.
+#### 6. Initiate a conversation.<a name="start"></a>
 
 Make sure that you have connected one of your WhatsApp senders to one of the flows (we recommend the Sphere-of-Influence flow to get started) and send a "Hi" message via WhatsApp to that connected number. This will initiate the conversation and the magic will begin.
 
-#### 7. Trouble Shooting
+#### 7. Trouble Shooting<a name="TS"></a>
 
 a. What is a WhatsApp sender?
 
