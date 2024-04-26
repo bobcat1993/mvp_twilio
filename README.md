@@ -132,18 +132,22 @@ b. I have a WhatsApp sender why is nothing happening when I send a message?
 
 You need to make sure that your WhatsApp sender is connected to the correct flow. Follow [these steps to setup the end point URLs](https://console.twilio.com/us1/develop/sms/try-it-out/whatsapp-learn); it's as simple as copying a URL from one place to another.
 
-c. I'm getting an error on the `Make HTTP Request` widgets, what is `flow.variables.server_path`?
+c. I'm getting a `KeyError: 'TWILIO_ACCOUNT_SID'` when I run `$ python3 app.py`.
+
+This means that your .env file is not configured correctly. Make sure the file is named .env and that the missing key is in the .env file.
+
+d. I'm getting an error on the `Make HTTP Request` widgets, what is `flow.variables.server_path`?
 
 Each flow will have a `server_path` or `ngrok_path` (or similar variable) set in the first widget of each flow. You must replace this with your Ngrok (or equivalent) path.
 
-d. How do I find my Ngrok path?
+e. How do I find my Ngrok path?
 
 When you run `$ ngrok http 8000` you will see something similar to `https://####-##-##-##-###.ngrok-free.app -> http://localhost:8000 `. `https://####-##-##-##-###.ngrok-free.app` is your Ngrok path.
 
 
-d. I'm getting an error on the `Make HTTP Request` widgets and I've set my server path correctly?
+f. I'm getting an error on the `Make HTTP Request` widgets and I've set my server path correctly?
 
-Visit `https://####-##-##-##-###.ngrok-free.app` and you may see an error message.
+Visit `https://####-##-##-##-###.ngrok-free.app` and you may see an error message. Ngrok also have brilliant inspectors which show you exactly where things are going wrong in the HTTP calls.
 
 
 
