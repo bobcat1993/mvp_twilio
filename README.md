@@ -118,8 +118,34 @@ STRIPE_SECRET=####
 
 #### 6. Initiate in an interaction.
 
+Make sure that you have connected one of your WhatsApp senders to one of the flows (we recommend the Sphere-of-Influence flow to get started) and send a "Hi" message via WhatsApp to that connected number. This will initiate the conversation and the magic will begin.
 
 #### 7. Trouble Shooting
+
+a. What is a WhatsApp sender?
+
+For a quick-start you can use [Twilio's WhatsApp sandbox](https://console.twilio.com/us1/develop/sms/try-it-out/whatsapp-learn) which allows you to connect to send WhatsApp messages to a small number of users. Go to the Sandbox settings to change where incoming messages are sent.
+
+If you have set a Twilio account, you will find your WhatsApp senders [here](https://console.twilio.com/us1/develop/sms/senders/whatsapp-senders).
+
+b. I have a WhatsApp sender why is nothing happening when I send a message?
+
+You need to make sure that your WhatsApp sender is connected to the correct flow. Follow [these steps to setup the end point URLs](https://console.twilio.com/us1/develop/sms/try-it-out/whatsapp-learn); it's as simple as copying a URL from one place to another.
+
+c. I'm getting an error on the `Make HTTP Request` widgets, what is `flow.variables.server_path`?
+
+Each flow will have a `server_path` or `ngrok_path` (or similar variable) set in the first widget of each flow. You must replace this with your Ngrok (or equivalent) path.
+
+d. How do I find my Ngrok path?
+
+When you run `$ ngrok http 8000` you will see something similar to `https://####-##-##-##-###.ngrok-free.app -> http://localhost:8000 `. `https://####-##-##-##-###.ngrok-free.app` is your Ngrok path.
+
+
+d. I'm getting an error on the `Make HTTP Request` widgets and I've set my server path correctly?
+
+Visit `https://####-##-##-##-###.ngrok-free.app` and you may see an error message.
+
+
 
 
 #### Final details 
