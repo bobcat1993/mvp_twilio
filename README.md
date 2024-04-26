@@ -195,7 +195,7 @@ If you are serious about building mental health apps, check out this [document](
 
 If you are anything like me, you probably already have 100 apps on your phone, some of which you NEVER open. One app I, and 2 billion other people, use regularly is WhatsApp. It's a familiar user interface with no download required. It's also easy to send people notifications of new features and reminders. You can even give people a link to connect directly to your bot, `https://wa.me/<number>`. Yes, it's really THAT SIMPLE!
 
-Building in WhatsApp allowed us to iterate faster; there was no "front-end variable" forcing us to focus our efforts on improving the conversational interaction that the user was having. It also meant that every interaction our users had with Bobby, had to be a conversation, which made the interaction more authentic.
+Building in WhatsApp allowed us to iterate faster; there was no front-end to "tweak", forcing us to focus our efforts on improving the conversational interaction that the user was having. It also meant that every interaction our users had with Bobby, had to be a conversation, which made the interaction more authentic.
 
 ### <a name="purpose"></a>How did you make conversations purposeful?
 
