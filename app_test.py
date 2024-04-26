@@ -1,3 +1,8 @@
+"""Tests for the app.py script.
+
+Some of these tests are commented out because running all the tests can be very expensive since they use LLMs or send messages using WhatsApp / Twilio.
+"""
+
 import unittest
 import app as my_app
 from app import app
