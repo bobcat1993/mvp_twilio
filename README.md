@@ -6,7 +6,7 @@ In 2023 we (my co-founder and I) saw the growing need for *someone* to build *so
 A year on, and while we were able to help thousands of individuals with workplace stress, we have made the difficult decision to retire BobbyChat.
 
 
-However, we still get messages almost every week from individuals asking how they can access Bobby and so we've decided to share our MVP and some learnings (see the READMEs) in the hopes that it inspires others to build mental well-being solutions in a responsible manner.
+However, we still get messages almost every week from individuals asking how they can access Bobby and so we've decided to share our MVP and some learnings in the hopes that it inspires others to build mental well-being solutions in a responsible manner.
 
 
 # Table of contents
@@ -43,7 +43,7 @@ We decided to open source the code with these elements to serve as a _starting p
 
 ### <a name="need"></a>What you will need
 
-* Twilio (required)
+* [Twilio](https://www.twilio.com/) (required)
 	* A Twilio account.
 	* In Twilio [configure a WhatsApp sender](https://console.twilio.com/us1/develop/sms/senders/whatsapp-senders).
 	* Then you should have a:
@@ -67,14 +67,14 @@ We decided to open source the code with these elements to serve as a _starting p
 	* To access BobbyChat our users had to purchase a subscription via Stripe. When a purchase was complete Stripe would send a webhook to our app (https://docs.stripe.com/webhooks/quickstart) with the user's phone number and this allowed us to seamlessly authenticate paying users via their phone number. Stripe also sent webhooks when the subscription expired.
 	* Add `STRIPE_API_KEY` and `STRIPE_SECRET` to your .env file.
 
-* Google Cloud Storage (optional and not recommended).
+* Google Cloud Storage (optional).
 
 **Important** Everything in your .env file is a secret, don't share it with anyone else (and don't accidentally commit it -- it could be an expensive mistake).
 
 
 ### <a name="setup"></a>Setup
 
-Since Bobby interacts with many other external API's and micro-services (e.g. Stripe, EmailOctopus etc) this code will **not** run out of the box and will require some setup.
+Since Bobby interacts with many other external API's and micro-services (e.g. Stripe, EmailOctopus etc.) this code will **not** run out of the box and will require some setup.
 
 #### <a name="import"></a>1. Importing the Twilio Flows into Twilio Studio.
 
