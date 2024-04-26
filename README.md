@@ -191,10 +191,6 @@ If you are serious about building mental health apps, check out this [document](
 
 ![MHRA Intended purpose](intended_purpose.png)
 
-### <a name="gdpr"></a>Where can I learn more about GDPR?
-
-A great place to learn about GDPR is the [Information Commissioners Office](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/).
-
 ### <a name="whatsapp"></a>Why did you use WhatsApp?
 
 If you are anything like me, you probably already have 100 apps on your phone, some of which you NEVER open. One app I, and 2 billion other people, use regularly is WhatsApp. It's a familiar user interface with no download required. It's also easy to send people notifications of new features and reminders. You can even give people a link to connect directly to your bot, `https://wa.me/<number>`. Yes, it's really THAT SIMPLE!
